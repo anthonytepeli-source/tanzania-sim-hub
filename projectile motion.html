@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projectile Motion — Simulator</title>
+<style>
+  *{box-sizing:border-box;}
+  html,body{
+    height:100%;margin:0;padding:0;overflow:hidden;
+    background:#ffffff;color:#000;
+    font-family:"Times New Roman", Times, Georgia, serif;
+    font-size:12pt;line-height:1.35;
+  }
+  .app{
+    height:100vh;display:grid;
+    grid-template-rows: auto auto auto minmax(0, 1fr);
+    padding:10px 18px 10px;gap:7px;overflow:hidden;
+  }
+
+  /* ---------- HEADER ---------- */
+  header{
+    display:flex;align-items:baseline;justify-content:space-between;
+    gap:16px;padding-bottom:5px;border-bottom:1.5px solid #000;
+  }
+  header h1{margin:0;font-size:15pt;font-weight:bold;color:#000;}
+  header h1 .sub{
+    font-size:10.5pt;font-weight:normal;font-style:italic;
+    color:#333;margin-left:12px;
+  }
+  header .right-block{display:flex;align-items:baseline;gap:18px;flex:none;}
+  header .status{font-size:11pt;font-style:italic;color:#333;}
+  header .status .dot{
+    display:inline-block;width:8px;height:8px;border-radius:50%;
+    background:#666;margin-right:6px;vertical-align:middle;
+  }
+  header .status.running .dot{background:#0a7d2b;}
+  header .status.paused  .dot{background:#b45309;}
+  header .btn-group{display:flex;gap:16px;align-items:baseline;}
+  header .btn{
+    background:none;border:none;padding:0 0 1px 0;
+    font-family:inherit;font-size:11pt;color:#000;cursor:pointer;
+    border-bottom:1px solid #000;letter-spacing:0;
+  }
+  header .btn:hover{font-weight:bold;}
+  header .btn.release{font-weight:bold;}
+  header .btn:active{color:#555;border-bottom-color:#555;}
+
+  /* ---------- CASE BAR ---------- */
+  .case-bar{
+    display:flex;align-items:baseline;gap:22px;
+    padding:2px 0 5px;
+  }
+  .case-bar .label{
+    font-size:10.5pt;font-style:italic;color:#333;flex:none;
+  }
+  .case-tabs{display:flex;gap:20px;flex-wrap:wrap;}
+  .case-tab{
+    background:none;border:none;padding:0 0 2px 0;
+    font-family:inherit;font-size:12pt;font-style:italic;
+    color:#1a3b5c;cursor:pointer;
+    border-bottom:1.5px solid transparent;
+    letter-spacing:0;transition:all .15s;
+  }
+  .case-tab:hover{color:#0d2440;font-weight:bold;}
+  .case-tab.active{
+    color:#000;font-weight:bold;
+    border-bottom:1.5px solid #000;
+  }
+
+  /* ---------- PARAMETER BAR ---------- */
+  .param-bar{
+    display:flex;flex-wrap:wrap;gap:12px 22px;
+    align-items:stretch;
+    padding:10px 16px;
+    background:#f3f7fc;
+    border:1.5px solid #b8c8dc;
+    border-radius:6px;
+    box-shadow:0 1px 3px rgba(20,50,90,0.06);
+  }
+
+  .p-block{
+    display:flex;flex-direction:column;
+    gap:5px;
+    min-width:168px;
+  }
+  .p-block-label{
+    font-style:italic;font-size:11pt;color:#000;
+    white-space:nowrap;
+  }
+  .p-block-label em{font-style:italic;font-weight:bold;}
+  .p-block-label .unit{
+    font-style:italic;font-weight:normal;
+    color:#556;font-size:10pt;
+    margin-left:4px;
+  }
+
+  .p-input-group{
+    display:flex;align-items:stretch;
+    border:1.5px solid #8aa4c4;
+    border-radius:6px;
+    background:#fff;
+    overflow:hidden;
+    box-shadow:inset 0 1px 2px rgba(20,50,90,0.05);
+  }
+
+  .p-btn{
+    background:linear-gradient(180deg,#eaf1fb,#d3dfee);
+    border:none;
+    padding:0;
+    width:34px;
+    font-family:"Times New Roman", Times, serif;
+    font-size:16pt;
+    font-weight:bold;
+    color:#1d4ed8;
+    cursor:pointer;
+    line-height:1;
+    display:flex;align-items:center;justify-content:center;
+    user-select:none;
+    transition:background .1s;
+  }
+  .p-btn:hover{background:linear-gradient(180deg,#dbe7f7,#bcd0e8);}
+  .p-btn:active{
+    background:linear-gradient(180deg,#bcd0e8,#a4bfdd);
+    color:#1e3a8a;
+  }
+  .p-btn.p-btn-minus{
+    border-right:1.5px solid #8aa4c4;
+  }
+  .p-btn.p-btn-plus{
+    border-left:1.5px solid #8aa4c4;
+  }
+  .p-btn:disabled{
+    color:#b0b8c4;
+    background:#eef2f8;
+    cursor:not-allowed;
+  }
+
+  .p-field{
+    flex:1;
+    min-width:72px;
+    border:none;
+    outline:none;
+    background:#fff;
+    text-align:center;
+    font-family:"Times New Roman", Times, serif;
+    font-weight:bold;
+    font-size:12pt;
+    color:#1e3a8a;
+    padding:8px 4px;
+    font-variant-numeric:tabular-nums;
+    -moz-appearance:textfield;
+    letter-spacing:0.2px;
+  }
+  .p-field::-webkit-outer-spin-button,
+  .p-field::-webkit-inner-spin-button{
+    -webkit-appearance:none;
+    margin:0;
+  }
+  .p-field:focus{
+    background:#fffbf0;
+    box-shadow:inset 0 0 0 2px #f3c44a;
+  }
+
+  /* ---------- MAIN ---------- */
+  .main{
+    display:grid;
+    grid-template-columns: 1fr 300px;
+    gap:18px;
+    min-height:0;overflow:hidden;
+  }
+  .sim-panel{
+    position:relative;display:flex;align-items:center;justify-content:center;
+    min-width:0;min-height:0;background:#fff;
+    border:1px solid #cfd8e4;
+    border-radius:4px;overflow:hidden;
+  }
+  .sim-panel canvas{display:block;}
+
+  .sidebar{
+    display:flex;flex-direction:column;gap:10px;
+    padding-left:18px;border-left:1px solid #c8c8c8;
+    overflow-y:auto;min-height:0;
+  }
+  .sidebar::-webkit-scrollbar{width:6px;}
+  .sidebar::-webkit-scrollbar-thumb{background:#bbb;}
+  .sidebar::-webkit-scrollbar-track{background:#f0f0f0;}
+  .sidebar h2{
+    margin:0 0 6px 0;font-size:11pt;font-weight:bold;
+    font-style:italic;color:#000;letter-spacing:.2px;
+  }
+  .sidebar section{
+    padding-bottom:10px;border-bottom:1px solid #d8d8d8;
+  }
+  .sidebar section:last-child{border-bottom:none;padding-bottom:0;}
+
+  .live-table{
+    width:100%;border-collapse:collapse;
+    font-size:11pt;line-height:1.25;
+  }
+  .live-table tbody td{padding:3px 0;vertical-align:baseline;}
+  .live-table tbody td.k{font-style:italic;color:#000;}
+  .live-table tbody td.v{
+    text-align:right;
+    font-variant-numeric:tabular-nums;
+    font-feature-settings:"tnum" 1;
+    font-weight:bold;white-space:nowrap;padding-left:12px;
+  }
+  .live-table tbody td.v .u{
+    font-style:italic;font-weight:normal;font-size:10pt;
+    color:#333;margin-left:3px;
+  }
+  .live-table tbody tr:first-child td{
+    border-top:1px solid #000;padding-top:4px;
+  }
+  .live-table tbody tr:last-child td{
+    border-bottom:1px solid #000;padding-bottom:4px;
+  }
+
+  .formula-block{
+    font-size:10pt;line-height:1.55;
+    font-style:italic;color:#111;
+  }
+  .formula-block .eq{
+    display:block;font-family:"Times New Roman", Times, serif;
+    font-style:normal;font-size:10.5pt;margin:2px 0;
+  }
+  .formula-block .comment{
+    font-style:italic;color:#555;font-size:9.5pt;margin-top:4px;
+  }
+
+  /* ---------- TOAST ---------- */
+  .toast{
+    position:fixed;top:58px;left:50%;
+    transform:translateX(-50%) translateY(-60px);
+    background:#000;color:#fff;padding:6px 15px;
+    font-family:"Times New Roman", Times, serif;
+    font-size:11pt;font-style:italic;
+    opacity:0;pointer-events:none;
+    transition:opacity .22s, transform .22s;
+    z-index:999;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  .hint-note{
+    font-size:10pt;font-style:italic;color:#556;
+    margin-top:4px;
+  }
+
+  @media(max-width:900px){
+    .main{grid-template-columns:1fr;grid-template-rows:1fr auto;}
+    .sidebar{border-left:none;border-top:1px solid #c8c8c8;
+             padding-left:0;padding-top:10px;
+             flex-direction:row;overflow-x:auto;overflow-y:hidden;
+             max-height:200px;}
+    .sidebar section{min-width:220px;border-bottom:none;
+                     border-right:1px solid #d8d8d8;
+                     padding-right:14px;padding-bottom:0;}
+    .sidebar section:last-child{border-right:none;}
+  }
+  @media(max-width:640px), (max-height:560px){
+    html,body{overflow:auto;height:auto;}
+    .app{height:auto;min-height:100vh;}
+    .sim-panel{min-height:400px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ============ HEADER ============ -->
+  <header>
+    <div>
+      <h1>Projectile Motion<span class="sub">Cambridge A Level Physics &middot; 9702</span></h1>
+    </div>
+    <div class="right-block">
+      <span class="status" id="statusTag"><span class="dot"></span><span id="statusText">Ready</span></span>
+      <div class="btn-group">
+        <button class="btn release" id="btnStart">Launch</button>
+        <button class="btn" id="btnPause">Pause</button>
+        <button class="btn" id="btnReset">Reset</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ CASE BAR ============ -->
+  <div class="case-bar">
+    <span class="label">Case:</span>
+    <div class="case-tabs" id="caseTabs">
+      <button class="case-tab" data-case="horizontal">Horizontal</button>
+      <button class="case-tab active" data-case="ground">From ground</button>
+      <button class="case-tab" data-case="height">From height</button>
+      <button class="case-tab" data-case="monkey">Monkey &amp; hunter</button>
+    </div>
+  </div>
+
+  <!-- ============ PARAMETER BAR ============ -->
+  <div class="param-bar" id="paramBar">
+
+    <div class="p-block" id="pU">
+      <span class="p-block-label">Initial speed <em>u</em><span class="unit">(m/s)</span></span>
+      <div class="p-input-group">
+        <button class="p-btn p-btn-minus" data-target="U" data-dir="-1" type="button">&minus;</button>
+        <input class="p-field" type="number" id="inU" value="20.0" min="2" max="60" step="0.5">
+        <button class="p-btn p-btn-plus" data-target="U" data-dir="1" type="button">+</button>
+      </div>
+    </div>
+
+    <div class="p-block" id="pTheta">
+      <span class="p-block-label">Launch angle <em>&theta;</em><span class="unit">(&deg;)</span></span>
+      <div class="p-input-group">
+        <button class="p-btn p-btn-minus" data-target="Theta" data-dir="-1" type="button">&minus;</button>
+        <input class="p-field" type="number" id="inTheta" value="45.0" min="0" max="90" step="0.5">
+        <button class="p-btn p-btn-plus" data-target="Theta" data-dir="1" type="button">+</button>
+      </div>
+    </div>
+
+    <div class="p-block" id="pH">
+      <span class="p-block-label" id="lblH">Height <em>h</em><span class="unit">(m)</span></span>
+      <div class="p-input-group">
+        <button class="p-btn p-btn-minus" data-target="H" data-dir="-1" type="button">&minus;</button>
+        <input class="p-field" type="number" id="inH" value="20.0" min="1" max="80" step="0.5">
+        <button class="p-btn p-btn-plus" data-target="H" data-dir="1" type="button">+</button>
+      </div>
+    </div>
+
+    <div class="p-block" id="pD" style="display:none;">
+      <span class="p-block-label">Monkey distance <em>d</em><span class="unit">(m)</span></span>
+      <div class="p-input-group">
+        <button class="p-btn p-btn-minus" data-target="D" data-dir="-1" type="button">&minus;</button>
+        <input class="p-field" type="number" id="inD" value="30.0" min="5" max="80" step="0.5">
+        <button class="p-btn p-btn-plus" data-target="D" data-dir="1" type="button">+</button>
+      </div>
+    </div>
+
+    <div class="p-block" id="pG">
+      <span class="p-block-label">Gravity <em>g</em><span class="unit">(m/s&sup2;)</span></span>
+      <div class="p-input-group">
+        <button class="p-btn p-btn-minus" data-target="G" data-dir="-1" type="button">&minus;</button>
+        <input class="p-field" type="number" id="inG" value="9.81" min="1" max="25" step="0.01">
+        <button class="p-btn p-btn-plus" data-target="G" data-dir="1" type="button">+</button>
+      </div>
+    </div>
+
+    <div class="p-block" id="pSpeed">
+      <span class="p-block-label">Animation rate<span class="unit">(&times;)</span></span>
+      <div class="p-input-group">
+        <button class="p-btn p-btn-minus" data-target="Speed" data-dir="-1" type="button">&minus;</button>
+        <input class="p-field" type="number" id="inSpeed" value="1.00" min="0.1" max="3" step="0.05">
+        <button class="p-btn p-btn-plus" data-target="Speed" data-dir="1" type="button">+</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============ MAIN ============ -->
+  <div class="main">
+    <div class="sim-panel" id="simPanel">
+      <canvas id="simCanvas"></canvas>
+    </div>
+
+    <aside class="sidebar">
+      <section>
+        <h2>Live data</h2>
+        <table class="live-table">
+          <tbody>
+            <tr><td class="k">Time <i>t</i></td>
+                <td class="v"><span id="readT">0.00</span><span class="u">s</span></td></tr>
+            <tr><td class="k">Horizontal <i>x</i></td>
+                <td class="v"><span id="readX">0.00</span><span class="u">m</span></td></tr>
+            <tr><td class="k">Height <i>y</i></td>
+                <td class="v"><span id="readY">0.00</span><span class="u">m</span></td></tr>
+            <tr><td class="k">Horizontal <i>v<sub>x</sub></i></td>
+                <td class="v"><span id="readVx">0.00</span><span class="u">m/s</span></td></tr>
+            <tr><td class="k">Vertical <i>v<sub>y</sub></i></td>
+                <td class="v"><span id="readVy">0.00</span><span class="u">m/s</span></td></tr>
+            <tr><td class="k">Resultant <i>v</i></td>
+                <td class="v"><span id="readV">0.00</span><span class="u">m/s</span></td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Predicted</h2>
+        <table class="live-table">
+          <tbody>
+            <tr><td class="k">Flight time <i>T</i></td>
+                <td class="v"><span id="readTOF">0.00</span><span class="u">s</span></td></tr>
+            <tr><td class="k">Range <i>R</i></td>
+                <td class="v"><span id="readR">0.00</span><span class="u">m</span></td></tr>
+            <tr><td class="k">Max height <i>H</i></td>
+                <td class="v"><span id="readH">0.00</span><span class="u">m</span></td></tr>
+            <tr id="rowAim" style="display:none;">
+                <td class="k">Aim <i>&theta;</i><sub>aim</sub></td>
+                <td class="v"><span id="readAim">&mdash;</span><span class="u">&deg;</span></td></tr>
+            <tr id="rowHit" style="display:none;">
+                <td class="k">Impact height</td>
+                <td class="v"><span id="readHit">&mdash;</span><span class="u">m</span></td></tr>
+          </tbody>
+        </table>
+        <div class="hint-note" id="dragHint">
+          Tip: drag the blue handles on the canvas to change angle or height.
+        </div>
+      </section>
+
+      <section>
+        <h2>Formulas</h2>
+        <div class="formula-block" id="formulaBlock"></div>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toastMsg">Ready</span></div>
+
+<script>
+/* ==================================================================
+   STATE
+   ================================================================== */
+const state = {
+  case: 'ground',
+  u: 20,
+  thetaDeg: 45,
+  h: 20,
+  d: 30,
+  g: 9.81,
+  t: 0,
+  running: false,
+  holding: false,
+  holdUntil: 0,
+  timeScale: 1.0,
+  showFullPath: true,
+  showComponents: true,
+  dragging: null
+};
+
+const PAD_TIME_AFTER_LAND = 1.2;
+const DPR = window.devicePixelRatio || 1;
+
+/* ==================================================================
+   PHYSICS
+   ================================================================== */
+const DEG = Math.PI / 180;
+
+function launchConfig(){
+  const th = state.thetaDeg * DEG;
+  switch (state.case){
+    case 'horizontal':
+      return { x0: 0, y0: state.h, vx0: state.u, vy0: 0 };
+    case 'ground':
+      return { x0: 0, y0: 0, vx0: state.u * Math.cos(th), vy0: state.u * Math.sin(th) };
+    case 'height':
+      return { x0: 0, y0: state.h, vx0: state.u * Math.cos(th), vy0: state.u * Math.sin(th) };
+    case 'monkey': {
+      const thAim = Math.atan2(state.h, state.d);
+      return { x0: 0, y0: 0, vx0: state.u * Math.cos(thAim), vy0: state.u * Math.sin(thAim), aim: thAim };
+    }
+  }
+}
+
+function projectileAt(t){
+  const c = launchConfig();
+  return {
+    x: c.x0 + c.vx0 * t,
+    y: c.y0 + c.vy0 * t - 0.5 * state.g * t * t,
+    vx: c.vx0,
+    vy: c.vy0 - state.g * t
+  };
+}
+function monkeyAt(t){
+  return { x: state.d, y: Math.max(0, state.h - 0.5 * state.g * t * t) };
+}
+
+function timeOfFlight(){
+  const c = launchConfig();
+  switch (state.case){
+    case 'horizontal': return Math.sqrt(2 * state.h / state.g);
+    case 'ground':     return 2 * c.vy0 / state.g;
+    case 'height': {
+      const vy0 = c.vy0;
+      return (vy0 + Math.sqrt(vy0 * vy0 + 2 * state.g * state.h)) / state.g;
+    }
+    case 'monkey': {
+      const tColl = state.d / c.vx0;
+      const yColl = state.h - 0.5 * state.g * tColl * tColl;
+      if (yColl > 0) return tColl;
+      return 2 * c.vy0 / state.g;
+    }
+  }
+}
+
+function predictions(){
+  const c = launchConfig();
+  const T = timeOfFlight();
+  let peak = 0;
+  for (let i = 0; i <= 200; i++){
+    const p = projectileAt(T * i / 200);
+    if (p.y > peak) peak = p.y;
+  }
+  let hitY = null;
+  if (state.case === 'monkey'){
+    const tColl = state.d / c.vx0;
+    const yColl = state.h - 0.5 * state.g * tColl * tColl;
+    if (yColl > 0) hitY = yColl;
+  }
+  return { T, range: c.vx0 * T, peak, hitY };
+}
+
+function worldBounds(){
+  const T = timeOfFlight();
+  let maxX = 0, maxY = 0;
+  for (let i = 0; i <= 200; i++){
+    const p = projectileAt(T * i / 200);
+    if (p.x > maxX) maxX = p.x;
+    if (p.y > maxY) maxY = p.y;
+  }
+  if (state.case === 'monkey'){
+    maxX = Math.max(maxX, state.d);
+    maxY = Math.max(maxY, state.h);
+  }
+  if (state.case === 'horizontal' || state.case === 'height'){
+    maxY = Math.max(maxY, state.h);
+  }
+  const padX = Math.max(4.0, maxX * 0.12);
+  const padY = Math.max(2.0, maxY * 0.14);
+  return { minX: -padX * 0.7, maxX: maxX + padX, minY: 0, maxY: maxY + padY };
+}
+
+/* ==================================================================
+   CANVAS
+   ================================================================== */
+const simCanvas = document.getElementById('simCanvas');
+const simPanel  = document.getElementById('simPanel');
+const ctx       = simCanvas.getContext('2d', { alpha: false });
+
+const VW = 960, VH = 680;
+
+function syncCanvas(){
+  const availW = Math.max(120, simPanel.clientWidth  - 4);
+  const availH = Math.max(120, simPanel.clientHeight - 4);
+  const aspect = VW / VH;
+  let w = availW, h = w / aspect;
+  if (h > availH){ h = availH; w = h * aspect; }
+  w = Math.round(w); h = Math.round(h);
+  const needW = Math.round(w * DPR);
+  const needH = Math.round(h * DPR);
+  if (simCanvas.width !== needW || simCanvas.height !== needH){
+    simCanvas.width  = needW;
+    simCanvas.height = needH;
+    simCanvas.style.width  = w + 'px';
+    simCanvas.style.height = h + 'px';
+  }
+  ctx.setTransform(needW / VW, 0, 0, needH / VH, 0, 0);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.textBaseline = 'middle';
+}
+
+const FONT = '"Times New Roman", Times, Georgia, serif';
+
+function makeTransform(bounds){
+  const MARGIN = { l: 78, r: 48, t: 60, b: 88 };
+  const availW = VW - MARGIN.l - MARGIN.r;
+  const availH = VH - MARGIN.t - MARGIN.b;
+  const wW = bounds.maxX - bounds.minX;
+  const wH = bounds.maxY - bounds.minY;
+  const scale = Math.min(availW / wW, availH / wH);
+  const usedW = wW * scale;
+  const usedH = wH * scale;
+  const offX = MARGIN.l + (availW - usedW) / 2;
+  const offY = MARGIN.t + (availH - usedH) / 2;
+  return {
+    scale,
+    xToScreen: wx => offX + (wx - bounds.minX) * scale,
+    yToScreen: wy => offY + (bounds.maxY - wy) * scale,
+    screenToX: sx => bounds.minX + (sx - offX) / scale,
+    screenToY: sy => bounds.maxY - (sy - offY) / scale,
+    offX, offY, bounds
+  };
+}
+
+/* ==================================================================
+   GRASS DECOR
+   ================================================================== */
+const GRASS_DECOR = (function(){
+  let s = 987654321;
+  const rand = () => { s = (s * 1103515245 + 12345) % 2147483648; return s / 2147483648; };
+  const arr = [];
+  for (let i = 0; i < 70; i++) arr.push({type:'tuft', xf:rand(), size:8+rand()*12, shade:rand()});
+  for (let i = 0; i < 200; i++) arr.push({type:'blade', xf:rand(), yf:rand(), size:4+rand()*7, shade:rand()});
+  for (let i = 0; i < 18; i++) arr.push({type:'flower', xf:rand(), yf:rand(), size:2.2+rand()*1.4, shade:rand()});
+  return arr;
+})();
+
+/* ==================================================================
+   SCENERY
+   ================================================================== */
+function drawSky(){
+  const sky = ctx.createLinearGradient(0, 0, 0, VH);
+  sky.addColorStop(0.00, '#4b91d8');
+  sky.addColorStop(0.35, '#7ab5e6');
+  sky.addColorStop(0.70, '#b3d9f2');
+  sky.addColorStop(1.00, '#d9ecf8');
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, VW, VH);
+}
+function drawSun(){
+  const sx = VW - 130, sy = 100, R = 40;
+  const halo = ctx.createRadialGradient(sx, sy, 0, sx, sy, R * 3.2);
+  halo.addColorStop(0.00, 'rgba(255, 235, 130, 0.55)');
+  halo.addColorStop(0.35, 'rgba(255, 220, 100, 0.22)');
+  halo.addColorStop(1.00, 'rgba(255, 200, 80, 0.00)');
+  ctx.beginPath(); ctx.arc(sx, sy, R * 3.2, 0, 2 * Math.PI);
+  ctx.fillStyle = halo; ctx.fill();
+  const body = ctx.createRadialGradient(sx - R*0.3, sy - R*0.3, R*0.15, sx, sy, R);
+  body.addColorStop(0.00, '#fffde0');
+  body.addColorStop(0.55, '#ffe16a');
+  body.addColorStop(1.00, '#f5b800');
+  ctx.beginPath(); ctx.arc(sx, sy, R, 0, 2 * Math.PI);
+  ctx.fillStyle = body; ctx.fill();
+}
+function drawCloud(x, y, scale){
+  ctx.save(); ctx.translate(x, y); ctx.scale(scale, scale);
+  const blobs = [
+    {dx:  0,  dy:  0,  r: 26}, {dx: 28, dy: 6,  r: 22}, {dx:-26, dy: 8,  r: 20},
+    {dx: 12, dy:-12,  r: 24}, {dx:-12, dy:-10,  r: 22}, {dx: 44, dy:12, r: 16},
+    {dx:-42, dy: 14,  r: 14}
+  ];
+  ctx.save(); ctx.globalAlpha = 0.15; ctx.fillStyle = '#6a9bd0';
+  blobs.forEach(b => { ctx.beginPath(); ctx.arc(b.dx, b.dy + 6, b.r, 0, 2*Math.PI); ctx.fill(); });
+  ctx.restore();
+  const cg = ctx.createLinearGradient(0, -30, 0, 30);
+  cg.addColorStop(0, '#ffffff'); cg.addColorStop(0.7, '#f4f9ff'); cg.addColorStop(1, '#dbe8f5');
+  ctx.fillStyle = cg;
+  blobs.forEach(b => { ctx.beginPath(); ctx.arc(b.dx, b.dy, b.r, 0, 2*Math.PI); ctx.fill(); });
+  ctx.restore();
+}
+function drawClouds(){
+  drawCloud(140, 90, 1.00); drawCloud(390, 60, 0.75);
+  drawCloud(640, 110, 0.90); drawCloud(870, 60, 0.65);
+}
+function drawHills(groundY){
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(-50, groundY + 4);
+  ctx.quadraticCurveTo(VW*0.18, groundY-90, VW*0.42, groundY+4);
+  ctx.quadraticCurveTo(VW*0.55, groundY-55, VW*0.70, groundY+4);
+  ctx.quadraticCurveTo(VW*0.86, groundY-110, VW+50, groundY+4);
+  ctx.lineTo(VW+50, groundY+20); ctx.lineTo(-50, groundY+20); ctx.closePath();
+  const bg = ctx.createLinearGradient(0, groundY-110, 0, groundY+20);
+  bg.addColorStop(0, '#9dbf8a'); bg.addColorStop(1, '#7ba368');
+  ctx.fillStyle = bg; ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(-50, groundY + 4);
+  ctx.quadraticCurveTo(VW*0.30, groundY-55, VW*0.60, groundY+4);
+  ctx.quadraticCurveTo(VW*0.80, groundY-40, VW+50, groundY+4);
+  ctx.lineTo(VW+50, groundY+20); ctx.lineTo(-50, groundY+20); ctx.closePath();
+  const fg = ctx.createLinearGradient(0, groundY-55, 0, groundY+20);
+  fg.addColorStop(0, '#88b874'); fg.addColorStop(1, '#6d9e58');
+  ctx.fillStyle = fg; ctx.fill();
+  ctx.restore();
+}
+function drawGrass(groundY){
+  const g = ctx.createLinearGradient(0, groundY, 0, VH);
+  g.addColorStop(0.00, '#7fbb62');
+  g.addColorStop(0.25, '#6ba850');
+  g.addColorStop(0.65, '#4f8c3a');
+  g.addColorStop(1.00, '#356b28');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, groundY, VW, VH - groundY);
+  const sp = ctx.createLinearGradient(0, groundY, 0, groundY + 40);
+  sp.addColorStop(0, 'rgba(200,235,150,0.55)');
+  sp.addColorStop(1, 'rgba(200,235,150,0.00)');
+  ctx.fillStyle = sp;
+  ctx.fillRect(0, groundY, VW, 40);
+  const grassH = VH - groundY;
+  GRASS_DECOR.forEach(d => {
+    const x = d.xf * VW;
+    if (d.type === 'tuft'){
+      const baseY = groundY + 2;
+      const col = d.shade < 0.33 ? '#3d7328' : d.shade < 0.66 ? '#4f8c3a' : '#5fa34a';
+      ctx.strokeStyle = col; ctx.lineWidth = 1.6; ctx.beginPath();
+      const blades = 4;
+      for (let k = 0; k < blades; k++){
+        const dx = (k - (blades - 1) / 2) * 2.4;
+        const bh = d.size * (0.7 + 0.4 * Math.abs(Math.sin(k*2.1 + d.xf*40)));
+        ctx.moveTo(x + dx, baseY);
+        ctx.quadraticCurveTo(x + dx + (dx>0?2:-2), baseY - bh*0.5,
+                             x + dx + (dx>0?1:-1), baseY - bh);
+      }
+      ctx.stroke();
+    } else if (d.type === 'blade'){
+      const y = groundY + d.yf * grassH * 0.85 + 6;
+      ctx.strokeStyle = d.shade < 0.5 ? 'rgba(50,90,35,0.55)' : 'rgba(120,175,95,0.55)';
+      ctx.lineWidth = 1.2; ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.quadraticCurveTo(x + 2, y - d.size*0.6, x, y - d.size);
+      ctx.stroke();
+    } else if (d.type === 'flower'){
+      const y = groundY + d.yf * grassH * 0.75 + 20;
+      ctx.fillStyle = d.shade < 0.5 ? '#ffd966' : '#ffffff';
+      for (let k = 0; k < 5; k++){
+        const a = k * 2 * Math.PI / 5;
+        ctx.beginPath();
+        ctx.arc(x + d.size*Math.cos(a), y + d.size*Math.sin(a), d.size*0.9, 0, 2*Math.PI);
+        ctx.fill();
+      }
+      ctx.fillStyle = '#e8a638';
+      ctx.beginPath(); ctx.arc(x, y, d.size*0.7, 0, 2*Math.PI); ctx.fill();
+    }
+  });
+}
+function drawGroundLine(groundY){
+  const g = ctx.createLinearGradient(0, groundY - 1, 0, groundY + 6);
+  g.addColorStop(0, '#5c3b1e'); g.addColorStop(1, '#7a5232');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, groundY, VW, 4);
+}
+
+/* ==================================================================
+   CANNON
+   ================================================================== */
+function drawCannon(tf){
+  const c = launchConfig();
+  const px = tf.xToScreen(c.x0);
+  const py = tf.yToScreen(c.y0);
+
+  let ang;
+  if (state.case === 'horizontal') ang = 0;
+  else if (state.case === 'monkey') ang = c.aim;
+  else ang = state.thetaDeg * DEG;
+
+  ctx.save();
+  ctx.translate(px, py);
+
+  ctx.save(); ctx.scale(1, 0.35);
+  ctx.beginPath(); ctx.arc(0, 0, 28, 0, 2*Math.PI);
+  ctx.fillStyle = 'rgba(0,0,0,0.22)'; ctx.fill();
+  ctx.restore();
+
+  ctx.save(); ctx.translate(-10, 4);
+  ctx.beginPath(); ctx.arc(0, 0, 12, 0, 2*Math.PI);
+  const wg = ctx.createRadialGradient(-3,-3,2,0,0,12);
+  wg.addColorStop(0,'#8a8f95'); wg.addColorStop(0.55,'#4b5057'); wg.addColorStop(1,'#25282c');
+  ctx.fillStyle = wg; ctx.fill();
+  ctx.strokeStyle = '#1a1c1f'; ctx.lineWidth = 1.2; ctx.stroke();
+  ctx.beginPath(); ctx.arc(0, 0, 3.5, 0, 2*Math.PI);
+  ctx.fillStyle = '#c8cdd3'; ctx.fill();
+  ctx.strokeStyle = '#c8cdd3'; ctx.lineWidth = 1;
+  for (let k = 0; k < 6; k++){
+    const a = k * Math.PI / 3;
+    ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(9*Math.cos(a), 9*Math.sin(a)); ctx.stroke();
+  }
+  ctx.restore();
+
+  ctx.beginPath();
+  ctx.moveTo(-24,-4); ctx.lineTo(10,-10); ctx.lineTo(14,0); ctx.lineTo(-26,6); ctx.closePath();
+  const wood = ctx.createLinearGradient(0,-10,0,8);
+  wood.addColorStop(0,'#9a6a3d'); wood.addColorStop(0.55,'#7a5028'); wood.addColorStop(1,'#523315');
+  ctx.fillStyle = wood; ctx.fill();
+  ctx.strokeStyle = '#3d2410'; ctx.lineWidth = 1.1; ctx.stroke();
+
+  ctx.save();
+  ctx.rotate(-ang);
+
+  const barrelLen = 62, barrelW = 16;
+  ctx.beginPath();
+  ctx.moveTo(6, -barrelW/2); ctx.lineTo(6, barrelW/2);
+  ctx.lineTo(barrelLen, barrelW/2); ctx.lineTo(barrelLen + 6, 0);
+  ctx.lineTo(barrelLen, -barrelW/2); ctx.closePath();
+  const metal = ctx.createLinearGradient(0, -barrelW/2, 0, barrelW/2);
+  metal.addColorStop(0,'#5a5e64'); metal.addColorStop(0.35,'#8f959c');
+  metal.addColorStop(0.55,'#b8bec5'); metal.addColorStop(1,'#3d4145');
+  ctx.fillStyle = metal; ctx.fill();
+  ctx.strokeStyle = '#1e2124'; ctx.lineWidth = 1.2; ctx.stroke();
+
+  ctx.beginPath();
+  ctx.ellipse(barrelLen + 2, 0, 4, barrelW/2 - 1, 0, 0, 2*Math.PI);
+  ctx.fillStyle = '#2b2e32'; ctx.fill();
+  ctx.strokeStyle = '#151719'; ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(20, -barrelW/2); ctx.lineTo(20, barrelW/2);
+  ctx.moveTo(38, -barrelW/2); ctx.lineTo(38, barrelW/2);
+  ctx.strokeStyle = '#2b2e32'; ctx.lineWidth = 1.5; ctx.stroke();
+
+  ctx.beginPath(); ctx.arc(2, 0, 7, 0, 2*Math.PI);
+  const br = ctx.createRadialGradient(-1,-1,1,2,0,7);
+  br.addColorStop(0,'#c8cdd3'); br.addColorStop(0.6,'#6a6f75'); br.addColorStop(1,'#2b2e32');
+  ctx.fillStyle = br; ctx.fill();
+  ctx.strokeStyle = '#1a1c1f'; ctx.lineWidth = 1; ctx.stroke();
+
+  ctx.restore();
+
+  if (state.case === 'ground' || state.case === 'height'){
+    const tipX = 62 * Math.cos(-ang);
+    const tipY = 62 * Math.sin(-ang);
+    ctx.beginPath(); ctx.arc(tipX, tipY, 11, 0, 2*Math.PI);
+    ctx.fillStyle = 'rgba(29,78,216,0.18)'; ctx.fill();
+    ctx.beginPath(); ctx.arc(tipX, tipY, 8, 0, 2*Math.PI);
+    ctx.fillStyle = '#1d4ed8'; ctx.fill();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+  }
+
+  ctx.restore();
+
+  ctx.fillStyle = '#1a3b5c';
+  ctx.font = 'italic bold 13px ' + FONT;
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'top';
+  ctx.fillText('O', -22, 10);
+}
+
+/* ==================================================================
+   MISSILE
+   ================================================================== */
+function drawSmokeTrail(tf, tNow){
+  if (tNow <= 0.02) return;
+  for (let i = 0; i < 26; i++){
+    const frac = i / 26;
+    const p = projectileAt(tNow * frac);
+    const px = tf.xToScreen(p.x);
+    const py = tf.yToScreen(Math.max(0, p.y));
+    const alpha = 0.04 + 0.10 * (1 - frac);
+    const radius = 4 + 6 * frac;
+    ctx.beginPath(); ctx.arc(px, py, radius, 0, 2*Math.PI);
+    ctx.fillStyle = 'rgba(220, 225, 235, ' + alpha + ')'; ctx.fill();
+  }
+}
+function drawMissile(px, py, angle){
+  ctx.save(); ctx.translate(px, py); ctx.rotate(angle);
+
+  ctx.beginPath();
+  ctx.moveTo(-13,0); ctx.lineTo(-19,-4); ctx.lineTo(-24,0); ctx.lineTo(-19,4); ctx.closePath();
+  const flame = ctx.createLinearGradient(-24, 0, -13, 0);
+  flame.addColorStop(0,'rgba(255,90,20,0.15)');
+  flame.addColorStop(0.4,'rgba(255,160,40,0.75)');
+  flame.addColorStop(1,'rgba(255,230,130,0.95)');
+  ctx.fillStyle = flame; ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(-14,0); ctx.lineTo(-18,-2); ctx.lineTo(-21,0); ctx.lineTo(-18,2); ctx.closePath();
+  ctx.fillStyle = 'rgba(255,250,200,0.95)'; ctx.fill();
+
+  ctx.beginPath(); ctx.moveTo(-10,-5); ctx.lineTo(-14,-10); ctx.lineTo(-6,-5); ctx.closePath();
+  ctx.fillStyle = '#8a2318'; ctx.fill();
+  ctx.strokeStyle = '#4a0f08'; ctx.lineWidth = 0.8; ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(-10,5); ctx.lineTo(-14,10); ctx.lineTo(-6,5); ctx.closePath();
+  ctx.fillStyle = '#8a2318'; ctx.fill(); ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(-12,-5); ctx.lineTo(8,-5);
+  ctx.quadraticCurveTo(16,-5,16,0);
+  ctx.quadraticCurveTo(16,5,8,5);
+  ctx.lineTo(-12,5); ctx.closePath();
+  const body = ctx.createLinearGradient(0,-5,0,5);
+  body.addColorStop(0,'#e8ecef'); body.addColorStop(0.45,'#b9c2c9');
+  body.addColorStop(0.7,'#8f979e'); body.addColorStop(1,'#5a6068');
+  ctx.fillStyle = body; ctx.fill();
+  ctx.strokeStyle = '#2b2f33'; ctx.lineWidth = 1; ctx.stroke();
+
+  ctx.beginPath(); ctx.moveTo(6,-5); ctx.lineTo(16,0); ctx.lineTo(6,5); ctx.closePath();
+  const nose = ctx.createLinearGradient(6,0,16,0);
+  nose.addColorStop(0,'#c13030'); nose.addColorStop(1,'#e85555');
+  ctx.fillStyle = nose; ctx.fill();
+  ctx.strokeStyle = '#4a0f08'; ctx.stroke();
+
+  ctx.beginPath(); ctx.moveTo(-2,-5); ctx.lineTo(-2,5);
+  ctx.strokeStyle = '#2b2f33'; ctx.lineWidth = 1.2; ctx.stroke();
+
+  ctx.beginPath(); ctx.moveTo(-10,-3); ctx.lineTo(6,-3);
+  ctx.strokeStyle = 'rgba(255,255,255,0.65)'; ctx.lineWidth = 1.2; ctx.stroke();
+
+  ctx.restore();
+}
+
+/* ==================================================================
+   MONKEY
+   ================================================================== */
+function drawMonkeyRich(x, y, tNow){
+  ctx.save();
+  const isFalling = (tNow > 0.001);
+
+  if (!isFalling){
+    ctx.beginPath();
+    ctx.moveTo(x - 40, y - 26);
+    ctx.quadraticCurveTo(x, y - 34, x + 40, y - 26);
+    ctx.strokeStyle = '#5b3a1e'; ctx.lineWidth = 5;
+    ctx.lineCap = 'round'; ctx.stroke();
+  }
+
+  ctx.beginPath(); ctx.arc(x, y, 11, 0, 2*Math.PI);
+  const body = ctx.createRadialGradient(x-3, y-3, 1, x, y, 11);
+  body.addColorStop(0,'#a86d3f'); body.addColorStop(0.55,'#8a5327'); body.addColorStop(1,'#5b3418');
+  ctx.fillStyle = body; ctx.fill();
+  ctx.strokeStyle = '#3d2210'; ctx.lineWidth = 1; ctx.stroke();
+
+  ctx.beginPath(); ctx.arc(x, y - 14, 8, 0, 2*Math.PI);
+  const head = ctx.createRadialGradient(x-2, y-16, 1, x, y-14, 8);
+  head.addColorStop(0,'#b87e4c'); head.addColorStop(0.6,'#8a5327'); head.addColorStop(1,'#5b3418');
+  ctx.fillStyle = head; ctx.fill();
+  ctx.strokeStyle = '#3d2210'; ctx.stroke();
+
+  ctx.beginPath(); ctx.arc(x, y - 14, 5, 0, 2*Math.PI);
+  ctx.fillStyle = '#e8b98a'; ctx.fill();
+
+  ctx.beginPath(); ctx.arc(x - 8, y - 14, 2.6, 0, 2*Math.PI);
+  ctx.fillStyle = '#8a5327'; ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.arc(x + 8, y - 14, 2.6, 0, 2*Math.PI);
+  ctx.fillStyle = '#8a5327'; ctx.fill(); ctx.stroke();
+
+  ctx.fillStyle = '#1a0e05';
+  ctx.beginPath(); ctx.arc(x - 2.4, y - 15, 1.2, 0, 2*Math.PI); ctx.fill();
+  ctx.beginPath(); ctx.arc(x + 2.4, y - 15, 1.2, 0, 2*Math.PI); ctx.fill();
+
+  ctx.beginPath();
+  ctx.arc(x, y - 12, 2.6, 0.15*Math.PI, 0.85*Math.PI);
+  ctx.strokeStyle = '#1a0e05'; ctx.lineWidth = 0.9; ctx.stroke();
+
+  ctx.strokeStyle = '#5b3418'; ctx.lineWidth = 2.6; ctx.lineCap = 'round';
+  if (!isFalling){
+    ctx.beginPath();
+    ctx.moveTo(x - 8, y - 6);
+    ctx.quadraticCurveTo(x - 12, y - 20, x - 10, y - 26);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x + 8, y - 6);
+    ctx.quadraticCurveTo(x + 12, y - 20, x + 10, y - 26);
+    ctx.stroke();
+  } else {
+    ctx.beginPath();
+    ctx.moveTo(x - 8, y - 4);
+    ctx.quadraticCurveTo(x - 16, y - 8, x - 18, y - 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x + 8, y - 4);
+    ctx.quadraticCurveTo(x + 16, y - 8, x + 18, y - 2);
+    ctx.stroke();
+  }
+
+  ctx.beginPath();
+  ctx.moveTo(x + 6, y + 8);
+  ctx.quadraticCurveTo(x + 14, y + 16, x + 6, y + 22);
+  ctx.quadraticCurveTo(x - 1, y + 26, x - 2, y + 20);
+  ctx.strokeStyle = '#5b3418'; ctx.lineWidth = 2.2; ctx.stroke();
+
+  ctx.restore();
+}
+
+/* ==================================================================
+   TRAJECTORY, VECTORS, MARKERS
+   ================================================================== */
+function drawTrajectory(tStart, tEnd, colour, width, dash, tf){
+  const N = 180;
+  ctx.save();
+  if (dash) ctx.setLineDash(dash);
+  ctx.beginPath();
+  for (let i = 0; i <= N; i++){
+    const t = tStart + (tEnd - tStart) * i / N;
+    const p = projectileAt(t);
+    const px = tf.xToScreen(p.x);
+    const py = tf.yToScreen(Math.max(0, p.y));
+    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+  }
+  ctx.strokeStyle = colour; ctx.lineWidth = width; ctx.stroke();
+  ctx.restore();
+}
+function drawVelocityVector(p, px, py){
+  const VSCALE = 6;
+  const vxPx =  p.vx * VSCALE;
+  const vyPx = -p.vy * VSCALE;
+  if (Math.hypot(vxPx, vyPx) < 4) return;
+
+  if (state.showComponents){
+    ctx.strokeStyle = '#0891b2'; ctx.fillStyle = '#0891b2'; ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px + vxPx, py); ctx.stroke();
+    if (Math.abs(vxPx) > 8) drawArrowHead(px + vxPx, py, vxPx > 0 ? 0 : Math.PI, '#0891b2');
+
+    ctx.strokeStyle = '#c2410c'; ctx.fillStyle = '#c2410c';
+    ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px, py + vyPx); ctx.stroke();
+    if (Math.abs(vyPx) > 8) drawArrowHead(px, py + vyPx, vyPx > 0 ? Math.PI/2 : -Math.PI/2, '#c2410c');
+
+    ctx.save(); ctx.setLineDash([3,4]);
+    ctx.strokeStyle = 'rgba(255,255,255,0.75)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(px + vxPx, py); ctx.lineTo(px + vxPx, py + vyPx); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(px, py + vyPx); ctx.lineTo(px + vxPx, py + vyPx); ctx.stroke();
+    ctx.restore();
+
+    ctx.font = 'italic bold 12px ' + FONT; ctx.textBaseline = 'middle';
+    if (Math.abs(vxPx) > 22){
+      ctx.fillStyle = '#0891b2'; ctx.textAlign = 'center';
+      ctx.fillText('v\u2093', px + vxPx*0.55, py - 10);
+    }
+    if (Math.abs(vyPx) > 22){
+      ctx.fillStyle = '#c2410c'; ctx.textAlign = 'right';
+      ctx.fillText('v\u1D67', px - 10, py + vyPx*0.55);
+    }
+  }
+
+  const ang = Math.atan2(vyPx, vxPx);
+  ctx.strokeStyle = '#0a7d2b'; ctx.fillStyle = '#0a7d2b'; ctx.lineWidth = 2.6;
+  ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px + vxPx, py + vyPx); ctx.stroke();
+  drawArrowHead(px + vxPx, py + vyPx, ang, '#0a7d2b');
+  ctx.fillStyle = '#0a7d2b'; ctx.font = 'italic bold 13px ' + FONT;
+  ctx.textAlign = 'left';
+  ctx.fillText('v', px + vxPx + 8, py + vyPx - 4);
+}
+function drawArrowHead(x, y, ang, colour){
+  const s = 8;
+  ctx.save(); ctx.fillStyle = colour;
+  ctx.beginPath(); ctx.moveTo(x, y);
+  ctx.lineTo(x - s*Math.cos(ang-0.42), y - s*Math.sin(ang-0.42));
+  ctx.lineTo(x - s*Math.cos(ang+0.42), y - s*Math.sin(ang+0.42));
+  ctx.closePath(); ctx.fill(); ctx.restore();
+}
+function drawAimLine(tf){
+  const ox = tf.xToScreen(0), oy = tf.yToScreen(0);
+  const mx = tf.xToScreen(state.d), my = tf.yToScreen(state.h);
+  const dx = mx - ox, dy = my - oy;
+  const len = Math.hypot(dx, dy) || 1;
+  const ux = dx / len, uy = dy / len;
+  ctx.save(); ctx.setLineDash([4,6]);
+  ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = 1.4;
+  ctx.beginPath(); ctx.moveTo(ox, oy);
+  ctx.lineTo(ox + ux * 1600, oy + uy * 1600); ctx.stroke();
+  ctx.restore();
+
+  ctx.save(); ctx.setLineDash([3,5]);
+  ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(mx, my); ctx.lineTo(mx, tf.yToScreen(0)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(mx, my); ctx.lineTo(ox, my); ctx.stroke();
+  ctx.restore();
+
+  ctx.fillStyle = '#0f1c33'; ctx.font = 'italic 14px ' + FONT;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  ctx.fillText('d = ' + state.d.toFixed(1) + ' m',
+               (ox + mx) / 2, tf.yToScreen(0) + 12);
+}
+function drawLandingMarker(x, y){
+  ctx.beginPath(); ctx.arc(x, y, 7, 0, 2*Math.PI);
+  ctx.strokeStyle = '#b91c1c'; ctx.lineWidth = 1.8; ctx.stroke();
+  ctx.fillStyle = '#b91c1c'; ctx.font = 'italic bold 12px ' + FONT;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  ctx.fillText('landing', x, y + 12);
+}
+function drawImpactMarker(x, y){
+  ctx.save();
+  ctx.strokeStyle = '#b91c1c'; ctx.fillStyle = '#b91c1c'; ctx.lineWidth = 2.2;
+  for (let k = 0; k < 8; k++){
+    const a = k * Math.PI / 4;
+    ctx.beginPath();
+    ctx.moveTo(x + 9*Math.cos(a), y + 9*Math.sin(a));
+    ctx.lineTo(x + 18*Math.cos(a), y + 18*Math.sin(a));
+    ctx.stroke();
+  }
+  ctx.beginPath(); ctx.arc(x, y, 5, 0, 2*Math.PI); ctx.fill();
+  ctx.fillStyle = '#b91c1c'; ctx.font = 'italic bold 13px ' + FONT;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+  ctx.fillText('hit', x, y - 22);
+  ctx.restore();
+}
+function drawAxisLabels(tf, bounds, groundY){
+  const spanX = bounds.maxX - bounds.minX;
+  const step = [1,2,5,10,20,50,100,200].find(s => spanX/s < 12) || 500;
+  ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+  ctx.fillStyle   = '#fff';
+  ctx.font = 'bold 12px ' + FONT;
+  ctx.lineWidth = 1; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  const yBase = groundY + 32;
+  ctx.beginPath();
+  ctx.moveTo(tf.xToScreen(bounds.minX), yBase + 4);
+  ctx.lineTo(tf.xToScreen(bounds.maxX), yBase + 4);
+  ctx.stroke();
+  const startTick = Math.ceil(bounds.minX / step) * step;
+  for (let x = startTick; x <= bounds.maxX; x += step){
+    const sx = tf.xToScreen(x);
+    ctx.beginPath(); ctx.moveTo(sx, yBase + 4); ctx.lineTo(sx, yBase - 2); ctx.stroke();
+    const txt = x.toFixed(0);
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.fillText(txt, sx + 1, yBase + 9);
+    ctx.fillStyle = '#fff';
+    ctx.fillText(txt, sx, yBase + 8);
+  }
+  ctx.font = 'italic bold 13px ' + FONT;
+  const cx = (tf.xToScreen(bounds.minX) + tf.xToScreen(bounds.maxX)) / 2;
+  ctx.fillStyle = 'rgba(0,0,0,0.35)';
+  ctx.fillText('horizontal distance  (m)', cx + 1, yBase + 29);
+  ctx.fillStyle = '#fff';
+  ctx.fillText('horizontal distance  (m)', cx, yBase + 28);
+}
+
+/* ==================================================================
+   MAIN DRAW
+   ================================================================== */
+function draw(){
+  const bounds = worldBounds();
+  const tf = makeTransform(bounds);
+  const T = timeOfFlight();
+  const tNow = Math.min(state.t, T);
+  const groundY = tf.yToScreen(0);
+
+  drawSky(); drawSun(); drawClouds();
+  drawHills(groundY); drawGrass(groundY); drawGroundLine(groundY);
+
+  if (state.case === 'horizontal' || state.case === 'height'){
+    const x0s = tf.xToScreen(0);
+    const yHs = tf.yToScreen(state.h);
+    ctx.save(); ctx.setLineDash([5,5]);
+    ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.moveTo(x0s, yHs); ctx.lineTo(x0s, groundY); ctx.stroke();
+    ctx.restore();
+
+    ctx.beginPath(); ctx.arc(x0s, yHs, 11, 0, 2*Math.PI);
+    ctx.fillStyle = 'rgba(29,78,216,0.18)'; ctx.fill();
+    ctx.beginPath(); ctx.arc(x0s, yHs, 8, 0, 2*Math.PI);
+    ctx.fillStyle = '#1d4ed8'; ctx.fill();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.font = 'italic bold 14px ' + FONT; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    ctx.fillText('h = ' + state.h.toFixed(1) + ' m', x0s - 18, (yHs + groundY) / 2 + 1);
+    ctx.fillStyle = '#fff';
+    ctx.fillText('h = ' + state.h.toFixed(1) + ' m', x0s - 19, (yHs + groundY) / 2);
+    ctx.restore();
+  }
+
+  drawSmokeTrail(tf, tNow);
+  if (state.showFullPath) drawTrajectory(0, T, 'rgba(255,255,255,0.55)', 1.8, [6,7], tf);
+  if (tNow > 0) drawTrajectory(0, tNow, 'rgba(29,78,216,0.85)', 2.6, null, tf);
+
+  if (state.case === 'monkey'){
+    drawAimLine(tf);
+    const mk = monkeyAt(tNow);
+    drawMonkeyRich(tf.xToScreen(mk.x), tf.yToScreen(mk.y), tNow);
+  }
+
+  drawCannon(tf);
+
+  const cur = projectileAt(tNow);
+  const px = tf.xToScreen(cur.x);
+  const py = tf.yToScreen(Math.max(0, cur.y));
+  if (state.t >= T){
+    if (state.case === 'monkey' && predictions().hitY !== null) drawImpactMarker(px, py);
+    else drawLandingMarker(px, py);
+  }
+  drawMissile(px, py, Math.atan2(-cur.vy, cur.vx));
+  if ((state.running || state.t > 0) && state.t <= T) drawVelocityVector(cur, px, py);
+
+  drawAxisLabels(tf, bounds, groundY);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  ctx.font = 'italic bold 13px ' + FONT;
+  ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+  ctx.fillText(caseDescription(), 20, 22);
+
+  ctx.textAlign = 'right';
+  ctx.save();
+  ctx.fillStyle = 'rgba(0,0,0,0.35)';
+  ctx.font = 'italic bold 14px ' + FONT;
+  ctx.fillText('t = ' + tNow.toFixed(3) + ' s', VW - 19, 23);
+  ctx.fillStyle = '#fff';
+  ctx.fillText('t = ' + tNow.toFixed(3) + ' s', VW - 20, 22);
+  ctx.fillStyle = 'rgba(0,0,0,0.35)';
+  ctx.fillText('t / T = ' + (T > 0 ? (tNow / T).toFixed(3) : '0'), VW - 19, 43);
+  ctx.fillStyle = '#fff';
+  ctx.fillText('t / T = ' + (T > 0 ? (tNow / T).toFixed(3) : '0'), VW - 20, 42);
+  ctx.restore();
+}
+function caseDescription(){
+  switch (state.case){
+    case 'horizontal': return 'Horizontal projection from a height';
+    case 'ground':     return 'Projection at an angle from ground level';
+    case 'height':     return 'Projection at an angle from a height';
+    case 'monkey':     return 'Monkey and hunter \u2014 aimed at a falling target';
+  }
+}
+
+/* ==================================================================
+   DRAG INTERACTION
+   ================================================================== */
+function getCanvasCoords(e){
+  const r = simCanvas.getBoundingClientRect();
+  return {
+    x: (e.clientX - r.left) * (VW / r.width),
+    y: (e.clientY - r.top)  * (VH / r.height)
+  };
+}
+function findDragTarget(cx, cy){
+  const bounds = worldBounds();
+  const tf = makeTransform(bounds);
+  const c = launchConfig();
+  const px = tf.xToScreen(c.x0);
+  const py = tf.yToScreen(c.y0);
+
+  if (state.case === 'ground' || state.case === 'height'){
+    const th = state.thetaDeg * DEG;
+    const tipX = px + 62 * Math.cos(th);
+    const tipY = py - 62 * Math.sin(th);
+    if (Math.hypot(cx - tipX, cy - tipY) < 22) return { type: 'angle' };
+  }
+  if (state.case === 'horizontal' || state.case === 'height'){
+    const hx = tf.xToScreen(0);
+    const hy = tf.yToScreen(state.h);
+    if (Math.hypot(cx - hx, cy - hy) < 22) return { type: 'height' };
+  }
+  return null;
+}
+function applyDrag(cx, cy){
+  const bounds = worldBounds();
+  const tf = makeTransform(bounds);
+  const c = launchConfig();
+  const px = tf.xToScreen(c.x0);
+  const py = tf.yToScreen(c.y0);
+
+  if (state.dragging === 'angle'){
+    const dx = cx - px;
+    const dy = py - cy;
+    let ang = Math.atan2(dy, dx) / DEG;
+    ang = Math.max(0, Math.min(90, ang));
+    setParam('Theta', Math.round(ang * 2) / 2);
+  }
+  else if (state.dragging === 'height'){
+    const wy = tf.screenToY(cy);
+    setParam('H', Math.round(Math.max(1, Math.min(80, wy)) * 2) / 2);
+  }
+}
+simCanvas.addEventListener('mousedown', e => {
+  const c = getCanvasCoords(e);
+  const target = findDragTarget(c.x, c.y);
+  if (target){
+    state.dragging = target.type;
+    simCanvas.style.cursor = target.type === 'angle' ? 'grabbing' : 'ns-resize';
+    e.preventDefault();
+  }
+});
+simCanvas.addEventListener('mousemove', e => {
+  const c = getCanvasCoords(e);
+  if (state.dragging){
+    applyDrag(c.x, c.y);
+    e.preventDefault();
+  } else {
+    const target = findDragTarget(c.x, c.y);
+    simCanvas.style.cursor = target
+      ? (target.type === 'angle' ? 'grab' : 'ns-resize')
+      : 'default';
+  }
+});
+window.addEventListener('mouseup', () => {
+  if (state.dragging){
+    state.dragging = null;
+    simCanvas.style.cursor = 'default';
+  }
+});
+simCanvas.addEventListener('touchstart', e => {
+  if (e.touches.length !== 1) return;
+  const r = simCanvas.getBoundingClientRect();
+  const cx = (e.touches[0].clientX - r.left) * (VW / r.width);
+  const cy = (e.touches[0].clientY - r.top)  * (VH / r.height);
+  const target = findDragTarget(cx, cy);
+  if (target){ state.dragging = target.type; e.preventDefault(); }
+}, {passive: false});
+simCanvas.addEventListener('touchmove', e => {
+  if (!state.dragging || e.touches.length !== 1) return;
+  const r = simCanvas.getBoundingClientRect();
+  const cx = (e.touches[0].clientX - r.left) * (VW / r.width);
+  const cy = (e.touches[0].clientY - r.top)  * (VH / r.height);
+  applyDrag(cx, cy);
+  e.preventDefault();
+}, {passive: false});
+simCanvas.addEventListener('touchend', () => { state.dragging = null; });
+
+/* ==================================================================
+   DOM WIRING
+   ================================================================== */
+const inU     = document.getElementById('inU');
+const inTheta = document.getElementById('inTheta');
+const inH     = document.getElementById('inH');
+const inD     = document.getElementById('inD');
+const inG     = document.getElementById('inG');
+const inSpeed = document.getElementById('inSpeed');
+
+const readT   = document.getElementById('readT');
+const readX   = document.getElementById('readX');
+const readY   = document.getElementById('readY');
+const readVx  = document.getElementById('readVx');
+const readVy  = document.getElementById('readVy');
+const readV   = document.getElementById('readV');
+const readTOF = document.getElementById('readTOF');
+const readR   = document.getElementById('readR');
+const readH   = document.getElementById('readH');
+const readAim = document.getElementById('readAim');
+const readHit = document.getElementById('readHit');
+const rowAim  = document.getElementById('rowAim');
+const rowHit  = document.getElementById('rowHit');
+
+const pU     = document.getElementById('pU');
+const pTheta = document.getElementById('pTheta');
+const pH     = document.getElementById('pH');
+const pD     = document.getElementById('pD');
+const lblH   = document.getElementById('lblH');
+
+const statusTag   = document.getElementById('statusTag');
+const statusText  = document.getElementById('statusText');
+const toast       = document.getElementById('toast');
+const toastMsg    = document.getElementById('toastMsg');
+const formulaBlock = document.getElementById('formulaBlock');
+const dragHint     = document.getElementById('dragHint');
+
+/* ==================================================================
+   CENTRAL SETTER  —  all parameter changes go through here
+   ================================================================== */
+const PARAM_CONFIG = {
+  U:     { stateKey: 'u',         input: inU,     min: 2,    max: 60,   step: 0.5,  decimals: 1 },
+  Theta: { stateKey: 'thetaDeg',  input: inTheta, min: 0,    max: 90,   step: 0.5,  decimals: 1 },
+  H:     { stateKey: 'h',         input: inH,     min: 1,    max: 80,   step: 0.5,  decimals: 1 },
+  D:     { stateKey: 'd',         input: inD,     min: 5,    max: 80,   step: 0.5,  decimals: 1 },
+  G:     { stateKey: 'g',         input: inG,     min: 1,    max: 25,   step: 0.01, decimals: 2 },
+  Speed: { stateKey: 'timeScale', input: inSpeed, min: 0.1,  max: 3,    step: 0.05, decimals: 2 }
+};
+
+function setParam(name, value){
+  const cfg = PARAM_CONFIG[name];
+  if (!cfg) return;
+  let v = parseFloat(value);
+  if (isNaN(v)) v = state[cfg.stateKey];
+  v = Math.max(cfg.min, Math.min(cfg.max, v));
+  state[cfg.stateKey] = v;
+  cfg.input.value = v.toFixed(cfg.decimals);
+  updateParamButtons();
+}
+
+function updateParamButtons(){
+  document.querySelectorAll('.p-btn').forEach(btn => {
+    const target = btn.dataset.target;
+    const dir = parseFloat(btn.dataset.dir);
+    const cfg = PARAM_CONFIG[target];
+    if (!cfg) return;
+    const v = state[cfg.stateKey];
+    const next = v + dir * cfg.step;
+    btn.disabled = (next < cfg.min - 1e-9) || (next > cfg.max + 1e-9);
+  });
+}
+
+/* ---- +/− buttons ---- */
+document.querySelectorAll('.p-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const target = btn.dataset.target;
+    const dir = parseFloat(btn.dataset.dir);
+    const cfg = PARAM_CONFIG[target];
+    if (!cfg) return;
+    const v = state[cfg.stateKey];
+    const next = v + dir * cfg.step;
+    setParam(target, next);
+  });
+});
+
+/* ---- typing into the field ---- */
+[inU, inTheta, inH, inD, inG, inSpeed].forEach(inp => {
+  /* as they type — apply immediately if valid */
+  inp.addEventListener('input', () => {
+    const name = Object.keys(PARAM_CONFIG).find(k => PARAM_CONFIG[k].input === inp);
+    if (name){
+      const v = parseFloat(inp.value);
+      if (!isNaN(v)){
+        const cfg = PARAM_CONFIG[name];
+        const clamped = Math.max(cfg.min, Math.min(cfg.max, v));
+        state[cfg.stateKey] = clamped;
+        updateParamButtons();
+      }
+    }
+  });
+  /* on blur / Enter — reformat to the correct decimal count */
+  inp.addEventListener('blur', () => {
+    const name = Object.keys(PARAM_CONFIG).find(k => PARAM_CONFIG[k].input === inp);
+    if (name){
+      const cfg = PARAM_CONFIG[name];
+      setParam(name, state[cfg.stateKey]);
+    }
+  });
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter'){
+      const name = Object.keys(PARAM_CONFIG).find(k => PARAM_CONFIG[k].input === inp);
+      if (name){
+        const cfg = PARAM_CONFIG[name];
+        setParam(name, inp.value);
+        inp.blur();
+      }
+    }
+    if (e.key === 'ArrowUp'){
+      e.preventDefault();
+      const name = Object.keys(PARAM_CONFIG).find(k => PARAM_CONFIG[k].input === inp);
+      if (name){
+        const cfg = PARAM_CONFIG[name];
+        setParam(name, state[cfg.stateKey] + cfg.step);
+      }
+    }
+    if (e.key === 'ArrowDown'){
+      e.preventDefault();
+      const name = Object.keys(PARAM_CONFIG).find(k => PARAM_CONFIG[k].input === inp);
+      if (name){
+        const cfg = PARAM_CONFIG[name];
+        setParam(name, state[cfg.stateKey] - cfg.step);
+      }
+    }
+  });
+  /* select-all on focus for quick replacement */
+  inp.addEventListener('focus', () => inp.select());
+});
+
+/* ==================================================================
+   CASE SWITCHING
+   ================================================================== */
+document.querySelectorAll('.case-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.case-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    switchCase(btn.dataset.case);
+  });
+});
+
+function switchCase(newCase){
+  state.case = newCase;
+  state.t = 0;
+  state.running = false;
+  state.holding = false;
+
+  switch (newCase){
+    case 'horizontal':
+      pU.style.display = 'flex';
+      pTheta.style.display = 'none';
+      pH.style.display = 'flex';
+      pD.style.display = 'none';
+      lblH.innerHTML = 'Height <em>h</em><span class="unit">(m)</span>';
+      dragHint.textContent = 'Tip: drag the blue handle at the launch point to change height.';
+      break;
+    case 'ground':
+      pU.style.display = 'flex';
+      pTheta.style.display = 'flex';
+      pH.style.display = 'none';
+      pD.style.display = 'none';
+      dragHint.textContent = 'Tip: drag the blue handle at the barrel tip to change angle.';
+      break;
+    case 'height':
+      pU.style.display = 'flex';
+      pTheta.style.display = 'flex';
+      pH.style.display = 'flex';
+      pD.style.display = 'none';
+      lblH.innerHTML = 'Height <em>h</em><span class="unit">(m)</span>';
+      dragHint.textContent = 'Tip: drag the barrel tip for angle, or the launch handle for height.';
+      break;
+    case 'monkey':
+      pU.style.display = 'flex';
+      pTheta.style.display = 'none';
+      pH.style.display = 'flex';
+      pD.style.display = 'flex';
+      lblH.innerHTML = 'Monkey <em>h</em><span class="unit">(m)</span>';
+      dragHint.textContent = 'Aim angle is set automatically by the height and distance.';
+      break;
+  }
+  rowAim.style.display = (newCase === 'monkey') ? 'table-row' : 'none';
+  rowHit.style.display = (newCase === 'monkey') ? 'table-row' : 'none';
+  updateFormulas();
+  setStatus('', 'Ready');
+  showToast('Case: ' + caseTitle(newCase));
+}
+
+function caseTitle(c){
+  return {horizontal:'Horizontal projection', ground:'From ground',
+          height:'From height', monkey:'Monkey & hunter'}[c];
+}
+
+function updateFormulas(){
+  let html = '';
+  switch (state.case){
+    case 'horizontal':
+      html =
+        '<span class="eq"><i>x</i> = <i>u t</i></span>' +
+        '<span class="eq"><i>y</i> = <i>h</i> &minus; &frac12; <i>g t</i>&sup2;</span>' +
+        '<span class="eq"><i>v<sub>x</sub></i> = <i>u</i></span>' +
+        '<span class="eq"><i>v<sub>y</sub></i> = &minus;<i>g t</i></span>' +
+        '<span class="eq"><i>T</i> = &radic;(2<i>h</i>/<i>g</i>)</span>' +
+        '<span class="eq"><i>R</i> = <i>u</i>&radic;(2<i>h</i>/<i>g</i>)</span>' +
+        '<span class="comment">Initial vertical velocity is zero.</span>';
+      break;
+    case 'ground':
+      html =
+        '<span class="eq"><i>x</i> = <i>u</i>cos&theta; &middot; <i>t</i></span>' +
+        '<span class="eq"><i>y</i> = <i>u</i>sin&theta; &middot; <i>t</i> &minus; &frac12;<i>gt</i>&sup2;</span>' +
+        '<span class="eq"><i>T</i> = 2<i>u</i>sin&theta;/<i>g</i></span>' +
+        '<span class="eq"><i>R</i> = <i>u</i>&sup2;sin2&theta;/<i>g</i></span>' +
+        '<span class="eq"><i>H</i> = <i>u</i>&sup2;sin&sup2;&theta;/(2<i>g</i>)</span>' +
+        '<span class="comment">Range is maximum at &theta; = 45&deg;.</span>';
+      break;
+    case 'height':
+      html =
+        '<span class="eq"><i>x</i> = <i>u</i>cos&theta; &middot; <i>t</i></span>' +
+        '<span class="eq"><i>y</i> = <i>h</i> + <i>u</i>sin&theta; &middot; <i>t</i> &minus; &frac12;<i>gt</i>&sup2;</span>' +
+        '<span class="eq"><i>T</i> = [<i>u</i>sin&theta; + &radic;(<i>u</i>&sup2;sin&sup2;&theta; + 2<i>gh</i>)]/<i>g</i></span>' +
+        '<span class="eq"><i>R</i> = <i>u</i>cos&theta; &middot; <i>T</i></span>' +
+        '<span class="comment">Projectile continues below the launch level.</span>';
+      break;
+    case 'monkey':
+      html =
+        '<span class="eq">&theta; = arctan(<i>h</i>/<i>d</i>)</span>' +
+        '<span class="eq">Collision at <i>t</i> = <i>d</i>/(<i>u</i>cos&theta;)</span>' +
+        '<span class="eq">Both fall with the same <i>g</i></span>' +
+        '<span class="comment">The projectile always hits the monkey, regardless of speed.</span>';
+      break;
+  }
+  formulaBlock.innerHTML = html;
+}
+
+/* ==================================================================
+   READOUTS
+   ================================================================== */
+function updateReadouts(){
+  const T = timeOfFlight();
+  const tf = Math.min(state.t, T);
+  const p = projectileAt(tf);
+  const preds = predictions();
+
+  readT.textContent  = tf.toFixed(3);
+  readX.textContent  = p.x.toFixed(3);
+  readY.textContent  = Math.max(0, p.y).toFixed(3);
+  readVx.textContent = p.vx.toFixed(3);
+  readVy.textContent = p.vy.toFixed(3);
+  readV.textContent  = Math.hypot(p.vx, p.vy).toFixed(3);
+
+  readTOF.textContent = T.toFixed(3);
+  readR.textContent   = preds.range.toFixed(3);
+  readH.textContent   = preds.peak.toFixed(3);
+
+  if (state.case === 'monkey'){
+    readAim.textContent = (Math.atan2(state.h, state.d) / DEG).toFixed(2);
+    readHit.textContent = preds.hitY !== null ? preds.hitY.toFixed(3) : 'miss';
+  }
+}
+
+/* ==================================================================
+   LOOP
+   ================================================================== */
+let lastFrame = performance.now();
+function loop(now){
+  const realDt = Math.min((now - lastFrame) / 1000, 0.06);
+  lastFrame = now;
+  const T = timeOfFlight();
+
+  if (state.running){
+    if (state.holding){
+      if (now >= state.holdUntil){ state.holding = false; state.t = 0; }
+    } else {
+      state.t += realDt * state.timeScale;
+      if (state.t >= T){
+        state.t = T; state.holding = true;
+        state.holdUntil = now + PAD_TIME_AFTER_LAND * 1000;
+      }
+    }
+  }
+
+  syncCanvas();
+  draw();
+  updateReadouts();
+  requestAnimationFrame(loop);
+}
+
+/* ==================================================================
+   BUTTONS
+   ================================================================== */
+document.getElementById('btnStart').addEventListener('click', () => {
+  state.t = 0; state.running = true; state.holding = false;
+  setStatus('running', 'Running');
+  showToast('Missile launched');
+});
+document.getElementById('btnPause').addEventListener('click', () => {
+  if (state.running){ state.running = false; setStatus('paused', 'Paused'); showToast('Paused'); }
+  else { state.running = true; setStatus('running', 'Running'); showToast('Resumed'); }
+});
+document.getElementById('btnReset').addEventListener('click', () => {
+  state.t = 0; state.running = false; state.holding = false;
+  setStatus('', 'Ready'); showToast('Reset');
+});
+
+function setStatus(cls, txt){
+  statusTag.className = 'status' + (cls ? ' ' + cls : '');
+  statusText.textContent = txt;
+}
+
+let toastTimer = null;
+function showToast(msg){
+  toastMsg.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 1500);
+}
+
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.code === 'Space'){ e.preventDefault(); document.getElementById('btnPause').click(); }
+  else if (e.key.toLowerCase() === 'r'){ document.getElementById('btnStart').click(); }
+  else if (e.key.toLowerCase() === 'c'){ document.getElementById('btnReset').click(); }
+});
+
+/* ==================================================================
+   BOOT
+   ================================================================== */
+setParam('U', 20);
+setParam('Theta', 45);
+setParam('H', 20);
+setParam('D', 30);
+setParam('G', 9.81);
+setParam('Speed', 1.00);
+
+switchCase('ground');
+
+requestAnimationFrame(loop);
+setTimeout(() => showToast('Type or use + / \u2212 to change values'), 500);
+</script>
+</body>
+</html>
