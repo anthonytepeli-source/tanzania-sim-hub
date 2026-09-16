@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tanzania Simulation Hub — Interactive Science Simulations</title>
+<meta name="description" content="Free interactive science simulations in Physics, Chemistry, Mathematics, and Astronomy. For students, teachers, and researchers at every level. Founded by Anthony A. Tepeli and Loema Sanzu.">
+<meta name="author" content="Anthony A. Tepeli, Loema Sanzu">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#1d4ed8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="SimHub TZ">
+
+<style>
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;
+    background:#ffffff;color:#000;
+    font-family:"Times New Roman", Times, Georgia, serif;
+    font-size:12pt;line-height:1.5;
+  }
+
+  /* ============================================================
+     SOLAR SYSTEM BANNER — academic line drawing
+     ============================================================ */
+  .solar-banner{
+    position:relative;
+    width:100%;
+    height:340px;
+    background:#ffffff;
+    border-bottom:1.5px solid #000;
+    overflow:hidden;
+  }
+  .solar-banner svg{
+    display:block;
+    width:100%;
+    height:100%;
+  }
+  .solar-banner .banner-caption{
+    position:absolute;
+    left:50%;
+    bottom:10px;
+    transform:translateX(-50%);
+    font-family:"Times New Roman", Times, serif;
+    font-style:italic;
+    font-size:10pt;
+    color:#4a5568;
+    letter-spacing:.3px;
+    text-align:center;
+    pointer-events:none;
+    white-space:nowrap;
+    background:#ffffff;
+    padding:0 12px;
+  }
+  @media(max-width:960px){
+    .solar-banner{height:260px;}
+    .solar-banner .banner-caption{font-size:9.5pt;bottom:8px;}
+  }
+  @media(max-width:600px){
+    .solar-banner{height:190px;}
+    .solar-banner .banner-caption{font-size:8.5pt;letter-spacing:.1px;}
+  }
+
+  /* ---------- HEADER ---------- */
+  header.site{
+    border-bottom:1.5px solid #000;
+    padding:24px 26px 20px;
+    background:#fff;
+  }
+  header.site .inner{
+    max-width:1180px;margin:0 auto;
+    display:flex;align-items:flex-start;justify-content:space-between;
+    gap:28px;flex-wrap:wrap;
+  }
+  header.site .brand{
+    display:block;
+  }
+  header.site .brand .text h1{
+    margin:0;font-size:22pt;font-weight:bold;letter-spacing:.2px;
+    color:#000;line-height:1.15;
+  }
+  header.site .brand .text .byline{
+    margin:8px 0 0 0;font-size:10.5pt;font-style:italic;
+    color:#4a5568;line-height:1.5;
+  }
+  header.site .brand .text .byline strong{
+    font-style:normal;color:#1e3a8a;font-weight:bold;
+  }
+  header.site .top-links{
+    display:flex;gap:22px;align-items:baseline;
+    font-size:11pt;margin-top:6px;
+  }
+  header.site .top-links a{
+    color:#1a3b5c;text-decoration:none;font-style:italic;
+    border-bottom:1px solid transparent;white-space:nowrap;
+  }
+  header.site .top-links a:hover{
+    color:#000;font-weight:bold;border-bottom-color:#000;
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    max-width:1180px;margin:0 auto;
+    padding:34px 26px 12px;
+  }
+  .hero p.lead{
+    margin:0 0 12px 0;font-size:14pt;font-style:italic;
+    color:#1e3a8a;max-width:920px;line-height:1.4;
+  }
+  .hero p.sub{
+    margin:0 0 10px 0;font-size:11pt;color:#334155;
+    max-width:940px;line-height:1.7;
+  }
+  .hero p.sub strong{color:#000;font-style:normal;}
+
+  /* ---------- FILTERS ---------- */
+  .filters{
+    max-width:1180px;margin:22px auto 0;padding:0 26px;
+  }
+  .search-box{
+    width:100%;padding:12px 16px;
+    font-family:inherit;font-size:12pt;
+    border:1.5px solid #8aa4c4;border-radius:6px;
+    background:#fff;color:#000;outline:none;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  .search-box:focus{
+    border-color:#1d4ed8;
+    box-shadow:0 0 0 3px rgba(29,78,216,.12);
+  }
+  .filter-group{
+    display:flex;align-items:baseline;gap:16px;
+    margin-top:16px;flex-wrap:wrap;
+  }
+  .filter-group .group-label{
+    font-style:italic;font-size:10.5pt;color:#333;
+    min-width:88px;flex:none;
+  }
+  .chips{display:flex;flex-wrap:wrap;gap:9px;}
+  .chip{
+    background:none;border:1px solid #b8c8dc;
+    border-radius:999px;padding:5px 15px;
+    font-family:inherit;font-size:10.5pt;
+    font-style:italic;color:#1a3b5c;cursor:pointer;
+    transition:all .15s;
+  }
+  .chip:hover{border-color:#1d4ed8;color:#1d4ed8;}
+  .chip.active{
+    background:#1d4ed8;color:#fff;
+    border-color:#1d4ed8;
+    font-weight:bold;font-style:normal;
+  }
+  .chip .count{
+    font-style:normal;font-size:9pt;
+    opacity:0.7;margin-left:5px;
+  }
+  .chip.active .count{opacity:0.9;}
+
+  .results-line{
+    max-width:1180px;margin:18px auto 4px;padding:0 26px;
+    font-size:10.5pt;font-style:italic;color:#4a5568;
+  }
+  .results-line strong{color:#000;font-style:normal;}
+
+  /* ---------- GRID ---------- */
+  .grid-wrap{
+    max-width:1180px;margin:0 auto;
+    padding:14px 26px 40px;
+  }
+  .grid{
+    display:grid;grid-template-columns:repeat(3, 1fr);gap:18px;
+  }
+  @media(max-width:960px){
+    .grid{grid-template-columns:repeat(2, 1fr);gap:14px;}
+    .hero{padding:26px 20px 12px;}
+    .filters{padding:0 20px;}
+    .results-line{padding:0 20px;}
+    .grid-wrap{padding:14px 20px 40px;}
+  }
+  @media(max-width:600px){
+    .grid{grid-template-columns:1fr;}
+    header.site{padding:18px 18px 16px;}
+    header.site .brand .text h1{font-size:18pt;}
+  }
+
+  /* ---------- CARD ---------- */
+  .card{
+    display:block;text-decoration:none;color:inherit;
+    background:#fff;border:1.5px solid #cbd5e1;
+    border-radius:6px;overflow:hidden;
+    transition:transform .12s, box-shadow .15s, border-color .15s;
+  }
+  .card:hover{
+    transform:translateY(-2px);
+    border-color:#1d4ed8;
+    box-shadow:0 4px 14px rgba(29,78,216,.14);
+  }
+  .card .strip{height:4px;background:#1d4ed8;}
+  .card .strip.physics{background:#1d4ed8;}
+  .card .strip.chemistry{background:#0a7d2b;}
+  .card .strip.mathematics{background:#9a3412;}
+  .card .strip.astronomy{background:#5b21b6;}
+
+  .card .body{padding:18px 20px 18px;}
+  .card .subject-line{
+    display:flex;align-items:baseline;justify-content:space-between;
+    gap:10px;margin-bottom:8px;
+  }
+  .card .subject{
+    font-size:9.5pt;font-weight:bold;
+    letter-spacing:.6px;text-transform:uppercase;
+    color:#4a5568;font-style:normal;
+  }
+  .card .subject.physics{color:#1d4ed8;}
+  .card .subject.chemistry{color:#15803d;}
+  .card .subject.mathematics{color:#9a3412;}
+  .card .subject.astronomy{color:#6d28d9;}
+  .card h2{
+    margin:0;font-size:13.5pt;font-weight:bold;
+    color:#000;line-height:1.25;
+  }
+  .card .desc{
+    margin:10px 0 0 0;font-size:10.5pt;
+    color:#334155;line-height:1.6;
+  }
+  .card .levels{
+    margin-top:14px;padding-top:12px;
+    border-top:1px solid #e2e8f0;
+    font-size:9.5pt;font-style:italic;
+    color:#64748b;display:flex;gap:6px;flex-wrap:wrap;
+  }
+  .card .levels .lvl{
+    font-style:normal;font-size:9pt;font-weight:bold;
+    letter-spacing:.3px;padding:2px 8px;border-radius:3px;
+    background:#f1f5f9;border:1px solid #e2e8f0;
+    color:#475569;text-transform:uppercase;
+  }
+
+  /* ---------- EMPTY ---------- */
+  .empty{
+    padding:48px 20px;text-align:center;
+    color:#64748b;font-style:italic;font-size:12pt;
+    border:1.5px dashed #cbd5e1;border-radius:6px;
+  }
+
+  /* ---------- FOUNDERS ---------- */
+  .founders-section{
+    background:#f8fafc;
+    border-top:1.5px solid #000;
+    border-bottom:1.5px solid #000;
+    padding:40px 26px 44px;
+    margin-top:20px;
+  }
+  .founders-section .inner{max-width:1180px;margin:0 auto;}
+  .founders-section .section-head{
+    text-align:center;margin-bottom:36px;
+  }
+  .founders-section .section-head .kicker{
+    font-size:10.5pt;font-style:italic;
+    color:#6b7280;letter-spacing:.6px;
+    text-transform:uppercase;font-weight:bold;
+    margin-bottom:6px;
+  }
+  .founders-section .section-head h2{
+    margin:0;font-size:20pt;font-weight:bold;
+    color:#000;letter-spacing:.2px;
+  }
+  .founders-section .section-head p.intro{
+    margin:14px auto 0;max-width:780px;
+    font-size:11pt;color:#334155;
+    line-height:1.7;font-style:italic;
+  }
+  .founders-grid{
+    display:grid;grid-template-columns: 1fr 1fr;
+    gap:36px;margin-top:20px;
+  }
+  @media(max-width:840px){
+    .founders-grid{grid-template-columns:1fr;gap:28px;}
+  }
+  .founder-card{
+    display:grid;grid-template-columns: 150px 1fr;
+    gap:22px;align-items:start;
+  }
+  @media(max-width:520px){
+    .founder-card{grid-template-columns:1fr;gap:14px;}
+  }
+  .founder-card .crest{
+    width:150px;height:150px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,#1e3a8a,#1d4ed8 55%,#0284c7);
+    color:#fff;text-align:center;
+    font-family:"Times New Roman", Times, serif;
+    box-shadow:0 8px 24px rgba(29,78,216,.22);
+    flex:none;
+  }
+  .founder-card .crest .initials{
+    font-size:38pt;font-weight:bold;line-height:1;letter-spacing:1px;
+  }
+  .founder-card .crest .sub{
+    font-size:8pt;letter-spacing:2.5px;text-transform:uppercase;
+    margin-top:6px;opacity:.92;font-style:italic;
+  }
+  .founder-card .bio h3{
+    margin:0 0 4px 0;font-size:17pt;font-weight:bold;
+    color:#1e3a8a;line-height:1.15;
+  }
+  .founder-card .bio .role{
+    margin:0 0 12px 0;font-size:11pt;font-style:italic;
+    color:#4a5568;line-height:1.45;
+  }
+  .founder-card .bio p{
+    margin:0 0 10px 0;font-size:10.5pt;
+    color:#334155;line-height:1.7;
+  }
+  .founders-section .shared-quote{
+    margin:36px auto 0;max-width:840px;
+    text-align:center;padding:22px 34px;
+    border-top:1px solid #cbd5e1;
+    border-bottom:1px solid #cbd5e1;
+    font-style:italic;color:#1e3a8a;
+    font-size:12pt;line-height:1.65;
+  }
+  .founders-section .shared-quote::before{
+    content:"\201C";font-size:24pt;color:#93c5fd;
+    line-height:0;vertical-align:-8px;margin-right:4px;
+  }
+  .founders-section .shared-quote::after{
+    content:"\201D";font-size:24pt;color:#93c5fd;
+    line-height:0;vertical-align:-8px;margin-left:4px;
+  }
+
+  /* ---------- FOOTER ---------- */
+  footer.site{
+    border-top:1.5px solid #000;
+    padding:26px 26px 34px;background:#fff;
+    font-size:10.5pt;color:#475569;text-align:center;
+  }
+  footer.site .inner{max-width:1180px;margin:0 auto;}
+  footer.site p{margin:5px 0;}
+  footer.site .attribution{
+    font-size:11pt;font-style:italic;
+    color:#334155;margin-bottom:10px;
+  }
+  footer.site .attribution strong{
+    font-style:normal;color:#1e3a8a;
+  }
+  footer.site a{
+    color:#1d4ed8;text-decoration:none;
+    border-bottom:1px solid transparent;
+  }
+  footer.site a:hover{border-bottom-color:#1d4ed8;}
+  footer.site .meta{
+    margin-top:14px;font-size:9.5pt;
+    color:#94a3b8;font-style:italic;
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     SOLAR SYSTEM BANNER
+     ============================================================ -->
+<div class="solar-banner" aria-hidden="true">
+  <svg id="solarSvg" viewBox="0 0 1400 400" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    <g id="orbitsLayer" fill="none" stroke="#000" stroke-width="0.9" stroke-dasharray="3 4"></g>
+    <g id="sunGroup">
+      <circle id="sunHalo" cx="700" cy="200" r="34" fill="none" stroke="#000" stroke-width="0.6" stroke-dasharray="2 3" opacity="0.4"/>
+      <circle cx="700" cy="200" r="9" fill="#000"/>
+    </g>
+    <g id="planetsLayer"></g>
+  </svg>
+  <div class="banner-caption">A universe of simulations &middot; free &middot; offline &middot; for everyone</div>
+</div>
+
+<!-- ============ HEADER ============ -->
+<header class="site">
+  <div class="inner">
+    <div class="brand">
+      <div class="text">
+        <h1>Tanzania Simulation Hub</h1>
+        <p class="byline">
+          Founded and developed by <strong>Anthony A. Tepeli</strong> and <strong>Loema Sanzu</strong>.
+        </p>
+      </div>
+    </div>
+    <nav class="top-links">
+      <a href="#founders">Founders</a>
+      <a href="#contribute">Contribute</a>
+      <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <p class="lead">Interactive science simulations, free and open to everyone.</p>
+  <p class="sub">
+    The Tanzania Simulation Hub offers a growing library of hands-on simulations in <strong>Physics</strong>, <strong>Chemistry</strong>, <strong>Mathematics</strong>, and <strong>Astronomy &amp; Astrophysics</strong>. Each simulation lets you change the variables yourself, watch the system respond in real time, and build intuition that words alone cannot give. Every simulation is designed to work <strong>offline</strong> on any phone, tablet, or computer &mdash; no data bundle, no sign-up, no cost.
+  </p>
+  <p class="sub">
+    Built for anyone curious about how the physical world works &mdash; school students, university students, teachers, and researchers alike. Wherever you are and whatever level you are at, the aim is the same: to make the abstract visible and the invisible touchable.
+  </p>
+</section>
+
+<!-- ============ FILTERS ============ -->
+<section class="filters" id="filters">
+  <input type="search" class="search-box" id="search" placeholder="Search simulations&hellip; (e.g. projectile, pendulum, waves, titration)">
+  <div class="filter-group">
+    <span class="group-label">Subject:</span>
+    <div class="chips" id="subjectChips"></div>
+  </div>
+  <div class="filter-group">
+    <span class="group-label">Topic:</span>
+    <div class="chips" id="topicChips"></div>
+  </div>
+</section>
+
+<p class="results-line" id="resultsLine"></p>
+
+<!-- ============ GRID ============ -->
+<section class="grid-wrap">
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" style="display:none;">No simulations match your filters.</div>
+</section>
+
+<!-- ============ FOUNDERS ============ -->
+<section class="founders-section" id="founders">
+  <div class="inner">
+    <div class="section-head">
+      <div class="kicker">About the Founders</div>
+      <h2>Built by Tanzanian physicists, for learners everywhere.</h2>
+      <p class="intro">
+        The Tanzania Simulation Hub was created by two physicists who met at Tanzanian public universities and shared a single conviction: that interactive, visual learning should not be a privilege reserved for those with fast internet and expensive textbooks.
+      </p>
+    </div>
+
+    <div class="founders-grid">
+      <div class="founder-card">
+        <div class="crest">
+          <div>
+            <div class="initials">A.T.</div>
+            <div class="sub">SimHub TZ</div>
+          </div>
+        </div>
+        <div class="bio">
+          <h3>Anthony A. Tepeli</h3>
+          <p class="role">Physics student &middot; University of Dar es Salaam</p>
+          <p>
+            Anthony leads the technical development of the platform &mdash; designing and coding every simulation, structuring the hub, and building the offline-first architecture that allows it to run on any shared phone or school computer, wherever it is needed.
+          </p>
+          <p>
+            His work is grounded in the belief that abstract ideas should become visible, and invisible forces should become touchable, for every learner regardless of where they study.
+          </p>
+        </div>
+      </div>
+
+      <div class="founder-card">
+        <div class="crest">
+          <div>
+            <div class="initials">L.S.</div>
+            <div class="sub">SimHub TZ</div>
+          </div>
+        </div>
+        <div class="bio">
+          <h3>Loema Sanzu</h3>
+          <p class="role">Physics alumna &middot; University of Dodoma</p>
+          <p>
+            Loema leads scientific review and educational design &mdash; ensuring every simulation is physically accurate, clearly explained, and pitched so that it serves beginners and advanced learners alike, from first exposure to a topic through to deeper exploration.
+          </p>
+          <p>
+            Her contribution keeps the hub anchored to real practice, from the classroom to the laboratory, for anyone who wants to understand how the world works.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <blockquote class="shared-quote">
+      Physics is not a list of formulas to memorise. It is a way of seeing the world. If a learner anywhere can watch a projectile curve through the air on their own phone and understand <em>why</em>, then this project has done its work.
+    </blockquote>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="site">
+  <div class="inner">
+    <p class="attribution">
+      <strong>Tanzania Simulation Hub</strong> &mdash; founded and maintained by
+      <strong>Anthony A. Tepeli</strong> and <strong>Loema Sanzu</strong>.
+    </p>
+    <p>
+      Anthony A. Tepeli &mdash; Physics student, University of Dar es Salaam &middot;
+      Loema Sanzu &mdash; Physics alumna, University of Dodoma.
+    </p>
+    <p>Free and open to every learner and teacher, at every level.</p>
+    <p style="margin-top:10px;">
+      All simulations are free to use, share, and adapt.
+      Licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC&nbsp;BY&nbsp;4.0</a>.
+    </p>
+    <p>Found a bug? Want to contribute a simulation? <a href="#contribute">Get in touch.</a></p>
+    <p class="meta">v1.0 &middot; Dar es Salaam &amp; Dodoma, Tanzania</p>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   SOLAR SYSTEM BANNER — academic animation
+   ============================================================ */
+(function(){
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+  const SUN_X  = 700;
+  const SUN_Y  = 200;
+  const SQUASH = 0.32;
+  const BASE_RATE = 0.55;
+
+  const R_BASE  = 40;
+  const R_SCALE = 108;
+  function visualRadius(a_AU){
+    return R_BASE + R_SCALE * Math.pow(a_AU, 0.45);
+  }
+
+  const PLANETS = [
+    { name:'Mercury', a: 0.387, size: 2.6, phase: 0.00 },
+    { name:'Venus',   a: 0.723, size: 3.3, phase: 0.85 },
+    { name:'Earth',   a: 1.000, size: 3.5, phase: 1.70 },
+    { name:'Mars',    a: 1.524, size: 3.0, phase: 2.55 },
+    { name:'Jupiter', a: 5.203, size: 6.0, phase: 3.40 },
+    { name:'Saturn',  a: 9.537, size: 5.0, phase: 4.25 },
+    { name:'Uranus',  a:19.191, size: 4.2, phase: 5.10 },
+    { name:'Neptune', a:30.069, size: 4.0, phase: 5.95 }
+  ];
+
+  PLANETS.forEach(p => {
+    p.rx    = visualRadius(p.a);
+    p.ry    = p.rx * SQUASH;
+    p.speed = BASE_RATE / Math.sqrt(p.a);
+    p.el    = null;
+    p.label = null;
+  });
+
+  const orbitsLayer = document.getElementById('orbitsLayer');
+  PLANETS.forEach(p => {
+    const e = document.createElementNS(SVG_NS, 'ellipse');
+    e.setAttribute('cx', SUN_X);
+    e.setAttribute('cy', SUN_Y);
+    e.setAttribute('rx', p.rx.toFixed(2));
+    e.setAttribute('ry', p.ry.toFixed(2));
+    const op = Math.max(0.18, 0.42 - p.a * 0.010);
+    e.setAttribute('stroke', 'rgba(0,0,0,' + op.toFixed(3) + ')');
+    orbitsLayer.appendChild(e);
+  });
+
+  const planetsLayer = document.getElementById('planetsLayer');
+  PLANETS.forEach(p => {
+    const c = document.createElementNS(SVG_NS, 'circle');
+    c.setAttribute('r', p.size);
+    c.setAttribute('fill', '#000');
+    c.setAttribute('cx', SUN_X + p.rx);
+    c.setAttribute('cy', SUN_Y);
+    planetsLayer.appendChild(c);
+    p.el = c;
+
+    const t = document.createElementNS(SVG_NS, 'text');
+    t.setAttribute('font-family', '"Times New Roman", Times, Georgia, serif');
+    t.setAttribute('font-style', 'italic');
+    t.setAttribute('font-size', '9.5');
+    t.setAttribute('fill', '#333');
+    t.setAttribute('text-anchor', 'start');
+    t.textContent = p.name;
+    planetsLayer.appendChild(t);
+    p.label = t;
+  });
+
+  const sunHalo = document.getElementById('sunHalo');
+  let t0 = performance.now();
+  let running = true;
+  let pausedElapsed = 0;
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden){
+      running = false;
+    } else {
+      running = true;
+      t0 = performance.now() - pausedElapsed;
+      requestAnimationFrame(loop);
+    }
+  });
+
+  function loop(now){
+    if (!running) return;
+    const t = (now - t0) / 1000;
+    pausedElapsed = now - t0;
+
+    PLANETS.forEach(p => {
+      const ang = t * p.speed + p.phase;
+      const x = SUN_X + p.rx * Math.cos(ang);
+      const y = SUN_Y + p.ry * Math.sin(ang);
+      p.el.setAttribute('cx', x.toFixed(2));
+      p.el.setAttribute('cy', y.toFixed(2));
+      const dx = x - SUN_X;
+      const dy = y - SUN_Y;
+      const len = Math.max(1, Math.sqrt(dx*dx + dy*dy));
+      const lx = x + (dx / len) * 10 + 2;
+      const ly = y + (dy / len) * 10 + 3;
+      p.label.setAttribute('x', lx.toFixed(2));
+      p.label.setAttribute('y', ly.toFixed(2));
+    });
+
+    const pulse = 34 + 3 * Math.sin(t * 0.9);
+    sunHalo.setAttribute('r', pulse.toFixed(1));
+
+    requestAnimationFrame(loop);
+  }
+
+  requestAnimationFrame(loop);
+})();
+
+/* ============================================================
+   SIMULATION CATALOGUE + FILTERS
+   ============================================================ */
+const SIMS = [
+  {
+    slug: 'projectile',
+    title: 'Projectile Motion',
+    subject: 'Physics',
+    topic: 'Mechanics',
+    desc: 'Launch a missile and study how angle, speed, and height change the trajectory. Explore range, time of flight, and vector components in real time.',
+    levels: ['Secondary', 'University']
+  },
+  {
+    slug: 'pendulum',
+    title: 'Simple Pendulum',
+    subject: 'Physics',
+    topic: 'Oscillations',
+    desc: 'Swing a pendulum and explore how length, mass, and gravity affect the period. Observe the small-angle approximation and the shift away from SHM at larger angles.',
+    levels: ['Secondary', 'University']
+  },
+  {
+    slug: 'u-tube',
+    title: 'U-Tube Liquid Oscillation',
+    subject: 'Physics',
+    topic: 'Oscillations',
+    desc: 'Observe a liquid column oscillating in a U-tube. Measure the period, explore damping, and verify the simple harmonic motion model.',
+    levels: ['University', 'Advanced']
+  },
+  {
+    slug: 'solar-system',
+    title: 'Solar System',
+    subject: 'Astronomy',
+    topic: 'Gravitation',
+    desc: 'Watch all eight planets orbit the Sun on their real elliptical paths and explore Kepler\u2019s laws of planetary motion.',
+    levels: ['Secondary', 'University']
+  }
+];
+
+const SUBJECTS = {
+  'Physics':     { key: 'physics',     colour: '#1d4ed8' },
+  'Chemistry':   { key: 'chemistry',   colour: '#0a7d2b' },
+  'Mathematics': { key: 'mathematics', colour: '#9a3412' },
+  'Astronomy':   { key: 'astronomy',   colour: '#5b21b6', label: 'Astronomy & Astrophysics' }
+};
+
+const filterState = { query: '', subject: null, topic: null };
+
+function buildChips(){
+  const subjectOrder = ['Physics', 'Chemistry', 'Mathematics', 'Astronomy'];
+  const subjectChips = document.getElementById('subjectChips');
+  subjectChips.innerHTML = '';
+  subjectOrder.forEach(s => {
+    const count = SIMS.filter(sim => sim.subject === s).length;
+    if (count === 0) return;
+    const meta = SUBJECTS[s];
+    const btn = document.createElement('button');
+    btn.className = 'chip';
+    btn.dataset.value = s;
+    btn.innerHTML = (meta.label || s) + '<span class="count">' + count + '</span>';
+    btn.onclick = () => toggleFilter('subject', s);
+    subjectChips.appendChild(btn);
+  });
+
+  const allTopics = [...new Set(SIMS.map(s => s.topic))].sort();
+  const topicChips = document.getElementById('topicChips');
+  topicChips.innerHTML = '';
+  allTopics.forEach(t => {
+    const count = SIMS.filter(s => s.topic === t).length;
+    const btn = document.createElement('button');
+    btn.className = 'chip';
+    btn.dataset.value = t;
+    btn.innerHTML = t + '<span class="count">' + count + '</span>';
+    btn.onclick = () => toggleFilter('topic', t);
+    topicChips.appendChild(btn);
+  });
+}
+
+function toggleFilter(key, value){
+  if (filterState[key] === value){ filterState[key] = null; }
+  else { filterState[key] = value; }
+  updateChipVisuals();
+  renderGrid();
+}
+
+function updateChipVisuals(){
+  document.querySelectorAll('.chip').forEach(chip => {
+    const parent = chip.parentElement.id;
+    const key = parent === 'subjectChips' ? 'subject' : 'topic';
+    const val = chip.dataset.value;
+    chip.classList.toggle('active', String(filterState[key]) === String(val));
+  });
+}
+
+function matchesFilters(sim){
+  if (filterState.subject && sim.subject !== filterState.subject) return false;
+  if (filterState.topic   && sim.topic   !== filterState.topic)   return false;
+  if (filterState.query){
+    const q = filterState.query.toLowerCase();
+    const haystack = [sim.title, sim.topic, sim.subject, sim.desc, (sim.levels || []).join(' ')]
+                     .join(' ').toLowerCase();
+    if (!haystack.includes(q)) return false;
+  }
+  return true;
+}
+
+function renderGrid(){
+  const grid  = document.getElementById('grid');
+  const empty = document.getElementById('empty');
+  const line  = document.getElementById('resultsLine');
+
+  const matches = SIMS.filter(matchesFilters);
+  grid.innerHTML = '';
+
+  if (matches.length === 0){
+    empty.style.display = 'block';
+    line.innerHTML = 'No simulations found.';
+    return;
+  }
+  empty.style.display = 'none';
+  line.innerHTML = 'Showing <strong>' + matches.length + '</strong> of <strong>' +
+                   SIMS.length + '</strong> simulations.';
+
+  matches.forEach(sim => {
+    const a = document.createElement('a');
+    a.className = 'card';
+    a.href = 'sims/' + sim.slug + '/';
+
+    const meta = SUBJECTS[sim.subject] || { key: 'physics', colour: '#1d4ed8' };
+    const subjectLabel = meta.label || sim.subject;
+    const levelTags = (sim.levels || []).map(lv => '<span class="lvl">' + lv + '</span>').join('');
+
+    a.innerHTML =
+      '<div class="strip ' + meta.key + '"></div>' +
+      '<div class="body">' +
+        '<div class="subject-line">' +
+          '<span class="subject ' + meta.key + '">' + subjectLabel + '</span>' +
+        '</div>' +
+        '<h2>' + sim.title + '</h2>' +
+        '<p class="desc">' + sim.desc + '</p>' +
+        (levelTags ? '<div class="levels">' + levelTags + '</div>' : '') +
+      '</div>';
+    grid.appendChild(a);
+  });
+}
+
+document.getElementById('search').addEventListener('input', e => {
+  filterState.query = e.target.value.trim();
+  renderGrid();
+});
+
+if ('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+
+buildChips();
+renderGrid();
+</script>
+</body>
+</html>
