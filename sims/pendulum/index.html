@@ -19,42 +19,43 @@
     height:100vh;
     display:grid;
     grid-template-rows: auto auto minmax(0, 1fr) auto;
-    padding:10px 18px 10px;
-    gap:8px;overflow:hidden;
+    padding:8px 14px 8px;
+    gap:6px;overflow:hidden;
   }
 
   /* ============ HEADER ============ */
   header.top{
     display:flex;align-items:baseline;justify-content:space-between;
-    gap:16px;padding-bottom:6px;border-bottom:1.5px solid #000;
+    gap:14px;padding-bottom:4px;border-bottom:1.5px solid #000;
     flex-wrap:wrap;
   }
-  header.top .left{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;}
+  header.top .left{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;}
   header.top .back{
-    font-size:10.5pt;font-style:italic;color:#000;
+    font-size:10pt;font-style:italic;color:#000;
     text-decoration:none;border-bottom:1px solid transparent;
   }
   header.top .back:hover{border-bottom-color:#000;}
-  header.top h1{margin:0;font-size:14pt;font-weight:bold;color:#000;}
-  header.top .subtitle{font-size:10pt;font-style:italic;color:#555;}
-  header.top .status{font-size:10.5pt;font-style:italic;color:#333;}
+  header.top h1{margin:0;font-size:13pt;font-weight:bold;color:#000;}
+  header.top .subtitle{font-size:9.5pt;font-style:italic;color:#555;}
+  header.top .status{font-size:10pt;font-style:italic;color:#333;}
   header.top .status .dot{
-    display:inline-block;width:8px;height:8px;border-radius:50%;
-    background:#888;margin-right:6px;vertical-align:middle;
+    display:inline-block;width:7px;height:7px;border-radius:50%;
+    background:#888;margin-right:5px;vertical-align:middle;
   }
   header.top .status.running .dot{background:#000;}
   header.top .status.paused .dot{background:#888;}
 
   /* ============ CONTROLS ============ */
   .controls{
-    display:flex;flex-wrap:wrap;gap:10px 18px;
+    display:flex;flex-wrap:wrap;gap:6px 12px;
     align-items:center;
-    padding:8px 14px;
+    padding:6px 10px;
     background:#f7f7f7;
     border:1px solid #c9c9c9;
     border-radius:4px;
+    font-size:9.5pt;
   }
-  .ctrl{display:flex;align-items:center;gap:7px;font-size:10.5pt;}
+  .ctrl{display:flex;align-items:center;gap:5px;font-size:9.5pt;}
   .ctrl label{font-style:italic;color:#000;white-space:nowrap;}
   .ctrl label em{font-style:italic;font-weight:bold;color:#000;}
   .ctrl .stepper{
@@ -63,8 +64,8 @@
     background:#fff;overflow:hidden;
   }
   .ctrl .stepper button{
-    background:#f0f0f0;border:none;padding:0;width:26px;
-    font-family:inherit;font-size:13pt;font-weight:bold;
+    background:#f0f0f0;border:none;padding:0;width:20px;
+    font-family:inherit;font-size:11pt;font-weight:bold;
     color:#000;cursor:pointer;
     display:flex;align-items:center;justify-content:center;
     user-select:none;
@@ -73,31 +74,35 @@
   .ctrl .stepper button:first-child{border-right:1px solid #888;}
   .ctrl .stepper button:last-child{border-left:1px solid #888;}
   .ctrl .stepper input{
-    width:52px;border:none;outline:none;background:#fff;
+    width:44px;border:none;outline:none;background:#fff;
     text-align:center;
-    font-family:inherit;font-weight:bold;font-size:10.5pt;
-    color:#000;padding:5px 2px;
+    font-family:inherit;font-weight:bold;font-size:9.5pt;
+    color:#000;padding:3px 2px;
     -moz-appearance:textfield;
   }
   .ctrl .stepper input::-webkit-outer-spin-button,
   .ctrl .stepper input::-webkit-inner-spin-button{
     -webkit-appearance:none;margin:0;
   }
-  .buttons{display:flex;gap:14px;margin-left:auto;}
+  .buttons{display:flex;gap:10px;margin-left:auto;}
   .buttons button{
     background:none;border:none;padding:0 0 1px 0;
-    font-family:inherit;font-size:11pt;color:#000;
+    font-family:inherit;font-size:10pt;color:#000;
     cursor:pointer;border-bottom:1px solid #000;letter-spacing:0;
   }
   .buttons button:hover{font-weight:bold;}
   .buttons button.start{font-weight:bold;}
 
-  /* ============ PANELS ============ */
+  /* ============================================================
+     PANELS — 2 × 2 grid
+     ============================================================ */
   .panels{
     display:grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap:12px;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap:8px;
     min-height:0;overflow:hidden;
+    min-width:0;
   }
   .panel{
     position:relative;background:#fff;
@@ -106,11 +111,11 @@
     overflow:hidden;min-width:0;min-height:0;
   }
   .panel .caption{
-    position:absolute;top:6px;left:10px;
-    font-style:italic;font-size:10pt;color:#555;
+    position:absolute;top:5px;left:9px;
+    font-style:italic;font-size:9.5pt;color:#555;
     pointer-events:none;z-index:2;
     background:rgba(255,255,255,0.92);
-    padding:1px 6px;
+    padding:1px 5px;
     letter-spacing:.2px;
   }
   .panel canvas{
@@ -120,44 +125,52 @@
 
   /* ============ DATA BAR ============ */
   .data-bar{
-    display:flex;flex-wrap:wrap;gap:8px 24px;
-    padding:8px 14px;
+    display:flex;flex-wrap:wrap;gap:4px 16px;
+    padding:5px 10px;
     background:#f7f7f7;
     border:1px solid #c9c9c9;
     border-radius:4px;
-    font-size:10.5pt;
+    font-size:9.5pt;
   }
-  .data-bar .item{display:flex;align-items:baseline;gap:5px;}
+  .data-bar .item{display:flex;align-items:baseline;gap:3px;}
   .data-bar .item .k{font-style:italic;color:#555;}
   .data-bar .item .v{
     font-family:Consolas,"Courier New",monospace;
     font-weight:bold;color:#000;
     font-variant-numeric:tabular-nums;
   }
-  .data-bar .item .u{font-style:italic;color:#555;font-size:9.5pt;}
+  .data-bar .item .u{font-style:italic;color:#555;font-size:8.5pt;}
+
+  .data-bar .item .dotkey{
+    display:inline-block;width:8px;height:8px;border-radius:50%;
+    margin-right:3px;vertical-align:middle;
+  }
+  .data-bar .item .dotkey.ke{background:#15803d;}
+  .data-bar .item .dotkey.pe{background:#c2410c;}
+  .data-bar .item .dotkey.tot{background:#1d4ed8;}
 
   /* ============ TOAST ============ */
   .toast{
-    position:fixed;top:58px;left:50%;
+    position:fixed;top:56px;left:50%;
     transform:translateX(-50%) translateY(-60px);
     background:#000;color:#fff;
-    padding:6px 15px;
+    padding:5px 13px;
     font-family:"Times New Roman", Times, serif;
-    font-size:10.5pt;font-style:italic;
+    font-size:10pt;font-style:italic;
     opacity:0;pointer-events:none;
     transition:opacity .22s, transform .22s;
     z-index:999;
   }
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-  @media(max-width:900px){
-    .panels{grid-template-columns:1fr;grid-template-rows:1fr 1fr 1fr;}
-    .panel{min-height:260px;}
-  }
-  @media(max-width:640px), (max-height:520px){
+  /* ============================================================
+     fall back to a single column only on phones
+     ============================================================ */
+  @media(max-width:620px){
     html,body{overflow:auto;height:auto;}
     .app{height:auto;min-height:100vh;}
-    .panel{min-height:320px;}
+    .panels{grid-template-columns:1fr;grid-template-rows:auto;}
+    .panel{min-height:340px;}
     .buttons{margin-left:0;}
   }
 </style>
@@ -170,7 +183,7 @@
     <div class="left">
       <a class="back" href="../../">&larr; All simulations</a>
       <h1>Simple Pendulum</h1>
-      <span class="subtitle">Oscillations &middot; Physics</span>
+      <span class="subtitle">Oscillations &middot; Energy in SHM &middot; Damping</span>
     </div>
     <span class="status" id="statusTag">
       <span class="dot"></span><span id="statusText">Ready</span>
@@ -179,7 +192,7 @@
 
   <div class="controls">
     <div class="ctrl">
-      <label>Length <em>L</em> (m)</label>
+      <label>L (m)</label>
       <div class="stepper">
         <button data-param="L" data-dir="-1">&minus;</button>
         <input type="number" id="in_L" data-param="L" value="1.00">
@@ -187,7 +200,7 @@
       </div>
     </div>
     <div class="ctrl">
-      <label>Mass <em>m</em> (kg)</label>
+      <label>m (kg)</label>
       <div class="stepper">
         <button data-param="m" data-dir="-1">&minus;</button>
         <input type="number" id="in_m" data-param="m" value="0.20">
@@ -195,7 +208,7 @@
       </div>
     </div>
     <div class="ctrl">
-      <label>Gravity <em>g</em> (m/s&sup2;)</label>
+      <label>g (m/s&sup2;)</label>
       <div class="stepper">
         <button data-param="g" data-dir="-1">&minus;</button>
         <input type="number" id="in_g" data-param="g" value="9.81">
@@ -203,11 +216,19 @@
       </div>
     </div>
     <div class="ctrl">
-      <label>Initial angle <em>&theta;&#8320;</em> (&deg;)</label>
+      <label>&theta;&#8320; (&deg;)</label>
       <div class="stepper">
         <button data-param="theta0" data-dir="-1">&minus;</button>
         <input type="number" id="in_theta0" data-param="theta0" value="8.0">
         <button data-param="theta0" data-dir="1">+</button>
+      </div>
+    </div>
+    <div class="ctrl">
+      <label>b (s&#8315;&sup1;)</label>
+      <div class="stepper">
+        <button data-param="b" data-dir="-1">&minus;</button>
+        <input type="number" id="in_b" data-param="b" value="0.00">
+        <button data-param="b" data-dir="1">+</button>
       </div>
     </div>
     <div class="buttons">
@@ -223,44 +244,61 @@
       <canvas id="pendulumCanvas"></canvas>
     </div>
     <div class="panel">
-      <span class="caption">Derivation: x = r &middot; cos&nbsp;&theta;</span>
+      <span class="caption">Derivation: x = r &middot; cos &theta;</span>
       <canvas id="circleCanvas"></canvas>
     </div>
     <div class="panel">
       <span class="caption">Displacement x &middot; time</span>
       <canvas id="graphCanvas"></canvas>
     </div>
+    <div class="panel">
+      <span class="caption">Energy &middot; time</span>
+      <canvas id="energyCanvas"></canvas>
+    </div>
   </main>
 
   <div class="data-bar">
     <div class="item">
-      <span class="k">Displacement x</span>
+      <span class="k">x</span>
       <span class="v" id="readX">0.139</span>
       <span class="u">m</span>
     </div>
     <div class="item">
-      <span class="k">Angle &theta;</span>
+      <span class="k">&theta;</span>
       <span class="v" id="readTheta">8.00</span>
       <span class="u">&deg;</span>
     </div>
     <div class="item">
-      <span class="k">Time t</span>
+      <span class="k">t</span>
       <span class="v" id="readT">0.00</span>
       <span class="u">s</span>
     </div>
     <div class="item">
-      <span class="k">Phase &phi;</span>
-      <span class="v" id="readPhi">0</span>
-      <span class="u">&deg;</span>
-    </div>
-    <div class="item">
-      <span class="k">Period T (ideal)</span>
+      <span class="k">T (ideal)</span>
       <span class="v" id="readTth">2.006</span>
       <span class="u">s</span>
     </div>
     <div class="item">
-      <span class="k">Period T (measured)</span>
+      <span class="k">T (measured)</span>
       <span class="v" id="readTmeas">&mdash;</span>
+    </div>
+    <div class="item">
+      <span class="dotkey ke"></span>
+      <span class="k">KE</span>
+      <span class="v" id="readKE">0.00</span>
+      <span class="u">mJ</span>
+    </div>
+    <div class="item">
+      <span class="dotkey pe"></span>
+      <span class="k">PE</span>
+      <span class="v" id="readPE">19.08</span>
+      <span class="u">mJ</span>
+    </div>
+    <div class="item">
+      <span class="dotkey tot"></span>
+      <span class="k">E</span>
+      <span class="v" id="readE">19.08</span>
+      <span class="u">mJ</span>
     </div>
   </div>
 
@@ -282,82 +320,70 @@ const state = {
   lastCrossT: null,
   measuredT: null,
   params: {
-    L: 1.00,
-    m: 0.20,
-    g: 9.81,
-    theta0: 8 * Math.PI / 180
+    L: 1.00, m: 0.20, g: 9.81,
+    theta0: 8 * Math.PI / 180, b: 0.00
   }
 };
 state.theta = state.params.theta0;
 
 const SIM_DT = 0.002;
-const HISTORY_MAX = 4000;
+const HISTORY_MAX = 5000;
 const TWO_PI = 2 * Math.PI;
 const DEG = Math.PI / 180;
 
-/* ============================================================
-   PHYSICS
-   ============================================================ */
-function angularAccel(theta){
+function angularAccel(theta, omega){
   const p = state.params;
-  return -(p.g / p.L) * Math.sin(theta);
+  return -(p.g / p.L) * Math.sin(theta) - p.b * omega;
 }
-
-function displacement(){
-  return state.params.L * Math.sin(state.theta);
+function displacement(){ return state.params.L * Math.sin(state.theta); }
+function energies(){
+  const p = state.params;
+  const PE = p.m * p.g * p.L * (1 - Math.cos(state.theta));
+  const v = p.L * state.omega;
+  const KE = 0.5 * p.m * v * v;
+  return { KE, PE, total: KE + PE };
 }
-
 function rk4Step(h){
-  const th = state.theta;
-  const om = state.omega;
-
-  const k1th = om;
-  const k1om = angularAccel(th);
-
-  const k2th = om + 0.5 * h * k1om;
-  const k2om = angularAccel(th + 0.5 * h * k1th);
-
-  const k3th = om + 0.5 * h * k2om;
-  const k3om = angularAccel(th + 0.5 * h * k2th);
-
-  const k4th = om + h * k3om;
-  const k4om = angularAccel(th + h * k3th);
-
+  const th = state.theta, om = state.omega;
+  const k1th = om, k1om = angularAccel(th, om);
+  const k2th = om + 0.5*h*k1om, k2om = angularAccel(th + 0.5*h*k1th, om + 0.5*h*k1om);
+  const k3th = om + 0.5*h*k2om, k3om = angularAccel(th + 0.5*h*k2th, om + 0.5*h*k2om);
+  const k4th = om + h*k3om,     k4om = angularAccel(th + h*k3th, om + h*k3om);
   const prevTh = state.theta;
-
-  state.theta += (h / 6) * (k1th + 2*k2th + 2*k3th + k4th);
-  state.omega += (h / 6) * (k1om + 2*k2om + 2*k3om + k4om);
+  state.theta += (h/6)*(k1th + 2*k2th + 2*k3th + k4th);
+  state.omega += (h/6)*(k1om + 2*k2om + 2*k3om + k4om);
   state.t     += h;
-
   const omega0 = Math.sqrt(state.params.g / state.params.L);
   state.phi += omega0 * h;
   while (state.phi >= TWO_PI) state.phi -= TWO_PI;
-
   if (prevTh < 0 && state.theta >= 0){
-    if (state.lastCrossT !== null){
-      state.measuredT = state.t - state.lastCrossT;
-    }
+    if (state.lastCrossT !== null) state.measuredT = state.t - state.lastCrossT;
     state.lastCrossT = state.t;
   }
 }
 
 /* ============================================================
-   CANVAS SETUP
+   CANVASES
    ============================================================ */
-const pendCanvas  = document.getElementById('pendulumCanvas');
-const circCanvas  = document.getElementById('circleCanvas');
-const graphCanvas = document.getElementById('graphCanvas');
+const pendCanvas   = document.getElementById('pendulumCanvas');
+const circCanvas   = document.getElementById('circleCanvas');
+const graphCanvas  = document.getElementById('graphCanvas');
+const energyCanvas = document.getElementById('energyCanvas');
 
-const pctx = pendCanvas.getContext('2d',  { alpha: false });
-const cctx = circCanvas.getContext('2d',  { alpha: false });
-const gctx = graphCanvas.getContext('2d', { alpha: false });
+const pctx = pendCanvas.getContext('2d',   { alpha: false });
+const cctx = circCanvas.getContext('2d',   { alpha: false });
+const gctx = graphCanvas.getContext('2d',  { alpha: false });
+const ectx = energyCanvas.getContext('2d', { alpha: false });
 
 const FONT = '"Times New Roman", Times, Georgia, serif';
+const COL_KE  = '#15803d';
+const COL_PE  = '#c2410c';
+const COL_TOT = '#1d4ed8';
 
 function resizeCanvas(canvas, ctx){
   const rect = canvas.getBoundingClientRect();
-  const w = Math.max(80, Math.round(rect.width));
-  const h = Math.max(80, Math.round(rect.height));
+  const w = Math.max(60, Math.round(rect.width));
+  const h = Math.max(60, Math.round(rect.height));
   const dpr = window.devicePixelRatio || 1;
   const nw = Math.round(w * dpr);
   const nh = Math.round(h * dpr);
@@ -375,7 +401,7 @@ function resizeCanvas(canvas, ctx){
 }
 
 /* ============================================================
-   DRAW — PENDULUM
+   PANEL 1 — PENDULUM
    ============================================================ */
 function drawPendulum(w, h){
   pctx.fillStyle = '#ffffff';
@@ -383,109 +409,82 @@ function drawPendulum(w, h){
 
   const p = state.params;
   const pivotX = w / 2;
-  const pivotY = h * 0.14;
+  const pivotY = h * 0.16;
 
-  const minLv = h * 0.42;
-  const maxLv = h * 0.72;
+  const minLv = h * 0.40;
+  const maxLv = h * 0.70;
   const Lv = minLv + (maxLv - minLv) * (p.L - 0.4) / 2.6;
-
-  const bobR = 10 + 12 * (p.m - 0.05) / 0.95;
+  const bobR = Math.max(8, Math.min(20, 10 + 12 * (p.m - 0.05) / 0.95));
 
   const theta = state.theta;
   const bobX = pivotX + Lv * Math.sin(theta);
   const bobY = pivotY + Lv * Math.cos(theta);
 
-  /* swing arc */
   const a0 = Math.abs(p.theta0);
   if (a0 > 0.005){
     pctx.beginPath();
-    pctx.arc(pivotX, pivotY, Lv, Math.PI / 2 - a0, Math.PI / 2 + a0);
+    pctx.arc(pivotX, pivotY, Lv, Math.PI/2 - a0, Math.PI/2 + a0);
     pctx.strokeStyle = '#cccccc';
     pctx.lineWidth = 1;
-    pctx.setLineDash([3, 5]);
-    pctx.stroke();
-    pctx.setLineDash([]);
+    pctx.setLineDash([3,5]); pctx.stroke(); pctx.setLineDash([]);
   }
 
-  /* equilibrium vertical */
   pctx.beginPath();
   pctx.moveTo(pivotX, pivotY);
-  pctx.lineTo(pivotX, pivotY + Lv + bobR + 10);
+  pctx.lineTo(pivotX, pivotY + Lv + bobR + 8);
   pctx.strokeStyle = '#bbbbbb';
   pctx.lineWidth = 1;
-  pctx.setLineDash([5, 5]);
-  pctx.stroke();
-  pctx.setLineDash([]);
+  pctx.setLineDash([5,5]); pctx.stroke(); pctx.setLineDash([]);
 
-  /* angle arc */
   if (Math.abs(theta) > 0.01){
-    const arcR = Math.min(62, Lv * 0.30);
+    const arcR = Math.min(58, Lv * 0.28);
     pctx.beginPath();
-    pctx.arc(pivotX, pivotY, arcR, Math.PI / 2 - theta, Math.PI / 2, theta > 0);
-    pctx.strokeStyle = '#000000';
-    pctx.lineWidth = 1.3;
-    pctx.stroke();
+    pctx.arc(pivotX, pivotY, arcR, Math.PI/2 - theta, Math.PI/2, theta > 0);
+    pctx.strokeStyle = '#000'; pctx.lineWidth = 1.3; pctx.stroke();
 
-    const midAngle = Math.PI / 2 - theta / 2;
+    const midAngle = Math.PI/2 - theta/2;
     const lx = pivotX + (arcR + 14) * Math.cos(midAngle);
     const ly = pivotY + (arcR + 14) * Math.sin(midAngle);
-    pctx.fillStyle = '#000000';
-    pctx.font = 'italic bold 16px ' + FONT;
-    pctx.textAlign = 'center';
-    pctx.textBaseline = 'middle';
+    pctx.fillStyle = '#000';
+    pctx.font = 'italic bold 15px ' + FONT;
+    pctx.textAlign = 'center'; pctx.textBaseline = 'middle';
     pctx.fillText('\u03B8', lx, ly);
   }
 
-  /* support bar */
-  const hatchW = Math.min(80, w * 0.20);
+  const hatchW = Math.min(80, w * 0.22);
   pctx.beginPath();
-  pctx.moveTo(pivotX - hatchW, pivotY - 12);
-  pctx.lineTo(pivotX + hatchW, pivotY - 12);
-  pctx.strokeStyle = '#000000';
-  pctx.lineWidth = 3;
-  pctx.stroke();
-
-  pctx.strokeStyle = '#000000';
-  pctx.lineWidth = 1;
+  pctx.moveTo(pivotX - hatchW, pivotY - 10);
+  pctx.lineTo(pivotX + hatchW, pivotY - 10);
+  pctx.strokeStyle = '#000'; pctx.lineWidth = 3; pctx.stroke();
+  pctx.strokeStyle = '#000'; pctx.lineWidth = 1;
   for (let i = -hatchW; i <= hatchW; i += 12){
     pctx.beginPath();
-    pctx.moveTo(pivotX + i, pivotY - 12);
-    pctx.lineTo(pivotX + i - 6, pivotY - 22);
+    pctx.moveTo(pivotX + i, pivotY - 10);
+    pctx.lineTo(pivotX + i - 6, pivotY - 20);
     pctx.stroke();
   }
 
-  /* string */
   pctx.beginPath();
   pctx.moveTo(pivotX, pivotY);
   pctx.lineTo(bobX, bobY);
-  pctx.strokeStyle = '#000000';
-  pctx.lineWidth = 1.4;
-  pctx.stroke();
+  pctx.strokeStyle = '#000'; pctx.lineWidth = 1.3; pctx.stroke();
 
-  /* pivot */
   pctx.beginPath();
   pctx.arc(pivotX, pivotY, 5, 0, TWO_PI);
-  pctx.fillStyle = '#000000';
-  pctx.fill();
+  pctx.fillStyle = '#000'; pctx.fill();
 
-  /* bob */
   pctx.beginPath();
   pctx.arc(bobX, bobY, bobR, 0, TWO_PI);
-  pctx.fillStyle = '#222222';
-  pctx.fill();
+  pctx.fillStyle = '#222222'; pctx.fill();
 
-  /* highlight */
   pctx.beginPath();
-  pctx.arc(bobX - bobR * 0.30, bobY - bobR * 0.30, bobR * 0.22, 0, TWO_PI);
-  pctx.fillStyle = 'rgba(255,255,255,0.35)';
-  pctx.fill();
+  pctx.arc(bobX - bobR*0.30, bobY - bobR*0.30, bobR*0.22, 0, TWO_PI);
+  pctx.fillStyle = 'rgba(255,255,255,0.35)'; pctx.fill();
 
-  /* displacement x marker */
   if (Math.abs(theta) > 0.005){
     pctx.save();
-    pctx.setLineDash([3, 3]);
-    pctx.strokeStyle = '#888888';
-    pctx.lineWidth = 1;
+    pctx.setLineDash([3,3]);
+    pctx.strokeStyle = '#888'; pctx.lineWidth = 1;
     pctx.beginPath();
     pctx.moveTo(pivotX, bobY);
     pctx.lineTo(bobX, bobY);
@@ -495,397 +494,414 @@ function drawPendulum(w, h){
     pctx.beginPath();
     pctx.moveTo(pivotX, bobY - 5);
     pctx.lineTo(pivotX, bobY + 5);
-    pctx.strokeStyle = '#888888';
-    pctx.lineWidth = 1;
-    pctx.stroke();
+    pctx.strokeStyle = '#888'; pctx.lineWidth = 1; pctx.stroke();
 
-    pctx.fillStyle = '#000000';
+    pctx.fillStyle = '#000';
     pctx.font = 'italic bold 14px ' + FONT;
-    pctx.textAlign = 'center';
-    pctx.textBaseline = 'bottom';
+    pctx.textAlign = 'center'; pctx.textBaseline = 'bottom';
     pctx.fillText('x', (pivotX + bobX) / 2, bobY - 4);
   }
 
-  /* length label */
   {
-    const mx = (pivotX + bobX) / 2;
-    const my = (pivotY + bobY) / 2;
+    const mx = (pivotX + bobX) / 2, my = (pivotY + bobY) / 2;
     const ux = bobX - pivotX, uy = bobY - pivotY;
-    const norm = Math.sqrt(ux * ux + uy * uy) || 1;
-    const offX = -uy / norm * 15;
-    const offY =  ux / norm * 15;
-    pctx.fillStyle = '#000000';
+    const norm = Math.sqrt(ux*ux + uy*uy) || 1;
+    const offX = -uy/norm*15, offY = ux/norm*15;
+    pctx.fillStyle = '#000';
     pctx.font = 'italic bold 15px ' + FONT;
-    pctx.textAlign = 'center';
-    pctx.textBaseline = 'middle';
+    pctx.textAlign = 'center'; pctx.textBaseline = 'middle';
     pctx.fillText('L', mx + offX, my + offY);
   }
 }
 
 /* ============================================================
-   DRAW — REFERENCE CIRCLE with x = r · cos θ derivation
+   PANEL 2 — REFERENCE CIRCLE with x = r · cos θ
    ============================================================ */
 function drawCircle(w, h){
   cctx.fillStyle = '#ffffff';
   cctx.fillRect(0, 0, w, h);
 
   const cx = w / 2;
-  const cy = h * 0.48;
-  const R  = Math.min(w * 0.32, h * 0.30);
+  const cy = h * 0.42;
+  const R  = Math.min(w * 0.26, h * 0.26);
 
-  /* circle outline */
-  cctx.beginPath();
-  cctx.arc(cx, cy, R, 0, TWO_PI);
-  cctx.strokeStyle = '#000000';
-  cctx.lineWidth = 1.4;
-  cctx.stroke();
-
-  /* horizontal & vertical diameters, faint */
-  cctx.beginPath();
-  cctx.moveTo(cx - R - 30, cy);
-  cctx.lineTo(cx + R + 30, cy);
-  cctx.strokeStyle = '#cccccc';
-  cctx.lineWidth = 1;
-  cctx.stroke();
+  cctx.beginPath(); cctx.arc(cx, cy, R, 0, TWO_PI);
+  cctx.strokeStyle = '#000'; cctx.lineWidth = 1.4; cctx.stroke();
 
   cctx.beginPath();
-  cctx.moveTo(cx, cy - R - 18);
-  cctx.lineTo(cx, cy + R + 18);
-  cctx.strokeStyle = '#e6e6e6';
-  cctx.lineWidth = 1;
-  cctx.stroke();
+  cctx.moveTo(cx - R - 26, cy); cctx.lineTo(cx + R + 26, cy);
+  cctx.strokeStyle = '#ccc'; cctx.lineWidth = 1; cctx.stroke();
+  cctx.beginPath();
+  cctx.moveTo(cx, cy - R - 14); cctx.lineTo(cx, cy + R + 14);
+  cctx.strokeStyle = '#e6e6e6'; cctx.lineWidth = 1; cctx.stroke();
 
-  /* amplitude ticks on horizontal axis */
-  cctx.strokeStyle = '#000000';
-  cctx.lineWidth = 1.3;
+  cctx.strokeStyle = '#000'; cctx.lineWidth = 1.3;
   cctx.beginPath(); cctx.moveTo(cx + R, cy - 5); cctx.lineTo(cx + R, cy + 5); cctx.stroke();
   cctx.beginPath(); cctx.moveTo(cx - R, cy - 5); cctx.lineTo(cx - R, cy + 5); cctx.stroke();
 
-  /* amplitude labels */
-  cctx.fillStyle = '#555555';
-  cctx.font = 'italic 10.5px ' + FONT;
-  cctx.textAlign = 'center';
-  cctx.textBaseline = 'middle';
+  cctx.fillStyle = '#555';
+  cctx.font = 'italic 11px ' + FONT;
+  cctx.textAlign = 'center'; cctx.textBaseline = 'middle';
   cctx.fillText('+r', cx + R, cy - 14);
   cctx.fillText('\u2212r', cx - R, cy - 14);
 
-  /* ---------- right triangle for the derivation ---------- */
   const phi = state.phi;
   const px = cx + R * Math.cos(phi);
   const py = cy - R * Math.sin(phi);
 
-  /* leg 1: hypotenuse O → P (radius) */
-  cctx.beginPath();
-  cctx.moveTo(cx, cy);
-  cctx.lineTo(px, py);
-  cctx.strokeStyle = '#000000';
-  cctx.lineWidth = 1.6;
-  cctx.stroke();
+  cctx.beginPath(); cctx.moveTo(cx, cy); cctx.lineTo(px, py);
+  cctx.strokeStyle = '#000'; cctx.lineWidth = 1.6; cctx.stroke();
 
-  /* leg 2: horizontal O → Q (this is x) */
-  cctx.beginPath();
-  cctx.moveTo(cx, cy);
-  cctx.lineTo(px, cy);
-  cctx.strokeStyle = '#000000';
-  cctx.lineWidth = 1.6;
-  cctx.stroke();
+  cctx.beginPath(); cctx.moveTo(cx, cy); cctx.lineTo(px, cy);
+  cctx.strokeStyle = '#000'; cctx.lineWidth = 1.6; cctx.stroke();
 
-  /* leg 3: vertical Q → P (this is y component) */
   cctx.save();
-  cctx.setLineDash([4, 4]);
-  cctx.beginPath();
-  cctx.moveTo(px, cy);
-  cctx.lineTo(px, py);
-  cctx.strokeStyle = '#888888';
-  cctx.lineWidth = 1.2;
-  cctx.stroke();
+  cctx.setLineDash([4,4]);
+  cctx.beginPath(); cctx.moveTo(px, cy); cctx.lineTo(px, py);
+  cctx.strokeStyle = '#888'; cctx.lineWidth = 1.2; cctx.stroke();
   cctx.restore();
 
-  /* right-angle square at Q */
   if (R > 40){
     const s = 8;
-    const dirX = Math.sign(px - cx) || 1;
-    const dirY = Math.sign(py - cy) || 1;
+    const dX = Math.sign(px - cx) || 1;
+    const dY = Math.sign(py - cy) || 1;
     cctx.beginPath();
-    cctx.moveTo(px - dirX * s, cy);
-    cctx.lineTo(px - dirX * s, cy + dirY * s);
-    cctx.lineTo(px, cy + dirY * s);
-    cctx.strokeStyle = '#555555';
-    cctx.lineWidth = 1;
-    cctx.stroke();
+    cctx.moveTo(px - dX*s, cy);
+    cctx.lineTo(px - dX*s, cy + dY*s);
+    cctx.lineTo(px, cy + dY*s);
+    cctx.strokeStyle = '#555'; cctx.lineWidth = 1; cctx.stroke();
   }
 
-  /* phase arc from +x axis to OP */
   const arcR = R * 0.26;
   if (phi > 0.012){
     cctx.beginPath();
     cctx.arc(cx, cy, arcR, 0, -phi, true);
-    cctx.strokeStyle = '#000000';
-    cctx.lineWidth = 1.4;
-    cctx.stroke();
-
+    cctx.strokeStyle = '#000'; cctx.lineWidth = 1.4; cctx.stroke();
     const bis = phi / 2;
     const lx = cx + (arcR + 12) * Math.cos(bis);
     const ly = cy - (arcR + 12) * Math.sin(bis);
-    cctx.fillStyle = '#000000';
+    cctx.fillStyle = '#000';
     cctx.font = 'italic bold 14px ' + FONT;
-    cctx.textAlign = 'center';
-    cctx.textBaseline = 'middle';
+    cctx.textAlign = 'center'; cctx.textBaseline = 'middle';
     cctx.fillText('\u03B8', lx, ly);
   }
 
-  /* labels on triangle sides */
-  /* radius r — midpoint of OP, offset perpendicular */
   {
-    const mx = (cx + px) / 2;
-    const my = (cy + py) / 2;
+    const mx = (cx + px)/2, my = (cy + py)/2;
     const ux = px - cx, uy = py - cy;
-    const norm = Math.sqrt(ux * ux + uy * uy) || 1;
-    const offX =  uy / norm * 15;
-    const offY = -ux / norm * 15;
-    cctx.fillStyle = '#000000';
+    const norm = Math.sqrt(ux*ux + uy*uy) || 1;
+    const offX = uy/norm*15, offY = -ux/norm*15;
+    cctx.fillStyle = '#000';
     cctx.font = 'italic bold 15px ' + FONT;
-    cctx.textAlign = 'center';
-    cctx.textBaseline = 'middle';
+    cctx.textAlign = 'center'; cctx.textBaseline = 'middle';
     cctx.fillText('r', mx + offX, my + offY);
   }
-
-  /* x leg — midpoint of OQ, below the line */
   {
-    const mx = (cx + px) / 2;
-    const my = cy;
-    cctx.fillStyle = '#000000';
+    const mx = (cx + px)/2;
+    cctx.fillStyle = '#000';
     cctx.font = 'italic bold 15px ' + FONT;
-    cctx.textAlign = 'center';
-    cctx.textBaseline = 'top';
-    cctx.fillText('x', mx, my + 6);
+    cctx.textAlign = 'center'; cctx.textBaseline = 'top';
+    cctx.fillText('x', mx, cy + 6);
   }
 
-  /* phase point P */
-  cctx.beginPath();
-  cctx.arc(px, py, 6, 0, TWO_PI);
-  cctx.fillStyle = '#000000';
-  cctx.fill();
-  cctx.beginPath();
-  cctx.arc(px, py, 2, 0, TWO_PI);
-  cctx.fillStyle = '#ffffff';
-  cctx.fill();
+  cctx.beginPath(); cctx.arc(px, py, 6, 0, TWO_PI);
+  cctx.fillStyle = '#000'; cctx.fill();
+  cctx.beginPath(); cctx.arc(px, py, 2, 0, TWO_PI);
+  cctx.fillStyle = '#fff'; cctx.fill();
 
-  /* P label */
   const pAng = phi + 0.35;
-  cctx.fillStyle = '#000000';
+  cctx.fillStyle = '#000';
   cctx.font = 'italic bold 14px ' + FONT;
-  cctx.textAlign = 'center';
-  cctx.textBaseline = 'middle';
-  cctx.fillText('P', px + 16 * Math.cos(pAng), py - 16 * Math.sin(pAng));
-
-  /* Q label */
-  cctx.fillStyle = '#000000';
+  cctx.textAlign = 'center'; cctx.textBaseline = 'middle';
+  cctx.fillText('P', px + 16*Math.cos(pAng), py - 16*Math.sin(pAng));
   cctx.textBaseline = 'top';
-  cctx.fillText('Q', px, cy + 20);
+  cctx.fillText('Q', px, cy + 18);
 
-  /* centre marker O */
-  cctx.beginPath();
-  cctx.arc(cx, cy, 3, 0, TWO_PI);
-  cctx.fillStyle = '#000000';
-  cctx.fill();
-
-  /* O label */
-  cctx.fillStyle = '#000000';
+  cctx.beginPath(); cctx.arc(cx, cy, 3, 0, TWO_PI);
+  cctx.fillStyle = '#000'; cctx.fill();
+  cctx.fillStyle = '#000';
   cctx.font = 'italic bold 14px ' + FONT;
-  cctx.textAlign = 'right';
-  cctx.textBaseline = 'middle';
+  cctx.textAlign = 'right'; cctx.textBaseline = 'middle';
   cctx.fillText('O', cx - 8, cy - 8);
 
-  /* ---------- the derivation equation at the bottom ---------- */
-  const boxY = h - 58;
-  cctx.fillStyle = '#ffffff';
-  cctx.fillRect(0, boxY - 8, w, 58);
+  /* derivation block */
+  const boxY = h - 66;
+  cctx.fillStyle = '#fff';
+  cctx.fillRect(0, boxY - 6, w, 66);
 
-  cctx.fillStyle = '#000000';
-  cctx.font = 'italic 13px ' + FONT;
-  cctx.textAlign = 'center';
-  cctx.textBaseline = 'top';
-  cctx.fillText('In the right triangle OPQ:  cos \u03B8 = x / r',
+  cctx.fillStyle = '#000';
+  cctx.font = 'italic 12.5px ' + FONT;
+  cctx.textAlign = 'center'; cctx.textBaseline = 'top';
+  cctx.fillText('In triangle OPQ:  cos \u03B8 = x / r',
                w / 2, boxY);
   cctx.font = 'bold italic 15px ' + FONT;
   cctx.fillText('\u2234   x = r \u00B7 cos \u03B8',
-               w / 2, boxY + 20);
-  cctx.font = 'italic 11px ' + FONT;
-  cctx.fillStyle = '#666666';
-  cctx.fillText('Displacement of the pendulum from equilibrium',
-               w / 2, boxY + 42);
+               w / 2, boxY + 19);
+  cctx.font = 'italic 10.5px ' + FONT;
+  cctx.fillStyle = '#666';
+  cctx.fillText('SHM is the projection of circular motion',
+               w / 2, boxY + 43);
 }
 
 /* ============================================================
-   DRAW — GRAPH  (x vs t, origin always visible)
+   PANEL 3 — DISPLACEMENT vs TIME
    ============================================================ */
 function drawGraph(w, h){
   gctx.fillStyle = '#ffffff';
   gctx.fillRect(0, 0, w, h);
 
-  const M = { l: 66, r: 26, t: 30, b: 52 };
+  const M = { l: 56, r: 18, t: 24, b: 42 };
   const pw = w - M.l - M.r;
   const ph = h - M.t - M.b;
 
-  /* ---------- TIME AXIS ALWAYS STARTS AT 0 ---------- */
   const tMin = 0;
-  /* time window grows in rounded steps so the whole history is always visible */
   const tMax = Math.max(10, Math.ceil(state.t / 5) * 5);
-
-  /* amplitude in metres */
   const p = state.params;
-  const xMax = p.L * Math.sin(p.theta0);
-  const xMaxPlot = Math.max(xMax, 0.005) * 1.18;
+  const xMaxPlot = Math.max(p.L * Math.sin(p.theta0), 0.005) * 1.18;
 
   const gx = t => M.l + (t - tMin) / (tMax - tMin) * pw;
   const gy = x => M.t + (xMaxPlot - x) / (2 * xMaxPlot) * ph;
 
-  /* grid */
-  gctx.strokeStyle = '#eeeeee';
-  gctx.lineWidth = 1;
+  gctx.strokeStyle = '#eee'; gctx.lineWidth = 1;
   for (let i = 0; i <= 8; i++){
     const y = M.t + i * ph / 8;
-    gctx.beginPath();
-    gctx.moveTo(M.l, y);
-    gctx.lineTo(M.l + pw, y);
-    gctx.stroke();
+    gctx.beginPath(); gctx.moveTo(M.l, y); gctx.lineTo(M.l + pw, y); gctx.stroke();
   }
   for (let i = 0; i <= 8; i++){
     const x = M.l + i * pw / 8;
-    gctx.beginPath();
-    gctx.moveTo(x, M.t);
-    gctx.lineTo(x, M.t + ph);
-    gctx.stroke();
+    gctx.beginPath(); gctx.moveTo(x, M.t); gctx.lineTo(x, M.t + ph); gctx.stroke();
   }
 
-  /* zero line for x — this is the origin line of the graph */
   const y0 = gy(0);
-  gctx.strokeStyle = '#888888';
-  gctx.lineWidth = 1;
-  gctx.beginPath();
-  gctx.moveTo(M.l, y0);
-  gctx.lineTo(M.l + pw, y0);
-  gctx.stroke();
+  gctx.strokeStyle = '#888'; gctx.lineWidth = 1;
+  gctx.beginPath(); gctx.moveTo(M.l, y0); gctx.lineTo(M.l + pw, y0); gctx.stroke();
 
-  /* axes — the t axis starts at the left, the x axis is at y=0 */
-  gctx.strokeStyle = '#000000';
-  gctx.lineWidth = 1.3;
-  gctx.beginPath();
-  gctx.moveTo(M.l, M.t);
-  gctx.lineTo(M.l, M.t + ph);
-  gctx.stroke();
-  gctx.beginPath();
-  gctx.moveTo(M.l, y0);
-  gctx.lineTo(M.l + pw, y0);
-  gctx.stroke();
+  gctx.strokeStyle = '#000'; gctx.lineWidth = 1.3;
+  gctx.beginPath(); gctx.moveTo(M.l, M.t); gctx.lineTo(M.l, M.t + ph); gctx.stroke();
+  gctx.beginPath(); gctx.moveTo(M.l, y0); gctx.lineTo(M.l + pw, y0); gctx.stroke();
 
-  /* origin marker at (0, 0) */
   gctx.beginPath();
   gctx.arc(M.l, y0, 2.6, 0, TWO_PI);
-  gctx.fillStyle = '#000000';
-  gctx.fill();
-  gctx.fillStyle = '#000000';
+  gctx.fillStyle = '#000'; gctx.fill();
+  gctx.fillStyle = '#000';
   gctx.font = 'italic 11px ' + FONT;
-  gctx.textAlign = 'left';
-  gctx.textBaseline = 'top';
+  gctx.textAlign = 'left'; gctx.textBaseline = 'top';
   gctx.fillText('O', M.l + 6, y0 + 4);
 
-  /* y-axis labels */
-  gctx.fillStyle = '#000000';
-  gctx.font = '11.5px ' + FONT;
-  gctx.textAlign = 'right';
-  gctx.textBaseline = 'middle';
+  gctx.fillStyle = '#000';
+  gctx.font = '11px ' + FONT;
+  gctx.textAlign = 'right'; gctx.textBaseline = 'middle';
   gctx.fillText('+' + xMaxPlot.toFixed(3), M.l - 8, gy( xMaxPlot));
   gctx.fillText('0', M.l - 8, gy(0));
   gctx.fillText('\u2212' + xMaxPlot.toFixed(3), M.l - 8, gy(-xMaxPlot));
 
-  /* y-axis title */
   gctx.save();
-  gctx.translate(16, M.t + ph / 2);
+  gctx.translate(12, M.t + ph / 2);
   gctx.rotate(-Math.PI / 2);
-  gctx.textAlign = 'center';
-  gctx.textBaseline = 'middle';
-  gctx.fillStyle = '#000000';
-  gctx.font = 'italic 13px ' + FONT;
+  gctx.textAlign = 'center'; gctx.textBaseline = 'middle';
+  gctx.fillStyle = '#000'; gctx.font = 'italic 12.5px ' + FONT;
   gctx.fillText('displacement  x  (m)', 0, 0);
   gctx.restore();
 
-  /* x-axis ticks — always starting from t = 0 */
-  gctx.fillStyle = '#000000';
-  gctx.font = '11.5px ' + FONT;
-  gctx.textAlign = 'center';
-  gctx.textBaseline = 'top';
+  gctx.fillStyle = '#000';
+  gctx.font = '11px ' + FONT;
+  gctx.textAlign = 'center'; gctx.textBaseline = 'top';
   const tickStep = (tMax <= 10) ? 2 : 5;
   for (let tv = 0; tv <= tMax + 1e-6; tv += tickStep){
     const x = gx(tv);
     gctx.beginPath();
     gctx.moveTo(x, M.t + ph);
     gctx.lineTo(x, M.t + ph + 4);
-    gctx.strokeStyle = '#000000';
-    gctx.lineWidth = 1;
-    gctx.stroke();
-    gctx.fillText(tv.toFixed(0), x, M.t + ph + 8);
+    gctx.strokeStyle = '#000'; gctx.lineWidth = 1; gctx.stroke();
+    gctx.fillText(tv.toFixed(0), x, M.t + ph + 7);
   }
-
-  /* x-axis title */
-  gctx.fillStyle = '#000000';
-  gctx.font = 'italic 13px ' + FONT;
-  gctx.textAlign = 'center';
-  gctx.textBaseline = 'bottom';
+  gctx.fillStyle = '#000';
+  gctx.font = 'italic 12.5px ' + FONT;
+  gctx.textAlign = 'center'; gctx.textBaseline = 'bottom';
   gctx.fillText('time  t  (s)', M.l + pw / 2, h - 8);
 
-  /* ---------- data curve, drawn from t = 0 onward ---------- */
   if (state.history.length > 1){
     gctx.beginPath();
     let started = false;
     for (const pt of state.history){
       if (pt.t < 0) continue;
-      const x = gx(pt.t);
-      const y = gy(pt.x);
+      const x = gx(pt.t), y = gy(pt.x);
       if (!started){ gctx.moveTo(x, y); started = true; }
       else gctx.lineTo(x, y);
     }
-    gctx.strokeStyle = '#000000';
-    gctx.lineWidth = 1.9;
-    gctx.stroke();
+    gctx.strokeStyle = '#000'; gctx.lineWidth = 1.8; gctx.stroke();
 
-    /* current position marker */
-    const px = gx(state.t);
-    const py = gy(displacement());
+    const px = gx(state.t), py = gy(displacement());
     if (px >= M.l - 1 && px <= M.l + pw + 1){
-      gctx.beginPath();
-      gctx.arc(px, py, 5, 0, TWO_PI);
-      gctx.fillStyle = '#ffffff';
-      gctx.fill();
-      gctx.beginPath();
-      gctx.arc(px, py, 5, 0, TWO_PI);
-      gctx.strokeStyle = '#000000';
-      gctx.lineWidth = 1.5;
-      gctx.stroke();
+      gctx.beginPath(); gctx.arc(px, py, 4.5, 0, TWO_PI);
+      gctx.fillStyle = '#fff'; gctx.fill();
+      gctx.beginPath(); gctx.arc(px, py, 4.5, 0, TWO_PI);
+      gctx.strokeStyle = '#000'; gctx.lineWidth = 1.5; gctx.stroke();
     }
   }
 
-  /* placeholder before release */
   if (state.history.length < 2 && !state.running){
-    gctx.fillStyle = '#999999';
-    gctx.font = 'italic 12.5px ' + FONT;
-    gctx.textAlign = 'center';
-    gctx.textBaseline = 'middle';
-    gctx.fillText('Press \u201CRelease\u201D to plot the displacement',
-                   M.l + pw / 2, M.t + ph / 2);
+    gctx.fillStyle = '#999';
+    gctx.font = 'italic 12px ' + FONT;
+    gctx.textAlign = 'center'; gctx.textBaseline = 'middle';
+    gctx.fillText('Press \u201CRelease\u201D to plot x(t)',
+                   M.l + pw/2, M.t + ph/2);
+  }
+}
+
+/* ============================================================
+   PANEL 4 — ENERGY vs TIME
+   ============================================================ */
+function drawEnergy(w, h){
+  ectx.fillStyle = '#ffffff';
+  ectx.fillRect(0, 0, w, h);
+
+  const M = { l: 56, r: 18, t: 24, b: 42 };
+  const pw = w - M.l - M.r;
+  const ph = h - M.t - M.b;
+
+  const tMin = 0;
+  const tMax = Math.max(10, Math.ceil(state.t / 5) * 5);
+
+  const p = state.params;
+  const E0mJ = p.m * p.g * p.L * (1 - Math.cos(p.theta0)) * 1000;
+  const yMax = Math.max(E0mJ, 0.5) * 1.15;
+
+  const gx = t => M.l + (t - tMin) / (tMax - tMin) * pw;
+  const gy = E => M.t + (yMax - E) / yMax * ph;
+
+  ectx.strokeStyle = '#eee'; ectx.lineWidth = 1;
+  for (let i = 0; i <= 8; i++){
+    const y = M.t + i * ph / 8;
+    ectx.beginPath(); ectx.moveTo(M.l, y); ectx.lineTo(M.l + pw, y); ectx.stroke();
+  }
+  for (let i = 0; i <= 8; i++){
+    const x = M.l + i * pw / 8;
+    ectx.beginPath(); ectx.moveTo(x, M.t); ectx.lineTo(x, M.t + ph); ectx.stroke();
+  }
+
+  ectx.strokeStyle = '#000'; ectx.lineWidth = 1.3;
+  ectx.beginPath(); ectx.moveTo(M.l, M.t); ectx.lineTo(M.l, M.t + ph); ectx.stroke();
+  ectx.beginPath(); ectx.moveTo(M.l, M.t + ph); ectx.lineTo(M.l + pw, M.t + ph); ectx.stroke();
+
+  ectx.beginPath();
+  ectx.arc(M.l, M.t + ph, 2.6, 0, TWO_PI);
+  ectx.fillStyle = '#000'; ectx.fill();
+
+  ectx.fillStyle = '#000';
+  ectx.font = '11px ' + FONT;
+  ectx.textAlign = 'right'; ectx.textBaseline = 'middle';
+  ectx.fillText(yMax.toFixed(1), M.l - 8, M.t + 6);
+  ectx.fillText((yMax/2).toFixed(1), M.l - 8, M.t + ph/2);
+  ectx.fillText('0', M.l - 8, M.t + ph - 6);
+
+  ectx.save();
+  ectx.translate(12, M.t + ph / 2);
+  ectx.rotate(-Math.PI / 2);
+  ectx.textAlign = 'center'; ectx.textBaseline = 'middle';
+  ectx.fillStyle = '#000'; ectx.font = 'italic 12.5px ' + FONT;
+  ectx.fillText('energy  (mJ)', 0, 0);
+  ectx.restore();
+
+  ectx.fillStyle = '#000';
+  ectx.font = '11px ' + FONT;
+  ectx.textAlign = 'center'; ectx.textBaseline = 'top';
+  const tickStep = (tMax <= 10) ? 2 : 5;
+  for (let tv = 0; tv <= tMax + 1e-6; tv += tickStep){
+    const x = gx(tv);
+    ectx.beginPath();
+    ectx.moveTo(x, M.t + ph);
+    ectx.lineTo(x, M.t + ph + 4);
+    ectx.strokeStyle = '#000'; ectx.lineWidth = 1; ectx.stroke();
+    ectx.fillText(tv.toFixed(0), x, M.t + ph + 7);
+  }
+  ectx.fillStyle = '#000';
+  ectx.font = 'italic 12.5px ' + FONT;
+  ectx.textAlign = 'center'; ectx.textBaseline = 'bottom';
+  ectx.fillText('time  t  (s)', M.l + pw / 2, h - 8);
+
+  if (state.history.length > 1){
+    ectx.beginPath();
+    { let started = false;
+      for (const pt of state.history){
+        if (pt.t < 0) continue;
+        const x = gx(pt.t), y = gy(pt.PE * 1000);
+        if (!started){ ectx.moveTo(x, y); started = true; }
+        else ectx.lineTo(x, y);
+      } }
+    ectx.strokeStyle = COL_PE; ectx.lineWidth = 1.8; ectx.stroke();
+
+    ectx.beginPath();
+    { let started = false;
+      for (const pt of state.history){
+        if (pt.t < 0) continue;
+        const x = gx(pt.t), y = gy(pt.KE * 1000);
+        if (!started){ ectx.moveTo(x, y); started = true; }
+        else ectx.lineTo(x, y);
+      } }
+    ectx.strokeStyle = COL_KE; ectx.lineWidth = 1.8; ectx.stroke();
+
+    ectx.beginPath();
+    { let started = false;
+      for (const pt of state.history){
+        if (pt.t < 0) continue;
+        const x = gx(pt.t), y = gy((pt.KE + pt.PE) * 1000);
+        if (!started){ ectx.moveTo(x, y); started = true; }
+        else ectx.lineTo(x, y);
+      } }
+    ectx.strokeStyle = COL_TOT; ectx.lineWidth = 2.0; ectx.stroke();
+
+    const eNow = energies();
+    const px = gx(state.t);
+    const py = gy((eNow.KE + eNow.PE) * 1000);
+    if (px >= M.l - 1 && px <= M.l + pw + 1){
+      ectx.beginPath(); ectx.arc(px, py, 4.5, 0, TWO_PI);
+      ectx.fillStyle = '#fff'; ectx.fill();
+      ectx.beginPath(); ectx.arc(px, py, 4.5, 0, TWO_PI);
+      ectx.strokeStyle = COL_TOT; ectx.lineWidth = 1.6; ectx.stroke();
+    }
+  }
+
+  /* legend */
+  {
+    const lx = M.l + 10;
+    let ly = M.t + 12;
+    const rows = [
+      { c: COL_KE,  t: 'KE' },
+      { c: COL_PE,  t: 'PE' },
+      { c: COL_TOT, t: 'KE + PE' }
+    ];
+    ectx.font = 'italic 11px ' + FONT;
+    ectx.textAlign = 'left'; ectx.textBaseline = 'middle';
+    rows.forEach(r => {
+      ectx.fillStyle = r.c;
+      ectx.fillRect(lx, ly - 4, 14, 3);
+      ectx.fillStyle = '#000';
+      ectx.fillText(r.t, lx + 20, ly - 2);
+      ly += 16;
+    });
+  }
+
+  if (state.history.length < 2 && !state.running){
+    ectx.fillStyle = '#999';
+    ectx.font = 'italic 12px ' + FONT;
+    ectx.textAlign = 'center'; ectx.textBaseline = 'middle';
+    ectx.fillText('Press \u201CRelease\u201D to plot energy',
+                   M.l + pw/2, M.t + ph/2);
   }
 }
 
 /* ============================================================
    READOUTS
    ============================================================ */
-const elX      = document.getElementById('readX');
-const elTheta  = document.getElementById('readTheta');
-const elT      = document.getElementById('readT');
-const elPhi    = document.getElementById('readPhi');
-const elTth    = document.getElementById('readTth');
-const elTmeas  = document.getElementById('readTmeas');
+const elX     = document.getElementById('readX');
+const elTheta = document.getElementById('readTheta');
+const elT     = document.getElementById('readT');
+const elTth   = document.getElementById('readTth');
+const elTmeas = document.getElementById('readTmeas');
+const elKE    = document.getElementById('readKE');
+const elPE    = document.getElementById('readPE');
+const elE     = document.getElementById('readE');
 const statusTag  = document.getElementById('statusTag');
 const statusText = document.getElementById('statusText');
 const toast      = document.getElementById('toast');
@@ -893,20 +909,20 @@ const toastMsg   = document.getElementById('toastMsg');
 
 function updateReadouts(){
   const p = state.params;
-  const thDeg = state.theta * 180 / Math.PI;
-  const phiDeg = state.phi * 180 / Math.PI;
   const Tth = 2 * Math.PI * Math.sqrt(p.L / p.g);
-
+  const e = energies();
   elX.textContent     = displacement().toFixed(3);
-  elTheta.textContent = thDeg.toFixed(2);
+  elTheta.textContent = (state.theta * 180 / Math.PI).toFixed(2);
   elT.textContent     = state.t.toFixed(2);
-  elPhi.textContent   = phiDeg.toFixed(0);
   elTth.textContent   = Tth.toFixed(3);
   elTmeas.textContent = state.measuredT ? state.measuredT.toFixed(3) + ' s' : '\u2014';
+  elKE.textContent    = (e.KE * 1000).toFixed(2);
+  elPE.textContent    = (e.PE * 1000).toFixed(2);
+  elE.textContent     = ((e.KE + e.PE) * 1000).toFixed(2);
 }
 
 /* ============================================================
-   ANIMATION LOOP
+   LOOP
    ============================================================ */
 let lastFrame = performance.now();
 let acc = 0;
@@ -917,22 +933,22 @@ function loop(now){
 
   if (state.running){
     acc += realDt;
-    while (acc >= SIM_DT){
-      rk4Step(SIM_DT);
-      acc -= SIM_DT;
-    }
-    state.history.push({ t: state.t, x: displacement() });
+    while (acc >= SIM_DT){ rk4Step(SIM_DT); acc -= SIM_DT; }
+    const e = energies();
+    state.history.push({ t: state.t, x: displacement(), KE: e.KE, PE: e.PE });
     while (state.history.length > HISTORY_MAX) state.history.shift();
-    if (state.t > 60) state.running = false;
+    if (state.t > 90) state.running = false;
   }
 
-  const a = resizeCanvas(pendCanvas,  pctx);
-  const b = resizeCanvas(circCanvas,  cctx);
-  const c = resizeCanvas(graphCanvas, gctx);
+  const a = resizeCanvas(pendCanvas,   pctx);
+  const b = resizeCanvas(circCanvas,   cctx);
+  const c = resizeCanvas(graphCanvas,  gctx);
+  const d = resizeCanvas(energyCanvas, ectx);
 
   drawPendulum(a.w, a.h);
   drawCircle(b.w, b.h);
   drawGraph(c.w, c.h);
+  drawEnergy(d.w, d.h);
   updateReadouts();
 
   requestAnimationFrame(loop);
@@ -945,7 +961,8 @@ const PARAMS = [
   { id: 'L',      key: 'L',      min: 0.40, max: 3.00, step: 0.05, dec: 2, scale: 1 },
   { id: 'm',      key: 'm',      min: 0.05, max: 1.00, step: 0.01, dec: 2, scale: 1 },
   { id: 'g',      key: 'g',      min: 1.00, max: 25.0, step: 0.01, dec: 2, scale: 1 },
-  { id: 'theta0', key: 'theta0', min: 2.0,  max: 30.0, step: 0.5,  dec: 1, scale: DEG }
+  { id: 'theta0', key: 'theta0', min: 2.0,  max: 30.0, step: 0.5,  dec: 1, scale: DEG },
+  { id: 'b',      key: 'b',      min: 0.00, max: 6.00, step: 0.05, dec: 2, scale: 1 }
 ];
 
 function setParam(id, userValue){
@@ -956,10 +973,7 @@ function setParam(id, userValue){
   v = Math.max(cfg.min, Math.min(cfg.max, v));
   state.params[cfg.key] = v * cfg.scale;
   document.getElementById('in_' + cfg.id).value = v.toFixed(cfg.dec);
-
-  if (cfg.key === 'theta0' && !state.running){
-    state.theta = state.params.theta0;
-  }
+  if (cfg.key === 'theta0' && !state.running) state.theta = state.params.theta0;
 }
 
 document.querySelectorAll('.stepper button').forEach(btn => {
@@ -968,8 +982,7 @@ document.querySelectorAll('.stepper button').forEach(btn => {
     const dir = parseFloat(btn.dataset.dir);
     const cfg = PARAMS.find(p => p.id === id);
     if (!cfg) return;
-    const cur = state.params[cfg.key] / cfg.scale;
-    setParam(id, cur + dir * cfg.step);
+    setParam(id, state.params[cfg.key] / cfg.scale + dir * cfg.step);
   });
 });
 
@@ -993,43 +1006,27 @@ document.querySelectorAll('.stepper input').forEach(inp => {
 
 document.getElementById('btnStart').addEventListener('click', () => {
   state.theta = state.params.theta0;
-  state.omega = 0;
-  state.phi   = 0;
-  state.t     = 0;
-  state.history = [];
-  state.lastCrossT = null;
-  state.measuredT  = null;
-  acc = 0;
-  state.running = true;
+  state.omega = 0; state.phi = 0; state.t = 0;
+  state.history = []; state.lastCrossT = null; state.measuredT = null;
+  acc = 0; state.running = true;
   setStatus('running', 'Running');
-  showToast('Pendulum released from \u03B8\u2080 = ' +
-            (state.params.theta0 * 180 / Math.PI).toFixed(1) + '\u00B0');
+  const msg = state.params.b > 0
+    ? 'Released with damping b = ' + state.params.b.toFixed(2) + ' s\u207B\u00B9'
+    : 'Released from \u03B8\u2080 = ' + (state.params.theta0 * 180 / Math.PI).toFixed(1) + '\u00B0';
+  showToast(msg);
 });
 
 document.getElementById('btnPause').addEventListener('click', () => {
-  if (state.running){
-    state.running = false;
-    setStatus('paused', 'Paused');
-    showToast('Paused');
-  } else {
-    state.running = true;
-    setStatus('running', 'Running');
-    showToast('Resumed');
-  }
+  if (state.running){ state.running = false; setStatus('paused', 'Paused'); showToast('Paused'); }
+  else { state.running = true; setStatus('running', 'Running'); showToast('Resumed'); }
 });
 
 document.getElementById('btnReset').addEventListener('click', () => {
   state.theta = state.params.theta0;
-  state.omega = 0;
-  state.phi   = 0;
-  state.t     = 0;
-  state.history = [];
-  state.lastCrossT = null;
-  state.measuredT  = null;
-  acc = 0;
-  state.running = false;
-  setStatus('', 'Ready');
-  showToast('Reset');
+  state.omega = 0; state.phi = 0; state.t = 0;
+  state.history = []; state.lastCrossT = null; state.measuredT = null;
+  acc = 0; state.running = false;
+  setStatus('', 'Ready'); showToast('Reset');
 });
 
 function setStatus(cls, txt){
@@ -1056,6 +1053,7 @@ setParam('L',      1.00);
 setParam('m',      0.20);
 setParam('g',      9.81);
 setParam('theta0', 8.0);
+setParam('b',      0.00);
 
 requestAnimationFrame(loop);
 setTimeout(() => showToast('Space = pause \u00B7 R = release \u00B7 C = reset'), 500);
