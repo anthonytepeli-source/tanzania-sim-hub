@@ -3,775 +3,1511 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tanzania Simulation Hub — Interactive Science Simulations</title>
-<meta name="description" content="Free interactive science simulations in Physics, Chemistry, Mathematics, and Astronomy. For students, teachers, and researchers at every level. Founded by Anthony A. Tepeli and Loema Sanzu.">
-<meta name="author" content="Anthony A. Tepeli, Loema Sanzu">
+<title>Tanzania Simulation Hub · T·SIMHUB</title>
+<meta name="description" content="A growing library of physics simulations from IGCSE to cosmology.">
+<meta name="author" content="Anthony A. Tepeli, Loema B. Sanzu">
 <link rel="manifest" href="/manifest.webmanifest">
-<meta name="theme-color" content="#1d4ed8">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="SimHub TZ">
+<meta name="theme-color" content="#050810">
+
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23050810'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%23ffd97a'/%3E%3Cellipse cx='32' cy='32' rx='22' ry='8' fill='none' stroke='%237ba3d9' stroke-width='1' transform='rotate(-25 32 32)'/%3E%3Cellipse cx='32' cy='32' rx='22' ry='8' fill='none' stroke='%237ba3d9' stroke-width='1' transform='rotate(35 32 32)'/%3E%3C/svg%3E">
 
 <style>
-  *{box-sizing:border-box;}
-  html,body{
-    margin:0;padding:0;
-    background:#ffffff;color:#000;
-    font-family:"Times New Roman", Times, Georgia, serif;
-    font-size:12pt;line-height:1.5;
-  }
+:root{ --serif:"Times New Roman", Times, Georgia, serif; }
+html.theme-dark{
+  --bg:#0a0e17; --bg-elev:#0f1420; --bg-soft:#131826;
+  --ink:#e4e9f2; --ink-soft:#a8b0c1; --ink-mute:#6d7688;
+  --rule:#232a3a; --rule-fine:#1a1f2c;
+  --accent:#7ba3d9; --accent-warm:#ffd97a;
+  --tab-active-bg:rgba(255,217,122,0.10);
+  color-scheme:dark;
+}
+html.theme-light{
+  --bg:#fbfaf7; --bg-elev:#ffffff; --bg-soft:#f4f1e8;
+  --ink:#12151d; --ink-soft:#4d5464; --ink-mute:#7a8296;
+  --rule:#d9d6cc; --rule-fine:#ebe8de;
+  --accent:#1e40af; --accent-warm:#b45309;
+  --tab-active-bg:rgba(180,83,9,0.08);
+  color-scheme:light;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{
+  background:var(--bg);color:var(--ink);
+  font-family:var(--serif);font-size:16px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  transition:background .35s ease, color .35s ease;
+}
 
-  /* ============================================================
-     SOLAR SYSTEM BANNER — academic line drawing
-     ============================================================ */
-  .solar-banner{
-    position:relative;
-    width:100%;
-    height:340px;
-    background:#ffffff;
-    border-bottom:1.5px solid #000;
-    overflow:hidden;
-  }
-  .solar-banner svg{
-    display:block;
-    width:100%;
-    height:100%;
-  }
-  .solar-banner .banner-caption{
-    position:absolute;
-    left:50%;
-    bottom:10px;
-    transform:translateX(-50%);
-    font-family:"Times New Roman", Times, serif;
-    font-style:italic;
-    font-size:10pt;
-    color:#4a5568;
-    letter-spacing:.3px;
-    text-align:center;
-    pointer-events:none;
-    white-space:nowrap;
-    background:#ffffff;
-    padding:0 12px;
-  }
-  @media(max-width:960px){
-    .solar-banner{height:260px;}
-    .solar-banner .banner-caption{font-size:9.5pt;bottom:8px;}
-  }
-  @media(max-width:600px){
-    .solar-banner{height:190px;}
-    .solar-banner .banner-caption{font-size:8.5pt;letter-spacing:.1px;}
-  }
+/* TOP BAR */
+.topbar{
+  position:sticky;top:0;z-index:100;
+  background:rgba(5,8,16,0.86);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(180,205,240,0.12);
+}
+.topbar-inner{
+  max-width:1280px;margin:0 auto;padding:11px 32px;
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
+}
+@media(max-width:640px){ .topbar-inner{padding:10px 18px;} }
+.banner{
+  display:inline-flex;align-items:baseline;gap:11px;color:#fff;
+  font-family:var(--serif);text-decoration:none;white-space:nowrap;
+}
+.banner .dot{
+  display:inline-block;width:9px;height:9px;border-radius:50%;
+  background:#ffd97a;box-shadow:0 0 12px rgba(255,217,122,0.85);
+  position:relative;top:1px;animation:pulse 3s ease-in-out infinite;
+}
+@keyframes pulse{
+  0%,100%{box-shadow:0 0 12px rgba(255,217,122,0.85);}
+  50%{box-shadow:0 0 20px rgba(255,217,122,1);}
+}
+.banner .main{font-size:14.5px;font-weight:bold;letter-spacing:0.3px;color:#fff;}
+.banner .sub{font-size:12.5px;font-style:italic;color:rgba(255,255,255,0.72);letter-spacing:0.4px;}
+.banner .sub::before{content:"·";margin-right:8px;color:rgba(255,255,255,0.4);}
+@media(max-width:520px){ .banner .sub{display:none;} }
+.topnav{display:flex;align-items:center;gap:22px;font-size:13.5px;}
+.topnav a{
+  color:rgba(255,255,255,0.72);text-decoration:none;font-style:italic;
+  padding-bottom:1px;border-bottom:1px solid transparent;
+  transition:color .15s, border-color .15s;
+}
+.topnav a:hover{color:#fff;border-bottom-color:#ffd97a;}
+@media(max-width:720px){ .topnav a{display:none;} }
+.theme-btn{
+  width:36px;height:36px;border-radius:50%;
+  border:1px solid rgba(180,205,240,0.22);
+  background:rgba(255,255,255,0.04);color:#fff;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;
+  transition:background .15s, border-color .15s, transform .1s;
+}
+.theme-btn:hover{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.45);}
+.theme-btn:active{transform:scale(0.92);}
+.theme-btn svg{width:17px;height:17px;fill:currentColor;}
+.theme-btn .sun{display:none;}
+html.theme-light .theme-btn .sun{display:block;}
+html.theme-light .theme-btn .moon{display:none;}
 
-  /* ---------- HEADER ---------- */
-  header.site{
-    border-bottom:1.5px solid #000;
-    padding:24px 26px 20px;
-    background:#fff;
-  }
-  header.site .inner{
-    max-width:1180px;margin:0 auto;
-    display:flex;align-items:flex-start;justify-content:space-between;
-    gap:28px;flex-wrap:wrap;
-  }
-  header.site .brand{
-    display:block;
-  }
-  header.site .brand .text h1{
-    margin:0;font-size:22pt;font-weight:bold;letter-spacing:.2px;
-    color:#000;line-height:1.15;
-  }
-  header.site .brand .text .byline{
-    margin:8px 0 0 0;font-size:10.5pt;font-style:italic;
-    color:#4a5568;line-height:1.5;
-  }
-  header.site .brand .text .byline strong{
-    font-style:normal;color:#1e3a8a;font-weight:bold;
-  }
-  header.site .top-links{
-    display:flex;gap:22px;align-items:baseline;
-    font-size:11pt;margin-top:6px;
-  }
-  header.site .top-links a{
-    color:#1a3b5c;text-decoration:none;font-style:italic;
-    border-bottom:1px solid transparent;white-space:nowrap;
-  }
-  header.site .top-links a:hover{
-    color:#000;font-weight:bold;border-bottom-color:#000;
-  }
+/* HERO */
+.hero{
+  position:relative;width:100%;
+  height:clamp(620px, 88vh, 920px);
+  background:#03050b;overflow:hidden;
+  border-bottom:1px solid rgba(180,205,240,0.10);
+}
+#spaceCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;}
+.hero::after{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:1;
+  background:linear-gradient(to bottom,
+    rgba(3,5,11,0.14) 0%, rgba(3,5,11,0.00) 28%,
+    rgba(3,5,11,0.25) 68%, rgba(3,5,11,0.78) 100%);
+}
+.hero-inner{
+  position:relative;z-index:2;max-width:1280px;height:100%;margin:0 auto;
+  padding:0 32px;display:grid;grid-template-rows:auto 1fr auto;
+}
+@media(max-width:640px){ .hero-inner{padding:0 20px;} }
+.hero-top{
+  padding-top:26px;display:flex;align-items:baseline;justify-content:space-between;
+  gap:16px;color:rgba(255,255,255,0.62);font-size:11.5px;font-style:italic;
+  letter-spacing:0.4px;
+}
+.hero-top .crumb::before{
+  content:"§";margin-right:8px;color:rgba(255,217,122,0.85);font-style:normal;
+}
+.hero-copy{align-self:center;max-width:840px;color:#fff;}
+.hero-copy h1{
+  font-family:var(--serif);font-weight:bold;
+  font-size:clamp(32px, 4.6vw, 54px);line-height:1.08;letter-spacing:-0.6px;
+  color:#fff;margin-bottom:20px;text-shadow:0 2px 30px rgba(0,0,0,0.6);
+}
+.hero-copy h1 em{font-style:italic;font-weight:normal;color:#ffd97a;}
+.hero-copy .byline{
+  font-family:var(--serif);font-size:12.5px;font-style:italic;
+  letter-spacing:0.4px;color:rgba(255,255,255,0.62);margin-bottom:22px;
+}
+.hero-copy .lede{
+  font-family:var(--serif);font-size:clamp(15px, 1.25vw, 17px);
+  line-height:1.7;color:rgba(255,255,255,0.80);
+  max-width:680px;text-shadow:0 1px 18px rgba(0,0,0,0.55);
+}
+.hero-copy .lede strong{color:#fff;font-weight:bold;}
+.hero-foot{
+  padding-bottom:28px;display:flex;justify-content:space-between;
+  align-items:flex-end;gap:24px;flex-wrap:wrap;
+  color:rgba(255,255,255,0.52);font-size:11.5px;font-style:italic;letter-spacing:0.4px;
+}
+.hero-foot .reading{display:inline-flex;align-items:baseline;gap:10px;}
+.hero-foot .reading::before{
+  content:"";display:inline-block;width:26px;height:1px;
+  background:rgba(255,217,122,0.7);position:relative;top:-4px;
+}
 
-  /* ---------- HERO ---------- */
-  .hero{
-    max-width:1180px;margin:0 auto;
-    padding:34px 26px 12px;
-  }
-  .hero p.lead{
-    margin:0 0 12px 0;font-size:14pt;font-style:italic;
-    color:#1e3a8a;max-width:920px;line-height:1.4;
-  }
-  .hero p.sub{
-    margin:0 0 10px 0;font-size:11pt;color:#334155;
-    max-width:940px;line-height:1.7;
-  }
-  .hero p.sub strong{color:#000;font-style:normal;}
+/* LEVEL TABS */
+.levels{
+  background:var(--bg-elev);border-bottom:1px solid var(--rule);
+  position:relative;z-index:5;transition:background .35s;
+}
+.levels-inner{
+  max-width:1280px;margin:0 auto;padding:0 32px;
+  display:flex;align-items:stretch;gap:0;overflow-x:auto;
+  scrollbar-width:thin;
+}
+@media(max-width:640px){ .levels-inner{padding:0 16px;} }
+.levels-inner::-webkit-scrollbar{height:4px;}
+.levels-inner::-webkit-scrollbar-thumb{background:var(--rule);}
+.level-tab{
+  background:none;border:none;border-bottom:2px solid transparent;
+  padding:18px 22px 16px;font-family:var(--serif);
+  font-size:14.5px;font-style:italic;color:var(--ink-soft);
+  cursor:pointer;white-space:nowrap;
+  transition:color .15s, border-color .15s, background .15s;
+  text-align:left;min-width:140px;
+}
+.level-tab .num{
+  display:block;font-size:10.5px;font-style:italic;
+  letter-spacing:1.4px;color:var(--ink-mute);margin-bottom:3px;
+}
+.level-tab .name{
+  display:block;font-size:14.5px;font-weight:bold;
+  font-style:normal;color:var(--ink);letter-spacing:0.1px;margin-bottom:2px;
+}
+.level-tab .sub{
+  display:block;font-size:11.5px;font-style:italic;
+  color:var(--ink-mute);letter-spacing:0.2px;
+}
+.level-tab:hover{color:var(--ink);}
+.level-tab:hover .name{color:var(--accent);}
+.level-tab.active{
+  border-bottom-color:var(--accent-warm);
+  background:var(--tab-active-bg);
+}
+.level-tab.active .num,.level-tab.active .name{color:var(--accent-warm);}
+.level-tab.active .sub{color:var(--ink-soft);}
 
-  /* ---------- FILTERS ---------- */
-  .filters{
-    max-width:1180px;margin:22px auto 0;padding:0 26px;
-  }
-  .search-box{
-    width:100%;padding:12px 16px;
-    font-family:inherit;font-size:12pt;
-    border:1.5px solid #8aa4c4;border-radius:6px;
-    background:#fff;color:#000;outline:none;
-    transition:border-color .15s, box-shadow .15s;
-  }
-  .search-box:focus{
-    border-color:#1d4ed8;
-    box-shadow:0 0 0 3px rgba(29,78,216,.12);
-  }
-  .filter-group{
-    display:flex;align-items:baseline;gap:16px;
-    margin-top:16px;flex-wrap:wrap;
-  }
-  .filter-group .group-label{
-    font-style:italic;font-size:10.5pt;color:#333;
-    min-width:88px;flex:none;
-  }
-  .chips{display:flex;flex-wrap:wrap;gap:9px;}
-  .chip{
-    background:none;border:1px solid #b8c8dc;
-    border-radius:999px;padding:5px 15px;
-    font-family:inherit;font-size:10.5pt;
-    font-style:italic;color:#1a3b5c;cursor:pointer;
-    transition:all .15s;
-  }
-  .chip:hover{border-color:#1d4ed8;color:#1d4ed8;}
-  .chip.active{
-    background:#1d4ed8;color:#fff;
-    border-color:#1d4ed8;
-    font-weight:bold;font-style:normal;
-  }
-  .chip .count{
-    font-style:normal;font-size:9pt;
-    opacity:0.7;margin-left:5px;
-  }
-  .chip.active .count{opacity:0.9;}
+/* TOPICS */
+.topics{background:var(--bg);padding:60px 32px 88px;transition:background .35s;}
+@media(max-width:640px){ .topics{padding:44px 20px 64px;} }
+.topics-inner{max-width:1280px;margin:0 auto;}
+.topics-head{
+  display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);
+  gap:56px;align-items:end;padding-bottom:32px;
+  border-bottom:1px solid var(--rule);margin-bottom:40px;
+}
+@media(max-width:820px){
+  .topics-head{grid-template-columns:1fr;gap:16px;padding-bottom:22px;margin-bottom:26px;}
+}
+.topics-head .kicker{
+  font-family:var(--serif);font-size:11.5px;font-style:italic;
+  letter-spacing:2.4px;text-transform:uppercase;color:var(--ink-mute);
+  margin-bottom:12px;
+}
+.topics-head .kicker::before{
+  content:"";display:inline-block;width:22px;height:1px;
+  background:var(--accent-warm);vertical-align:middle;
+  margin-right:12px;position:relative;top:-2px;
+}
+.topics-head h2{
+  font-family:var(--serif);font-size:30px;font-weight:bold;
+  letter-spacing:-0.3px;line-height:1.15;color:var(--ink);
+}
+.topics-head h2 em{font-style:italic;font-weight:normal;color:var(--accent);}
+.topics-head .blurb{
+  font-family:var(--serif);font-size:15.5px;
+  line-height:1.75;color:var(--ink-soft);max-width:720px;padding-bottom:6px;
+}
+@media(max-width:820px){
+  .topics-head h2{font-size:24px;}
+  .topics-head .blurb{font-size:14.5px;}
+}
+.topics-grid{
+  display:grid;grid-template-columns:repeat(3, 1fr);gap:0;
+  border-top:1px solid var(--rule-fine);border-left:1px solid var(--rule-fine);
+}
+@media(max-width:1000px){ .topics-grid{grid-template-columns:repeat(2, 1fr);} }
+@media(max-width:600px){ .topics-grid{grid-template-columns:1fr;} }
+.topic-link{
+  padding:22px 24px 22px;
+  border-right:1px solid var(--rule-fine);
+  border-bottom:1px solid var(--rule-fine);
+  background:transparent;transition:background .15s;
+  position:relative;cursor:pointer;display:block;
+  text-decoration:none;color:inherit;
+}
+.topic-link:hover{background:var(--bg-elev);}
+.topic-link:hover .idx{color:var(--accent-warm);}
+.topic-link:hover h3{color:var(--accent-warm);}
+.topic-link:hover .arrow{opacity:1;transform:translateX(2px);}
+.topic-link .idx{
+  display:block;font-family:var(--serif);font-size:10.5px;
+  font-style:italic;letter-spacing:1.6px;color:var(--ink-mute);
+  margin-bottom:10px;transition:color .15s;
+}
+.topic-link .head-row{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:12px;margin-bottom:6px;
+}
+.topic-link h3{
+  font-family:var(--serif);font-size:16px;font-weight:bold;
+  line-height:1.35;color:var(--ink);flex:1;transition:color .15s;
+}
+.topic-link .arrow{
+  flex:none;width:16px;height:16px;position:relative;top:5px;
+  color:var(--accent-warm);opacity:0.5;
+  transition:opacity .2s, transform .2s;
+}
+.topic-link .arrow svg{
+  width:100%;height:100%;fill:none;stroke:currentColor;
+  stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
+}
+.topic-link p{
+  font-family:var(--serif);font-size:13.5px;
+  line-height:1.6;color:var(--ink-soft);margin-bottom:10px;
+}
+.topic-link .count{
+  font-size:11.5px;font-style:italic;color:var(--ink-mute);
+  letter-spacing:0.3px;
+}
 
-  .results-line{
-    max-width:1180px;margin:18px auto 4px;padding:0 26px;
-    font-size:10.5pt;font-style:italic;color:#4a5568;
-  }
-  .results-line strong{color:#000;font-style:normal;}
+/* ABOUT */
+.about{
+  background:var(--bg-elev);border-top:1px solid var(--rule);
+  padding:52px 32px 56px;transition:background .35s;
+}
+@media(max-width:640px){ .about{padding:36px 20px 40px;} }
+.about-inner{
+  max-width:920px;margin:0 auto;
+  display:grid;grid-template-columns:200px 1fr;gap:36px;align-items:start;
+}
+@media(max-width:600px){ .about-inner{grid-template-columns:1fr;gap:14px;} }
+.about-inner .label{
+  font-family:var(--serif);font-size:11.5px;font-style:italic;
+  letter-spacing:2.4px;text-transform:uppercase;color:var(--ink-mute);
+}
+.about-inner .label::before{
+  content:"";display:inline-block;width:22px;height:1px;
+  background:var(--accent-warm);vertical-align:middle;
+  margin-right:12px;position:relative;top:-2px;
+}
+.about-inner p{
+  font-family:var(--serif);font-size:15px;
+  line-height:1.75;color:var(--ink-soft);
+}
+.about-inner p strong{color:var(--ink);font-weight:bold;}
 
-  /* ---------- GRID ---------- */
-  .grid-wrap{
-    max-width:1180px;margin:0 auto;
-    padding:14px 26px 40px;
-  }
-  .grid{
-    display:grid;grid-template-columns:repeat(3, 1fr);gap:18px;
-  }
-  @media(max-width:960px){
-    .grid{grid-template-columns:repeat(2, 1fr);gap:14px;}
-    .hero{padding:26px 20px 12px;}
-    .filters{padding:0 20px;}
-    .results-line{padding:0 20px;}
-    .grid-wrap{padding:14px 20px 40px;}
-  }
-  @media(max-width:600px){
-    .grid{grid-template-columns:1fr;}
-    header.site{padding:18px 18px 16px;}
-    header.site .brand .text h1{font-size:18pt;}
-  }
+/* FOOTER */
+footer{
+  background:var(--bg);border-top:1px solid var(--rule);
+  padding:36px 32px 56px;transition:background .35s;
+}
+@media(max-width:640px){ footer{padding:28px 20px 44px;} }
+.footer-inner{
+  max-width:1280px;margin:0 auto;
+  display:grid;grid-template-columns:1fr auto 1fr;
+  gap:36px;align-items:start;
+  font-family:var(--serif);font-size:13px;
+  color:var(--ink-mute);line-height:1.7;
+}
+@media(max-width:800px){ .footer-inner{grid-template-columns:1fr;gap:24px;} }
+.footer-inner strong{color:var(--ink);font-weight:bold;}
+.footer-inner .right{text-align:right;}
+@media(max-width:800px){ .footer-inner .right{text-align:left;} }
 
-  /* ---------- CARD ---------- */
-  .card{
-    display:block;text-decoration:none;color:inherit;
-    background:#fff;border:1.5px solid #cbd5e1;
-    border-radius:6px;overflow:hidden;
-    transition:transform .12s, box-shadow .15s, border-color .15s;
+.visitor-block{
+  text-align:center;padding:0 20px;
+  border-left:1px solid var(--rule-fine);
+  border-right:1px solid var(--rule-fine);
+}
+@media(max-width:800px){
+  .visitor-block{
+    text-align:left;border-left:none;border-right:none;
+    border-top:1px solid var(--rule-fine);
+    border-bottom:1px solid var(--rule-fine);
+    padding:16px 0;
   }
-  .card:hover{
-    transform:translateY(-2px);
-    border-color:#1d4ed8;
-    box-shadow:0 4px 14px rgba(29,78,216,.14);
-  }
-  .card .strip{height:4px;background:#1d4ed8;}
-  .card .strip.physics{background:#1d4ed8;}
-  .card .strip.chemistry{background:#0a7d2b;}
-  .card .strip.mathematics{background:#9a3412;}
-  .card .strip.astronomy{background:#5b21b6;}
+}
+.visitor-block .head{
+  font-size:10.5px;font-style:italic;
+  letter-spacing:2.4px;text-transform:uppercase;
+  color:var(--ink-mute);margin-bottom:14px;
+}
+.visitor-block .head::before{
+  content:"";display:inline-block;width:20px;height:1px;
+  background:var(--accent-warm);vertical-align:middle;
+  margin-right:10px;position:relative;top:-2px;
+}
+.visitor-row{
+  display:flex;align-items:baseline;gap:10px;
+  justify-content:center;margin-bottom:6px;
+}
+@media(max-width:800px){ .visitor-row{justify-content:flex-start;} }
+.visitor-row .label{
+  font-size:12px;font-style:italic;color:var(--ink-mute);
+  min-width:64px;text-align:right;
+}
+.visitor-row .value{
+  font-family:Consolas,"Courier New",monospace;
+  font-size:22px;font-weight:bold;color:var(--ink);
+  font-variant-numeric:tabular-nums;letter-spacing:0.5px;
+  transition:opacity .3s;
+}
+.visitor-row .value.loading{opacity:0.35;}
+.visitor-row .unit{font-size:11.5px;font-style:italic;color:var(--ink-mute);}
+.visitor-note{
+  font-size:10.5px;font-style:italic;color:var(--ink-mute);
+  margin-top:10px;opacity:0.75;
+}
 
-  .card .body{padding:18px 20px 18px;}
-  .card .subject-line{
-    display:flex;align-items:baseline;justify-content:space-between;
-    gap:10px;margin-bottom:8px;
-  }
-  .card .subject{
-    font-size:9.5pt;font-weight:bold;
-    letter-spacing:.6px;text-transform:uppercase;
-    color:#4a5568;font-style:normal;
-  }
-  .card .subject.physics{color:#1d4ed8;}
-  .card .subject.chemistry{color:#15803d;}
-  .card .subject.mathematics{color:#9a3412;}
-  .card .subject.astronomy{color:#6d28d9;}
-  .card h2{
-    margin:0;font-size:13.5pt;font-weight:bold;
-    color:#000;line-height:1.25;
-  }
-  .card .desc{
-    margin:10px 0 0 0;font-size:10.5pt;
-    color:#334155;line-height:1.6;
-  }
-  .card .levels{
-    margin-top:14px;padding-top:12px;
-    border-top:1px solid #e2e8f0;
-    font-size:9.5pt;font-style:italic;
-    color:#64748b;display:flex;gap:6px;flex-wrap:wrap;
-  }
-  .card .levels .lvl{
-    font-style:normal;font-size:9pt;font-weight:bold;
-    letter-spacing:.3px;padding:2px 8px;border-radius:3px;
-    background:#f1f5f9;border:1px solid #e2e8f0;
-    color:#475569;text-transform:uppercase;
-  }
+.theme-toast{
+  position:fixed;bottom:22px;left:50%;
+  transform:translateX(-50%) translateY(80px);
+  background:var(--ink);color:var(--bg);
+  padding:8px 18px;border-radius:4px;
+  font-family:var(--serif);font-size:13px;font-style:italic;
+  opacity:0;pointer-events:none;
+  transition:opacity .22s, transform .22s;z-index:200;
+  box-shadow:0 6px 24px rgba(0,0,0,0.4);
+}
+.theme-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-  /* ---------- EMPTY ---------- */
-  .empty{
-    padding:48px 20px;text-align:center;
-    color:#64748b;font-style:italic;font-size:12pt;
-    border:1.5px dashed #cbd5e1;border-radius:6px;
-  }
-
-  /* ---------- FOUNDERS ---------- */
-  .founders-section{
-    background:#f8fafc;
-    border-top:1.5px solid #000;
-    border-bottom:1.5px solid #000;
-    padding:40px 26px 44px;
-    margin-top:20px;
-  }
-  .founders-section .inner{max-width:1180px;margin:0 auto;}
-  .founders-section .section-head{
-    text-align:center;margin-bottom:36px;
-  }
-  .founders-section .section-head .kicker{
-    font-size:10.5pt;font-style:italic;
-    color:#6b7280;letter-spacing:.6px;
-    text-transform:uppercase;font-weight:bold;
-    margin-bottom:6px;
-  }
-  .founders-section .section-head h2{
-    margin:0;font-size:20pt;font-weight:bold;
-    color:#000;letter-spacing:.2px;
-  }
-  .founders-section .section-head p.intro{
-    margin:14px auto 0;max-width:780px;
-    font-size:11pt;color:#334155;
-    line-height:1.7;font-style:italic;
-  }
-  .founders-grid{
-    display:grid;grid-template-columns: 1fr 1fr;
-    gap:36px;margin-top:20px;
-  }
-  @media(max-width:840px){
-    .founders-grid{grid-template-columns:1fr;gap:28px;}
-  }
-  .founder-card{
-    display:grid;grid-template-columns: 150px 1fr;
-    gap:22px;align-items:start;
-  }
-  @media(max-width:520px){
-    .founder-card{grid-template-columns:1fr;gap:14px;}
-  }
-  .founder-card .crest{
-    width:150px;height:150px;border-radius:50%;
-    display:flex;align-items:center;justify-content:center;
-    background:linear-gradient(135deg,#1e3a8a,#1d4ed8 55%,#0284c7);
-    color:#fff;text-align:center;
-    font-family:"Times New Roman", Times, serif;
-    box-shadow:0 8px 24px rgba(29,78,216,.22);
-    flex:none;
-  }
-  .founder-card .crest .initials{
-    font-size:38pt;font-weight:bold;line-height:1;letter-spacing:1px;
-  }
-  .founder-card .crest .sub{
-    font-size:8pt;letter-spacing:2.5px;text-transform:uppercase;
-    margin-top:6px;opacity:.92;font-style:italic;
-  }
-  .founder-card .bio h3{
-    margin:0 0 4px 0;font-size:17pt;font-weight:bold;
-    color:#1e3a8a;line-height:1.15;
-  }
-  .founder-card .bio .role{
-    margin:0 0 12px 0;font-size:11pt;font-style:italic;
-    color:#4a5568;line-height:1.45;
-  }
-  .founder-card .bio p{
-    margin:0 0 10px 0;font-size:10.5pt;
-    color:#334155;line-height:1.7;
-  }
-  .founders-section .shared-quote{
-    margin:36px auto 0;max-width:840px;
-    text-align:center;padding:22px 34px;
-    border-top:1px solid #cbd5e1;
-    border-bottom:1px solid #cbd5e1;
-    font-style:italic;color:#1e3a8a;
-    font-size:12pt;line-height:1.65;
-  }
-  .founders-section .shared-quote::before{
-    content:"\201C";font-size:24pt;color:#93c5fd;
-    line-height:0;vertical-align:-8px;margin-right:4px;
-  }
-  .founders-section .shared-quote::after{
-    content:"\201D";font-size:24pt;color:#93c5fd;
-    line-height:0;vertical-align:-8px;margin-left:4px;
-  }
-
-  /* ---------- FOOTER ---------- */
-  footer.site{
-    border-top:1.5px solid #000;
-    padding:26px 26px 34px;background:#fff;
-    font-size:10.5pt;color:#475569;text-align:center;
-  }
-  footer.site .inner{max-width:1180px;margin:0 auto;}
-  footer.site p{margin:5px 0;}
-  footer.site .attribution{
-    font-size:11pt;font-style:italic;
-    color:#334155;margin-bottom:10px;
-  }
-  footer.site .attribution strong{
-    font-style:normal;color:#1e3a8a;
-  }
-  footer.site a{
-    color:#1d4ed8;text-decoration:none;
-    border-bottom:1px solid transparent;
-  }
-  footer.site a:hover{border-bottom-color:#1d4ed8;}
-  footer.site .meta{
-    margin-top:14px;font-size:9.5pt;
-    color:#94a3b8;font-style:italic;
-  }
+@media(max-width:600px){
+  .hero{height:auto;min-height:560px;}
+  .hero-inner{min-height:560px;}
+  .hero-copy h1{font-size:30px;}
+}
 </style>
 </head>
 <body>
 
-<!-- ============================================================
-     SOLAR SYSTEM BANNER
-     ============================================================ -->
-<div class="solar-banner" aria-hidden="true">
-  <svg id="solarSvg" viewBox="0 0 1400 400" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
-    <g id="orbitsLayer" fill="none" stroke="#000" stroke-width="0.9" stroke-dasharray="3 4"></g>
-    <g id="sunGroup">
-      <circle id="sunHalo" cx="700" cy="200" r="34" fill="none" stroke="#000" stroke-width="0.6" stroke-dasharray="2 3" opacity="0.4"/>
-      <circle cx="700" cy="200" r="9" fill="#000"/>
-    </g>
-    <g id="planetsLayer"></g>
-  </svg>
-  <div class="banner-caption">A universe of simulations &middot; free &middot; offline &middot; for everyone</div>
-</div>
-
-<!-- ============ HEADER ============ -->
-<header class="site">
-  <div class="inner">
-    <div class="brand">
-      <div class="text">
-        <h1>Tanzania Simulation Hub</h1>
-        <p class="byline">
-          Founded and developed by <strong>Anthony A. Tepeli</strong> and <strong>Loema Sanzu</strong>.
-        </p>
-      </div>
-    </div>
-    <nav class="top-links">
-      <a href="#founders">Founders</a>
-      <a href="#contribute">Contribute</a>
-      <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="banner" href="/" aria-label="Tanzania Simulation Hub home">
+      <span class="dot"></span>
+      <span class="main">Tanzania Simulation Hub</span>
+      <span class="sub">T·SIMHUB</span>
+    </a>
+    <nav class="topnav">
+      <a href="#levels">Levels</a>
+      <a href="#topics">Topics</a>
+      <a href="#about">About</a>
+      <button class="theme-btn" id="themeToggle" aria-label="Toggle theme">
+        <svg class="moon" viewBox="0 0 24 24"><path d="M20.7 15.3A9 9 0 0 1 8.7 3.3a9 9 0 1 0 12 12z"/></svg>
+        <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 1v3M12 20v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M1 12h3M20 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+      </button>
     </nav>
   </div>
-</header>
+</div>
 
-<!-- ============ HERO ============ -->
-<section class="hero">
-  <p class="lead">Interactive science simulations, free and open to everyone.</p>
-  <p class="sub">
-    The Tanzania Simulation Hub offers a growing library of hands-on simulations in <strong>Physics</strong>, <strong>Chemistry</strong>, <strong>Mathematics</strong>, and <strong>Astronomy &amp; Astrophysics</strong>. Each simulation lets you change the variables yourself, watch the system respond in real time, and build intuition that words alone cannot give. Every simulation is designed to work <strong>offline</strong> on any phone, tablet, or computer &mdash; no data bundle, no sign-up, no cost.
-  </p>
-  <p class="sub">
-    Built for anyone curious about how the physical world works &mdash; school students, university students, teachers, and researchers alike. Wherever you are and whatever level you are at, the aim is the same: to make the abstract visible and the invisible touchable.
-  </p>
-</section>
-
-<!-- ============ FILTERS ============ -->
-<section class="filters" id="filters">
-  <input type="search" class="search-box" id="search" placeholder="Search simulations&hellip; (e.g. projectile, pendulum, waves, titration)">
-  <div class="filter-group">
-    <span class="group-label">Subject:</span>
-    <div class="chips" id="subjectChips"></div>
-  </div>
-  <div class="filter-group">
-    <span class="group-label">Topic:</span>
-    <div class="chips" id="topicChips"></div>
-  </div>
-</section>
-
-<p class="results-line" id="resultsLine"></p>
-
-<!-- ============ GRID ============ -->
-<section class="grid-wrap">
-  <div class="grid" id="grid"></div>
-  <div class="empty" id="empty" style="display:none;">No simulations match your filters.</div>
-</section>
-
-<!-- ============ FOUNDERS ============ -->
-<section class="founders-section" id="founders">
-  <div class="inner">
-    <div class="section-head">
-      <div class="kicker">About the Founders</div>
-      <h2>Built by Tanzanian physicists, for learners everywhere.</h2>
-      <p class="intro">
-        The Tanzania Simulation Hub was created by two physicists who met at Tanzanian public universities and shared a single conviction: that interactive, visual learning should not be a privilege reserved for those with fast internet and expensive textbooks.
+<section class="hero" id="hero">
+  <canvas id="spaceCanvas"></canvas>
+  <div class="hero-inner">
+    <div class="hero-top">
+      <span class="crumb">Dar es Salaam · Tanzania</span>
+      <span class="tag">A growing library</span>
+    </div>
+    <div class="hero-copy">
+      <h1>Physics, from first principles to the <em>edge of the universe</em>.</h1>
+      <p class="byline">Founded by Anthony A. Tepeli and Loema B. Sanzu</p>
+      <p class="lede">
+        A growing library of interactive physics simulations spanning <strong>IGCSE, AS, A Level, university physics, astronomy &amp; astrophysics, and cosmology</strong>. Free, offline-friendly, and open to every learner &mdash; from a shared classroom phone to a university lecture hall.
       </p>
     </div>
-
-    <div class="founders-grid">
-      <div class="founder-card">
-        <div class="crest">
-          <div>
-            <div class="initials">A.T.</div>
-            <div class="sub">SimHub TZ</div>
-          </div>
-        </div>
-        <div class="bio">
-          <h3>Anthony A. Tepeli</h3>
-          <p class="role">Physics student &middot; University of Dar es Salaam</p>
-          <p>
-            Anthony leads the technical development of the platform &mdash; designing and coding every simulation, structuring the hub, and building the offline-first architecture that allows it to run on any shared phone or school computer, wherever it is needed.
-          </p>
-          <p>
-            His work is grounded in the belief that abstract ideas should become visible, and invisible forces should become touchable, for every learner regardless of where they study.
-          </p>
-        </div>
-      </div>
-
-      <div class="founder-card">
-        <div class="crest">
-          <div>
-            <div class="initials">L.S.</div>
-            <div class="sub">SimHub TZ</div>
-          </div>
-        </div>
-        <div class="bio">
-          <h3>Loema Sanzu</h3>
-          <p class="role">Physics alumna &middot; University of Dodoma</p>
-          <p>
-            Loema leads scientific review and educational design &mdash; ensuring every simulation is physically accurate, clearly explained, and pitched so that it serves beginners and advanced learners alike, from first exposure to a topic through to deeper exploration.
-          </p>
-          <p>
-            Her contribution keeps the hub anchored to real practice, from the classroom to the laboratory, for anyone who wants to understand how the world works.
-          </p>
-        </div>
-      </div>
+    <div class="hero-foot">
+      <span class="reading">The grid behind this text is a live simulation of curved spacetime.</span>
+      <span>v1.0 · CC BY 4.0</span>
     </div>
-
-    <blockquote class="shared-quote">
-      Physics is not a list of formulas to memorise. It is a way of seeing the world. If a learner anywhere can watch a projectile curve through the air on their own phone and understand <em>why</em>, then this project has done its work.
-    </blockquote>
   </div>
 </section>
 
-<!-- ============ FOOTER ============ -->
-<footer class="site">
-  <div class="inner">
-    <p class="attribution">
-      <strong>Tanzania Simulation Hub</strong> &mdash; founded and maintained by
-      <strong>Anthony A. Tepeli</strong> and <strong>Loema Sanzu</strong>.
-    </p>
+<section class="levels" id="levels">
+  <div class="levels-inner" id="levelsInner"></div>
+</section>
+
+<section class="topics" id="topics">
+  <div class="topics-inner">
+    <header class="topics-head">
+      <div>
+        <p class="kicker" id="topicsKicker">IGCSE · Level 01</p>
+        <h2 id="topicsTitle">IGCSE <em>Physics</em></h2>
+      </div>
+      <p class="blurb" id="topicsBlurb"></p>
+    </header>
+    <div class="topics-grid" id="topicsGrid"></div>
+  </div>
+</section>
+
+<section class="about" id="about">
+  <div class="about-inner">
+    <span class="label">About</span>
     <p>
-      Anthony A. Tepeli &mdash; Physics student, University of Dar es Salaam &middot;
-      Loema Sanzu &mdash; Physics alumna, University of Dodoma.
+      <strong>T·SIMHUB</strong> is maintained by <strong>Anthony A. Tepeli</strong>, a physics student at the University of Dar es Salaam, and <strong>Miss Loema B. Sanzu</strong>, a physics alumna of the University of Dodoma currently working as a nuclear scientist at the Tanzania Atomic Energy Commission. Every simulation is free to use, share, and adapt.
     </p>
-    <p>Free and open to every learner and teacher, at every level.</p>
-    <p style="margin-top:10px;">
-      All simulations are free to use, share, and adapt.
-      Licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC&nbsp;BY&nbsp;4.0</a>.
-    </p>
-    <p>Found a bug? Want to contribute a simulation? <a href="#contribute">Get in touch.</a></p>
-    <p class="meta">v1.0 &middot; Dar es Salaam &amp; Dodoma, Tanzania</p>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <strong>Tanzania Simulation Hub</strong> · T·SIMHUB<br>
+      Free, offline-friendly, and open to every learner.
+    </div>
+    <div class="visitor-block">
+      <div class="head">Visitors</div>
+      <div class="visitor-row">
+        <span class="label">Today</span>
+        <span class="value loading" id="visitorsToday">—</span>
+        <span class="unit">today</span>
+      </div>
+      <div class="visitor-row">
+        <span class="label">All time</span>
+        <span class="value loading" id="visitorsTotal">—</span>
+        <span class="unit">visits</span>
+      </div>
+      <div class="visitor-note" id="visitorNote">Counting…</div>
+    </div>
+    <div class="right">
+      Released under CC BY 4.0<br>
+      Dar es Salaam · Dodoma · Tanzania
+    </div>
   </div>
 </footer>
 
+<div class="theme-toast" id="themeToast">Theme changed</div>
+
 <script>
 /* ============================================================
-   SOLAR SYSTEM BANNER — academic animation
+   THEME
    ============================================================ */
 (function(){
-  const SVG_NS = 'http://www.w3.org/2000/svg';
-  const SUN_X  = 700;
-  const SUN_Y  = 200;
-  const SQUASH = 0.32;
-  const BASE_RATE = 0.55;
-
-  const R_BASE  = 40;
-  const R_SCALE = 108;
-  function visualRadius(a_AU){
-    return R_BASE + R_SCALE * Math.pow(a_AU, 0.45);
+  const root = document.documentElement;
+  const btn = document.getElementById('themeToggle');
+  const toast = document.getElementById('themeToast');
+  function apply(theme){
+    root.classList.remove('theme-dark', 'theme-light');
+    root.classList.add('theme-' + theme);
+    localStorage.setItem('tsimhub-theme', theme);
+    document.querySelector('meta[name="theme-color"]')
+      .setAttribute('content', theme === 'light' ? '#fbfaf7' : '#050810');
   }
-
-  const PLANETS = [
-    { name:'Mercury', a: 0.387, size: 2.6, phase: 0.00 },
-    { name:'Venus',   a: 0.723, size: 3.3, phase: 0.85 },
-    { name:'Earth',   a: 1.000, size: 3.5, phase: 1.70 },
-    { name:'Mars',    a: 1.524, size: 3.0, phase: 2.55 },
-    { name:'Jupiter', a: 5.203, size: 6.0, phase: 3.40 },
-    { name:'Saturn',  a: 9.537, size: 5.0, phase: 4.25 },
-    { name:'Uranus',  a:19.191, size: 4.2, phase: 5.10 },
-    { name:'Neptune', a:30.069, size: 4.0, phase: 5.95 }
-  ];
-
-  PLANETS.forEach(p => {
-    p.rx    = visualRadius(p.a);
-    p.ry    = p.rx * SQUASH;
-    p.speed = BASE_RATE / Math.sqrt(p.a);
-    p.el    = null;
-    p.label = null;
+  const saved = localStorage.getItem('tsimhub-theme');
+  apply(saved === 'light' ? 'light' : 'dark');
+  let toastTimer = null;
+  btn.addEventListener('click', () => {
+    const cur = root.classList.contains('theme-light') ? 'light' : 'dark';
+    const next = cur === 'light' ? 'dark' : 'light';
+    apply(next);
+    toast.textContent = 'Switched to ' + next + ' theme';
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 1600);
   });
-
-  const orbitsLayer = document.getElementById('orbitsLayer');
-  PLANETS.forEach(p => {
-    const e = document.createElementNS(SVG_NS, 'ellipse');
-    e.setAttribute('cx', SUN_X);
-    e.setAttribute('cy', SUN_Y);
-    e.setAttribute('rx', p.rx.toFixed(2));
-    e.setAttribute('ry', p.ry.toFixed(2));
-    const op = Math.max(0.18, 0.42 - p.a * 0.010);
-    e.setAttribute('stroke', 'rgba(0,0,0,' + op.toFixed(3) + ')');
-    orbitsLayer.appendChild(e);
-  });
-
-  const planetsLayer = document.getElementById('planetsLayer');
-  PLANETS.forEach(p => {
-    const c = document.createElementNS(SVG_NS, 'circle');
-    c.setAttribute('r', p.size);
-    c.setAttribute('fill', '#000');
-    c.setAttribute('cx', SUN_X + p.rx);
-    c.setAttribute('cy', SUN_Y);
-    planetsLayer.appendChild(c);
-    p.el = c;
-
-    const t = document.createElementNS(SVG_NS, 'text');
-    t.setAttribute('font-family', '"Times New Roman", Times, Georgia, serif');
-    t.setAttribute('font-style', 'italic');
-    t.setAttribute('font-size', '9.5');
-    t.setAttribute('fill', '#333');
-    t.setAttribute('text-anchor', 'start');
-    t.textContent = p.name;
-    planetsLayer.appendChild(t);
-    p.label = t;
-  });
-
-  const sunHalo = document.getElementById('sunHalo');
-  let t0 = performance.now();
-  let running = true;
-  let pausedElapsed = 0;
-
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden){
-      running = false;
-    } else {
-      running = true;
-      t0 = performance.now() - pausedElapsed;
-      requestAnimationFrame(loop);
-    }
-  });
-
-  function loop(now){
-    if (!running) return;
-    const t = (now - t0) / 1000;
-    pausedElapsed = now - t0;
-
-    PLANETS.forEach(p => {
-      const ang = t * p.speed + p.phase;
-      const x = SUN_X + p.rx * Math.cos(ang);
-      const y = SUN_Y + p.ry * Math.sin(ang);
-      p.el.setAttribute('cx', x.toFixed(2));
-      p.el.setAttribute('cy', y.toFixed(2));
-      const dx = x - SUN_X;
-      const dy = y - SUN_Y;
-      const len = Math.max(1, Math.sqrt(dx*dx + dy*dy));
-      const lx = x + (dx / len) * 10 + 2;
-      const ly = y + (dy / len) * 10 + 3;
-      p.label.setAttribute('x', lx.toFixed(2));
-      p.label.setAttribute('y', ly.toFixed(2));
-    });
-
-    const pulse = 34 + 3 * Math.sin(t * 0.9);
-    sunHalo.setAttribute('r', pulse.toFixed(1));
-
-    requestAnimationFrame(loop);
-  }
-
-  requestAnimationFrame(loop);
 })();
 
 /* ============================================================
-   SIMULATION CATALOGUE + FILTERS
+   VISITOR COUNTER
    ============================================================ */
-const SIMS = [
-  {
-    slug: 'projectile',
-    title: 'Projectile Motion',
-    subject: 'Physics',
-    topic: 'Mechanics',
-    desc: 'Launch a missile and study how angle, speed, and height change the trajectory. Explore range, time of flight, and vector components in real time.',
-    levels: ['Secondary', 'University']
-  },
-  {
-    slug: 'pendulum',
-    title: 'Simple Pendulum',
-    subject: 'Physics',
-    topic: 'Oscillations',
-    desc: 'Swing a pendulum and explore how length, mass, and gravity affect the period. Observe the small-angle approximation and the shift away from SHM at larger angles.',
-    levels: ['Secondary', 'University']
-  },
-  {
-    slug: 'u-tube',
-    title: 'U-Tube Liquid Oscillation',
-    subject: 'Physics',
-    topic: 'Oscillations',
-    desc: 'Observe a liquid column oscillating in a U-tube. Measure the period, explore damping, and verify the simple harmonic motion model.',
-    levels: ['University', 'Advanced']
-  },
-  {
-    slug: 'solar-system',
-    title: 'Solar System',
-    subject: 'Astronomy',
-    topic: 'Gravitation',
-    desc: 'Watch all eight planets orbit the Sun on their real elliptical paths and explore Kepler\u2019s laws of planetary motion.',
-    levels: ['Secondary', 'University']
-  }
-];
+(function visitorCounter(){
+  const NS = 'tsimhub-anthonytepeli';
+  const todayKey = 'daily-' + new Date().toISOString().slice(0,10);
+  const sessionFlag = 'tsimhub-counted-' + todayKey;
+  const elToday = document.getElementById('visitorsToday');
+  const elTotal = document.getElementById('visitorsTotal');
+  const elNote  = document.getElementById('visitorNote');
 
-const SUBJECTS = {
-  'Physics':     { key: 'physics',     colour: '#1d4ed8' },
-  'Chemistry':   { key: 'chemistry',   colour: '#0a7d2b' },
-  'Mathematics': { key: 'mathematics', colour: '#9a3412' },
-  'Astronomy':   { key: 'astronomy',   colour: '#5b21b6', label: 'Astronomy & Astrophysics' }
+  (async function(){
+    try {
+      let today = null;
+      if (!sessionStorage.getItem(sessionFlag)){
+        const r = await fetch('https://abacus.jasoncameron.dev/hit/' + NS + '/' + todayKey, { cache: 'no-store' });
+        if (r.ok){ today = (await r.json()).value; sessionStorage.setItem(sessionFlag, '1'); }
+      } else {
+        const r = await fetch('https://abacus.jasoncameron.dev/get/' + NS + '/' + todayKey, { cache: 'no-store' });
+        if (r.ok) today = (await r.json()).value;
+      }
+      if (today != null){
+        elToday.textContent = Number(today).toLocaleString();
+        elToday.classList.remove('loading');
+      }
+
+      let tr = await fetch('https://abacus.jasoncameron.dev/get/' + NS + '/total', { cache: 'no-store' });
+      let total = tr.ok ? (await tr.json()).value : null;
+      if (total == null || total === 0){
+        const hi = await fetch('https://abacus.jasoncameron.dev/hit/' + NS + '/total', { cache: 'no-store' });
+        if (hi.ok) total = (await hi.json()).value;
+      }
+      if (total != null){
+        elTotal.textContent = Number(total).toLocaleString();
+        elTotal.classList.remove('loading');
+      }
+      elNote.textContent = 'Live counts · refreshed on each visit';
+    } catch (err){
+      elToday.textContent = '—'; elToday.classList.remove('loading');
+      elTotal.textContent = '—'; elTotal.classList.remove('loading');
+      elNote.textContent = 'Visitor counter offline';
+    }
+  })();
+})();
+
+/* ============================================================
+   SLUG + LEVELS DATA
+   ============================================================ */
+function slugify(s){
+  return s.toLowerCase().replace(/&/g,'and').replace(/[—–-]/g,'-')
+    .replace(/[^\w\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-')
+    .replace(/^-|-$/g,'');
+}
+
+const LEVELS = {
+  igcse:{num:'01',name:'IGCSE',sub:'Foundations · Ages 14–16',slug:'igcse',title:'IGCSE <em>Physics</em>',blurb:'The complete Cambridge IGCSE 0625 syllabus. Every topic below opens into its own simulation library.',topics:[
+    {name:'Physical Quantities & Measurement',desc:'Measurement, SI units, scalars and vectors, precision and accuracy.'},
+    {name:'Motion',desc:'Speed, velocity, acceleration, motion graphs, free fall.'},
+    {name:'Mass, Weight & Density',desc:'Mass vs weight, gravitational field strength, density.'},
+    {name:'Forces & Newton\'s Laws',desc:'Resultant forces, Newton\'s three laws, friction.'},
+    {name:'Moments & Equilibrium',desc:'Moments, principle of moments, centre of gravity, stability.'},
+    {name:'Work, Energy & Power',desc:'Work, kinetic and potential energy, conservation, power.'},
+    {name:'Energy Resources',desc:'Renewable and non-renewable sources, energy transfer.'},
+    {name:'Pressure',desc:'Pressure in solids, liquids, gases; atmospheric pressure.'},
+    {name:'Kinetic Particle Model',desc:'States of matter, Brownian motion, gas pressure.'},
+    {name:'Thermal Properties & Temperature',desc:'Specific heat capacity, latent heat, thermal expansion.'},
+    {name:'Thermal Energy Transfers',desc:'Conduction, convection, radiation.'},
+    {name:'Sound',desc:'Production, transmission, speed, echo, ultrasound.'},
+    {name:'Light — Reflection & Refraction',desc:'Reflection, refraction, total internal reflection.'},
+    {name:'Light — Lenses & the Eye',desc:'Converging and diverging lenses, image formation.'},
+    {name:'Electromagnetic Spectrum',desc:'Radio to gamma, uses, dangers, communication.'},
+    {name:'Magnetism',desc:'Magnetic fields, poles, magnetic materials, the Earth\'s field.'},
+    {name:'Electromagnetic Effects',desc:'Motor effect, induction, generators, transformers.'},
+    {name:'Static Electricity',desc:'Electric charge, charging by friction, electric fields.'},
+    {name:'Current Electricity',desc:'Current, EMF, potential difference, resistance, Ohm\'s law.'},
+    {name:'Electrical Circuits',desc:'Series and parallel circuits, potential dividers.'},
+    {name:'Electrical Energy Transfers',desc:'Power, energy cost, efficiency.'},
+    {name:'Atomic Physics',desc:'Atomic structure, isotopes, radioactivity, half-life.'},
+    {name:'Nuclear Physics',desc:'Nuclear fission and fusion, mass–energy equivalence.'}
+  ]},
+  as:{num:'02',name:'AS Level',sub:'First-year A Level',slug:'as',title:'AS Level <em>Physics</em>',blurb:'The complete Cambridge 9702 AS syllabus. Every topic opens into its own simulation library.',topics:[
+    {name:'Physical Quantities & Units',desc:'SI base units, derived units, homogeneity, uncertainties.'},
+    {name:'Kinematics',desc:'Motion with constant acceleration, projectiles, motion graphs.'},
+    {name:'Dynamics',desc:'Newton\'s laws, linear momentum, impulse, collisions.'},
+    {name:'Forces, Density & Pressure',desc:'Equilibrium, moments, couples, centre of gravity, upthrust.'},
+    {name:'Work, Energy & Power',desc:'Work-energy theorem, conservative forces, power, efficiency.'},
+    {name:'Deformation of Solids',desc:'Hooke\'s law, stress, strain, Young\'s modulus.'},
+    {name:'Waves',desc:'Progressive waves, polarisation, Doppler effect.'},
+    {name:'Superposition',desc:'Interference, stationary waves, diffraction gratings.'},
+    {name:'Electricity',desc:'Charge, current, potential difference, resistance, power.'},
+    {name:'D.C. Circuits',desc:'Kirchhoff\'s laws, potential dividers, internal resistance.'},
+    {name:'Particle Physics',desc:'The Standard Model, quarks, leptons, conservation laws.'}
+  ]},
+  a:{num:'03',name:'A Level',sub:'Full A Level',slug:'a',title:'A Level <em>Physics</em>',blurb:'The full Cambridge 9702 A Level syllabus, in every topic.',topics:[
+    {name:'Kinematics',desc:'Motion in 2D and 3D, projectiles with air resistance.'},
+    {name:'Dynamics',desc:'Momentum in 2D, centre of mass, collisions at angle, impulse.'},
+    {name:'Circular Motion',desc:'Angular velocity, centripetal force, motion in a vertical circle.'},
+    {name:'Gravitational Fields',desc:'Newton\'s law of gravitation, field strength, potential, orbits.'},
+    {name:'Oscillations',desc:'Simple harmonic motion, energy in SHM, damping, resonance.'},
+    {name:'Temperature',desc:'Thermal equilibrium, temperature scales, the Kelvin scale.'},
+    {name:'Ideal Gases',desc:'Boyle\'s law, Charles\' law, ideal gas equation, kinetic theory.'},
+    {name:'Thermal Properties of Materials',desc:'Specific heat capacity, specific latent heat, internal energy.'},
+    {name:'Electric Fields',desc:'Field strength, potential, uniform and radial fields, Coulomb\'s law.'},
+    {name:'Capacitance',desc:'Capacitors, energy stored, charging and discharging.'},
+    {name:'Magnetic Fields',desc:'Force on a moving charge, electromagnetic induction, Faraday\'s law.'},
+    {name:'Alternating Currents',desc:'RMS values, rectification, transformers, power transmission.'},
+    {name:'Quantum Physics',desc:'Photoelectric effect, wave-particle duality, energy levels.'},
+    {name:'Nuclear Physics',desc:'Radioactive decay, half-life, mass defect, binding energy.'},
+    {name:'Medical Physics',desc:'Ultrasound, X-ray imaging, CT scans, PET, radiation safety.'},
+    {name:'Astronomy & Cosmology (Option)',desc:'Standard candles, Hubble\'s law, the Big Bang, stellar evolution.'}
+  ]},
+  university:{num:'04',name:'University',sub:'Undergraduate',slug:'university',title:'University <em>Physics</em>',blurb:'The full undergraduate physics curriculum — every core module from mathematical methods to general relativity.',topics:[
+    {name:'Mathematical Methods for Physics',desc:'Vector calculus, differential equations, linear algebra, Fourier methods.'},
+    {name:'Classical Mechanics',desc:'Lagrangian and Hamiltonian mechanics, central forces, rigid bodies.'},
+    {name:'Special Relativity',desc:'Lorentz transformations, four-vectors, relativistic dynamics.'},
+    {name:'Electromagnetism',desc:'Electrostatics, magnetostatics, Maxwell\'s equations, EM waves.'},
+    {name:'Optics & Photonics',desc:'Geometric optics, interference, diffraction, polarisation, lasers.'},
+    {name:'Thermodynamics',desc:'Zeroth, first, and second laws, entropy, engines.'},
+    {name:'Statistical Mechanics',desc:'Microstates, ensembles, partition functions, quantum statistics.'},
+    {name:'Quantum Mechanics I',desc:'Wavefunctions, Schrödinger equation, operators, uncertainty principle.'},
+    {name:'Quantum Mechanics II',desc:'Angular momentum, spin, hydrogen atom, perturbation theory.'},
+    {name:'Atomic & Molecular Physics',desc:'Multi-electron atoms, fine structure, molecular bonding.'},
+    {name:'Nuclear Physics',desc:'Nuclear models, scattering, radioactive decay, reactions.'},
+    {name:'Particle Physics',desc:'The Standard Model, quarks, leptons, gauge bosons, Feynman diagrams.'},
+    {name:'Solid State & Condensed Matter',desc:'Crystal structure, band theory, semiconductors, superconductivity.'},
+    {name:'Fluid Mechanics',desc:'Continuity, Bernoulli, viscosity, turbulence, boundary layers.'},
+    {name:'Plasma Physics',desc:'Ionisation, Debye shielding, plasma oscillations, magnetic confinement.'},
+    {name:'Computational Physics',desc:'Numerical methods, Monte Carlo, molecular dynamics.'},
+    {name:'General Relativity',desc:'Curved spacetime, Einstein field equations, black holes.'},
+    {name:'Quantum Field Theory',desc:'Canonical quantisation, Feynman path integrals, renormalisation.'}
+  ]},
+  astrophysics:{num:'05',name:'Astrophysics',sub:'Stars & galaxies',slug:'astrophysics',title:'Astronomy &amp; <em>Astrophysics</em>',blurb:'The physics of stars, galaxies, and compact objects.',topics:[
+    {name:'Spherical Astronomy',desc:'Celestial coordinates, time systems, precession.'},
+    {name:'Celestial Mechanics',desc:'Two-body problem, Kepler orbits, tidal forces.'},
+    {name:'Observational Techniques',desc:'Telescopes, imaging, spectroscopy, photometry, interferometry.'},
+    {name:'Stellar Structure',desc:'Hydrostatic equilibrium, energy transport, stellar models.'},
+    {name:'Stellar Atmospheres',desc:'Radiative transfer, spectral line formation.'},
+    {name:'Stellar Evolution',desc:'Protostars, main sequence, red giants, white dwarfs, supernovae.'},
+    {name:'Hertzsprung–Russell Diagram',desc:'Luminosity, temperature, main sequence, giants, dwarfs.'},
+    {name:'Binary Star Systems',desc:'Visual, spectroscopic, eclipsing binaries, mass determination.'},
+    {name:'Variable Stars',desc:'Cepheids, RR Lyrae, period–luminosity relation.'},
+    {name:'Supernovae',desc:'Type Ia and core-collapse supernovae, light curves, remnants.'},
+    {name:'White Dwarfs & Neutron Stars',desc:'Degenerate matter, Chandrasekhar limit, pulsars.'},
+    {name:'Black Holes',desc:'Schwarzschild and Kerr metrics, event horizons, accretion disks.'},
+    {name:'Accretion Physics',desc:'Accretion disks, Eddington limit, X-ray binaries.'},
+    {name:'Interstellar Medium',desc:'Molecular clouds, dust, H II regions, 21-cm line.'},
+    {name:'Star Formation',desc:'Gravitational collapse, Jeans instability, protostellar disks.'},
+    {name:'Galactic Astronomy',desc:'Milky Way structure, spiral arms, galactic centre.'},
+    {name:'Galactic Dynamics',desc:'Rotation curves, dark matter halos, spiral density waves.'},
+    {name:'Galaxies',desc:'Morphology, scaling relations, Tully–Fisher.'},
+    {name:'Active Galactic Nuclei & Quasars',desc:'Supermassive black holes, jets, variability.'},
+    {name:'Galaxy Clusters',desc:'Cluster dynamics, X-ray emission, SZ effect.'},
+    {name:'Gravitational Waves',desc:'Sources, detectors, waveform analysis.'}
+  ]},
+  cosmology:{num:'06',name:'Cosmology',sub:'The universe at large',slug:'cosmology',title:'<em>Cosmology</em>',blurb:'The study of the universe as a whole — its origin, expansion, composition, and ultimate fate.',topics:[
+    {name:'Historical Cosmology',desc:'Aristotle to Hubble — the evolution of cosmological thought.'},
+    {name:'Big Bang Model',desc:'The standard model of cosmology, its evidence and predictions.'},
+    {name:'Cosmological Principle',desc:'Homogeneity and isotropy on large scales.'},
+    {name:'Friedmann–Robertson–Walker Metric',desc:'The metric of an expanding homogeneous universe.'},
+    {name:'Friedmann Equations',desc:'The dynamical equations governing cosmic expansion.'},
+    {name:'Cosmological Parameters',desc:'H₀, Ω_m, Ω_Λ, Ω_r, and their measurement.'},
+    {name:'Redshift & Distance Measures',desc:'Cosmological redshift, luminosity distance.'},
+    {name:'Hubble\'s Law',desc:'The expansion of the universe and the Hubble constant.'},
+    {name:'Cosmic Microwave Background',desc:'Relic radiation, temperature, anisotropies, polarisation.'},
+    {name:'Big Bang Nucleosynthesis',desc:'Formation of the light elements in the first three minutes.'},
+    {name:'Recombination & Decoupling',desc:'Formation of neutral atoms and the release of the CMB.'},
+    {name:'Reionization',desc:'The re-ionisation of the universe by the first stars.'},
+    {name:'Cosmic Inflation',desc:'The exponential expansion of the very early universe.'},
+    {name:'Dark Matter',desc:'Evidence, candidates, and experimental searches.'},
+    {name:'Dark Energy & Cosmological Constant',desc:'The accelerating expansion of the universe.'},
+    {name:'Structure Formation',desc:'Growth of density perturbations, the cosmic web.'},
+    {name:'Galaxy Formation & Evolution',desc:'Hierarchical formation, feedback.'},
+    {name:'Baryon Acoustic Oscillations',desc:'The imprint of sound waves in the early universe.'},
+    {name:'Type Ia Supernovae as Standard Candles',desc:'Their use in measuring cosmic acceleration.'},
+    {name:'Gravitational Lensing in Cosmology',desc:'Strong and weak lensing as cosmological probes.'},
+    {name:'Thermal History of the Universe',desc:'From the Planck epoch to the present.'},
+    {name:'The Fate of the Universe',desc:'Big Freeze, Big Rip, Big Crunch.'},
+    {name:'Observational Cosmology',desc:'Surveys, space missions, and the future.'}
+  ]}
 };
+const LEVEL_ORDER = ['igcse','as','a','university','astrophysics','cosmology'];
 
-const filterState = { query: '', subject: null, topic: null };
-
-function buildChips(){
-  const subjectOrder = ['Physics', 'Chemistry', 'Mathematics', 'Astronomy'];
-  const subjectChips = document.getElementById('subjectChips');
-  subjectChips.innerHTML = '';
-  subjectOrder.forEach(s => {
-    const count = SIMS.filter(sim => sim.subject === s).length;
-    if (count === 0) return;
-    const meta = SUBJECTS[s];
-    const btn = document.createElement('button');
-    btn.className = 'chip';
-    btn.dataset.value = s;
-    btn.innerHTML = (meta.label || s) + '<span class="count">' + count + '</span>';
-    btn.onclick = () => toggleFilter('subject', s);
-    subjectChips.appendChild(btn);
-  });
-
-  const allTopics = [...new Set(SIMS.map(s => s.topic))].sort();
-  const topicChips = document.getElementById('topicChips');
-  topicChips.innerHTML = '';
-  allTopics.forEach(t => {
-    const count = SIMS.filter(s => s.topic === t).length;
-    const btn = document.createElement('button');
-    btn.className = 'chip';
-    btn.dataset.value = t;
-    btn.innerHTML = t + '<span class="count">' + count + '</span>';
-    btn.onclick = () => toggleFilter('topic', t);
-    topicChips.appendChild(btn);
-  });
-}
-
-function toggleFilter(key, value){
-  if (filterState[key] === value){ filterState[key] = null; }
-  else { filterState[key] = value; }
-  updateChipVisuals();
-  renderGrid();
-}
-
-function updateChipVisuals(){
-  document.querySelectorAll('.chip').forEach(chip => {
-    const parent = chip.parentElement.id;
-    const key = parent === 'subjectChips' ? 'subject' : 'topic';
-    const val = chip.dataset.value;
-    chip.classList.toggle('active', String(filterState[key]) === String(val));
-  });
-}
-
-function matchesFilters(sim){
-  if (filterState.subject && sim.subject !== filterState.subject) return false;
-  if (filterState.topic   && sim.topic   !== filterState.topic)   return false;
-  if (filterState.query){
-    const q = filterState.query.toLowerCase();
-    const haystack = [sim.title, sim.topic, sim.subject, sim.desc, (sim.levels || []).join(' ')]
-                     .join(' ').toLowerCase();
-    if (!haystack.includes(q)) return false;
-  }
-  return true;
-}
-
-function renderGrid(){
-  const grid  = document.getElementById('grid');
-  const empty = document.getElementById('empty');
-  const line  = document.getElementById('resultsLine');
-
-  const matches = SIMS.filter(matchesFilters);
-  grid.innerHTML = '';
-
-  if (matches.length === 0){
-    empty.style.display = 'block';
-    line.innerHTML = 'No simulations found.';
-    return;
-  }
-  empty.style.display = 'none';
-  line.innerHTML = 'Showing <strong>' + matches.length + '</strong> of <strong>' +
-                   SIMS.length + '</strong> simulations.';
-
-  matches.forEach(sim => {
-    const a = document.createElement('a');
-    a.className = 'card';
-    a.href = 'sims/' + sim.slug + '/';
-
-    const meta = SUBJECTS[sim.subject] || { key: 'physics', colour: '#1d4ed8' };
-    const subjectLabel = meta.label || sim.subject;
-    const levelTags = (sim.levels || []).map(lv => '<span class="lvl">' + lv + '</span>').join('');
-
-    a.innerHTML =
-      '<div class="strip ' + meta.key + '"></div>' +
-      '<div class="body">' +
-        '<div class="subject-line">' +
-          '<span class="subject ' + meta.key + '">' + subjectLabel + '</span>' +
-        '</div>' +
-        '<h2>' + sim.title + '</h2>' +
-        '<p class="desc">' + sim.desc + '</p>' +
-        (levelTags ? '<div class="levels">' + levelTags + '</div>' : '') +
-      '</div>';
-    grid.appendChild(a);
-  });
-}
-
-document.getElementById('search').addEventListener('input', e => {
-  filterState.query = e.target.value.trim();
-  renderGrid();
+/* RENDER LEVEL TABS */
+const tabsWrap = document.getElementById('levelsInner');
+LEVEL_ORDER.forEach((key, i) => {
+  const L = LEVELS[key];
+  const tab = document.createElement('button');
+  tab.className = 'level-tab' + (i === 0 ? ' active' : '');
+  tab.dataset.level = key;
+  tab.innerHTML =
+    '<span class="num">' + L.num + '</span>' +
+    '<span class="name">' + L.name + '</span>' +
+    '<span class="sub">' + L.sub + '</span>';
+  tab.addEventListener('click', () => selectLevel(key, true));
+  tabsWrap.appendChild(tab);
 });
 
-if ('serviceWorker' in navigator){
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
-  });
-}
+/* RENDER TOPICS */
+const kickerEl = document.getElementById('topicsKicker');
+const titleEl  = document.getElementById('topicsTitle');
+const blurbEl  = document.getElementById('topicsBlurb');
+const gridEl   = document.getElementById('topicsGrid');
 
-buildChips();
-renderGrid();
+function selectLevel(key, scroll){
+  const L = LEVELS[key];
+  if (!L) return;
+  document.querySelectorAll('.level-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.level === key);
+  });
+  kickerEl.textContent = L.name + ' · Level ' + L.num;
+  titleEl.innerHTML = L.title;
+  blurbEl.textContent = L.blurb;
+  gridEl.innerHTML = '';
+  L.topics.forEach((topic, i) => {
+    const idx = String(i+1).padStart(2,'0');
+    const href = '/topics/' + L.slug + '/' + slugify(topic.name) + '/';
+    const card = document.createElement('a');
+    card.className = 'topic-link';
+    card.href = href;
+    card.innerHTML =
+      '<span class="idx">Topic ' + idx + '</span>' +
+      '<div class="head-row">' +
+        '<h3>' + topic.name + '</h3>' +
+        '<span class="arrow"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>' +
+      '</div>' +
+      '<p>' + topic.desc + '</p>' +
+      '<span class="count">Open simulation library →</span>';
+    gridEl.appendChild(card);
+  });
+  if (scroll){
+    const sec = document.getElementById('topics');
+    const y = sec.getBoundingClientRect().top + window.scrollY - 78;
+    window.scrollTo({ top: y, behavior: 'smooth' });
+  }
+}
+selectLevel('igcse', false);
+
+/* ============================================================
+   SPACETIME HERO — fully rebuilt
+   ============================================================ */
+(function spacetime(){
+  const canvas = document.getElementById('spaceCanvas');
+  const ctx = canvas.getContext('2d', { alpha: false });
+  const DPR = Math.min(window.devicePixelRatio || 1, 2);
+  let VW = 0, VH = 0;
+
+  function resize(){
+    const r = canvas.getBoundingClientRect();
+    VW = Math.max(320, Math.round(r.width));
+    VH = Math.max(320, Math.round(r.height));
+    canvas.width  = Math.round(VW * DPR);
+    canvas.height = Math.round(VH * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  /* -------- STARS -------- */
+  let stars = [];
+  function buildStars(){
+    const n = Math.round((VW * VH) / 4400);
+    stars = [];
+    for (let i = 0; i < n; i++){
+      stars.push({
+        x: Math.random()*VW, y: Math.random()*VH,
+        r: Math.random()*1.15 + 0.22,
+        a: Math.random()*0.65 + 0.22,
+        tw: Math.random()*0.7 + 0.4,
+        ph: Math.random()*Math.PI*2
+      });
+    }
+  }
+  buildStars();
+  window.addEventListener('resize', buildStars);
+
+  /* -------- WELL + RIPPLES -------- */
+  const WELL_DEPTH = 100;
+  const WELL_R = 130;
+
+  function wellBase(x, y){
+    const r = Math.sqrt(x*x + y*y);
+    return -WELL_DEPTH / (1 + Math.pow(r / WELL_R, 1.65));
+  }
+
+  function rippleAt(x, y, t){
+    const r = Math.sqrt(x*x + y*y);
+    if (r < 25) return 0;
+
+    /* Two overlapping wave trains — strong, clearly visible */
+    const wave1 = Math.sin(r * 0.055 - t * 3.4) * 5.5;
+    const wave2 = Math.sin(r * 0.032 - t * 2.2) * 4.0;
+
+    /* Envelope: strongest in the mid-region of the sheet */
+    const env = Math.exp(-Math.abs(r - 280) / 340);
+
+    /* Inner mask — no ripples inside the sun's immediate well */
+    const innerMask = Math.min(1, Math.max(0, (r - 45) / 80));
+
+    /* Outer fade */
+    const outerFade = Math.exp(-r / 780);
+
+    return (wave1 + wave2) * env * innerMask * outerFade;
+  }
+
+  function wellZ(x, y, t){
+    return wellBase(x, y) + rippleAt(x, y, t);
+  }
+
+  /* -------- CAMERA -------- */
+  let yaw = 0.35;
+
+  function project(x, y, z){
+    const pitch = 0.72;                /* ~41° elevation — sees the funnel nicely */
+    const dist  = 780;
+    const targetZ = -WELL_DEPTH * 0.34;
+
+    const cx = dist * Math.cos(pitch) * Math.cos(yaw);
+    const cy = dist * Math.cos(pitch) * Math.sin(yaw);
+    const cz = targetZ + dist * Math.sin(pitch);
+
+    const fx = -cx, fy = -cy, fz = targetZ - cz;
+    const fl = Math.hypot(fx, fy, fz);
+    const Fx = fx/fl, Fy = fy/fl, Fz = fz/fl;
+
+    let Rx = Fy, Ry = -Fx, Rz = 0;
+    const Rl = Math.hypot(Rx, Ry, Rz) || 1;
+    Rx /= Rl; Ry /= Rl; Rz /= Rl;
+
+    const Ux = Ry*Fz - Rz*Fy;
+    const Uy = Rz*Fx - Rx*Fz;
+    const Uz = Rx*Fy - Ry*Fx;
+
+    const dx = x - cx, dy = y - cy, dz = z - cz;
+    const depth = dx*Fx + dy*Fy + dz*Fz;
+    if (depth < 20) return null;
+
+    const sx = dx*Rx + dy*Ry + dz*Rz;
+    const sy = dx*Ux + dy*Uy + dz*Uz;
+
+    const focal = Math.max(760, VH * 1.55);
+    return {
+      x: VW/2 + focal * sx / depth,
+      y: VH/2 - focal * sy / depth,
+      depth: depth
+    };
+  }
+
+  /* -------- FABRIC -------- */
+  const RINGS = 48;
+  const SEGS = 96;
+  const R_IN = 12;
+  const R_OUT = 760;
+
+  const ringRadii = [];
+  for (let i = 0; i <= RINGS; i++){
+    const t = i / RINGS;
+    ringRadii.push(R_IN * Math.pow(R_OUT / R_IN, t));
+  }
+
+  function drawFabric(t){
+    /* Compute all vertices once */
+    const z3 = [], s2 = [];
+    for (let i = 0; i <= RINGS; i++){
+      const r = ringRadii[i];
+      const zRow = [], pRow = [];
+      for (let j = 0; j < SEGS; j++){
+        const a = j * Math.PI * 2 / SEGS;
+        const x = r * Math.cos(a);
+        const y = r * Math.sin(a);
+        const z = wellZ(x, y, t);
+        zRow.push(z);
+        pRow.push(project(x, y, z));
+      }
+      z3.push(zRow); s2.push(pRow);
+    }
+
+    /* Build quads for filled rendering with depth sorting */
+    const quads = [];
+    const D = WELL_DEPTH;
+    for (let i = 0; i < RINGS; i++){
+      const tR = i / RINGS;
+      for (let j = 0; j < SEGS; j++){
+        const j2 = (j + 1) % SEGS;
+        const p00 = s2[i][j],   p01 = s2[i][j2];
+        const p10 = s2[i+1][j], p11 = s2[i+1][j2];
+        if (!p00 || !p01 || !p10 || !p11) continue;
+        const depth = (p00.depth + p01.depth + p10.depth + p11.depth) * 0.25;
+        const zAvg  = (z3[i][j] + z3[i][j2] + z3[i+1][j] + z3[i+1][j2]) * 0.25;
+        quads.push({ p00, p01, p10, p11, depth, zAvg, tR });
+      }
+    }
+    quads.sort((a, b) => b.depth - a.depth);
+
+    /* Filled quads — deep blue-violet in the well, cyan-blue on the plain */
+    for (let k = 0; k < quads.length; k++){
+      const q = quads[k];
+      const dt = Math.max(0, Math.min(1, -q.zAvg / D));
+      const r = Math.round(24 + (1 - dt) * 82);
+      const g = Math.round(50 + (1 - dt) * 120);
+      const b = Math.round(105 + (1 - dt) * 140);
+      const edgeFade = 1 - q.tR * 0.55;
+      const alpha = 0.55 * edgeFade;
+      ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + alpha.toFixed(3) + ')';
+      ctx.beginPath();
+      ctx.moveTo(q.p00.x, q.p00.y);
+      ctx.lineTo(q.p01.x, q.p01.y);
+      ctx.lineTo(q.p11.x, q.p11.y);
+      ctx.lineTo(q.p10.x, q.p10.y);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    /* Wireframe — bright grid so the ripples are visible */
+    for (let i = 0; i <= RINGS; i++){
+      const pRow = s2[i];
+      const tR = i / RINGS;
+      const alpha = Math.max(0, 0.68 - tR * 0.55);
+      if (alpha < 0.04) continue;
+      ctx.strokeStyle = 'rgba(180,220,255,' + alpha.toFixed(3) + ')';
+      ctx.lineWidth = (i % 4 === 0) ? 1.0 : 0.4;
+      ctx.beginPath();
+      let started = false;
+      for (let j = 0; j <= SEGS; j++){
+        const p = pRow[j % SEGS];
+        if (!p){ started = false; continue; }
+        if (!started){ ctx.moveTo(p.x, p.y); started = true; }
+        else ctx.lineTo(p.x, p.y);
+      }
+      ctx.stroke();
+    }
+    for (let j = 0; j < SEGS; j += 3){
+      ctx.beginPath();
+      let started = false;
+      for (let i = 0; i <= RINGS; i++){
+        const p = s2[i][j];
+        if (!p){ started = false; continue; }
+        if (!started){ ctx.moveTo(p.x, p.y); started = true; }
+        else ctx.lineTo(p.x, p.y);
+      }
+      ctx.strokeStyle = 'rgba(180,220,255,0.28)';
+      ctx.lineWidth = 0.4;
+      ctx.stroke();
+    }
+  }
+
+  /* -------- SUN -------- */
+  function drawSun(t){
+    const z = -WELL_DEPTH * 0.72;
+    const p = project(0, 0, z);
+    if (!p) return;
+
+    const pulse = 1 + 0.035 * Math.sin(t * 1.6);
+    const sunR = 22 * VH / 640 * pulse;
+
+    /* Wide outer glow */
+    const g1 = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, sunR * 16);
+    g1.addColorStop(0.00, 'rgba(255,225,150,0.42)');
+    g1.addColorStop(0.20, 'rgba(255,180,95,0.20)');
+    g1.addColorStop(0.55, 'rgba(255,140,55,0.06)');
+    g1.addColorStop(1.00, 'rgba(255,120,40,0)');
+    ctx.fillStyle = g1;
+    ctx.beginPath(); ctx.arc(p.x, p.y, sunR * 16, 0, Math.PI*2); ctx.fill();
+
+    /* Inner halo */
+    const g2 = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, sunR * 2.6);
+    g2.addColorStop(0.00, 'rgba(255,250,220,1)');
+    g2.addColorStop(0.35, 'rgba(255,220,140,0.62)');
+    g2.addColorStop(1.00, 'rgba(255,170,70,0)');
+    ctx.fillStyle = g2;
+    ctx.beginPath(); ctx.arc(p.x, p.y, sunR * 2.6, 0, Math.PI*2); ctx.fill();
+
+    /* Core */
+    const g3 = ctx.createRadialGradient(
+      p.x - sunR*0.30, p.y - sunR*0.30, sunR*0.10,
+      p.x, p.y, sunR
+    );
+    g3.addColorStop(0.00, '#fffdea');
+    g3.addColorStop(0.45, '#ffe58a');
+    g3.addColorStop(1.00, '#f0942a');
+    ctx.fillStyle = g3;
+    ctx.beginPath(); ctx.arc(p.x, p.y, sunR, 0, Math.PI*2); ctx.fill();
+
+    /* Granulation */
+    for (let i = 0; i < 18; i++){
+      const a = i * 0.449 * Math.PI * 2;
+      const rr = sunR * 0.60;
+      const gx = p.x + Math.cos(a) * rr * 0.75;
+      const gy = p.y + Math.sin(a) * rr * 0.75;
+      const gr = sunR * 0.16;
+      const gg = ctx.createRadialGradient(gx, gy, 0, gx, gy, gr);
+      gg.addColorStop(0, 'rgba(255,255,245,0.6)');
+      gg.addColorStop(1, 'rgba(255,255,245,0)');
+      ctx.fillStyle = gg;
+      ctx.beginPath(); ctx.arc(gx, gy, gr, 0, Math.PI*2); ctx.fill();
+    }
+  }
+
+  /* -------- PLANETS -------- */
+  const PLANETS = [
+    { a:150, T:6.0,  key:'mercury', size:5.5,  seed:1, phase:0.0 },
+    { a:225, T:9.5,  key:'venus',   size:7.0,  seed:2, phase:1.1 },
+    { a:315, T:14,   key:'earth',   size:7.5,  seed:3, phase:2.4 },
+    { a:415, T:19,   key:'mars',    size:6.0,  seed:4, phase:3.6 },
+    { a:545, T:27,   key:'jupiter', size:15.0, seed:5, phase:4.8 },
+    { a:680, T:36,   key:'saturn',  size:12.0, seed:6, phase:6.0 }
+  ];
+
+  /* deterministic rng */
+  function rng(seed){
+    let s = seed;
+    return function(){
+      s = (s * 1103515245 + 12345) % 2147483648;
+      return s / 2147483648;
+    };
+  }
+
+  /* surface data per planet */
+  const SURFACES = {};
+  PLANETS.forEach(p => {
+    const r = rng(p.seed * 7919);
+    if (p.key === 'earth'){
+      const conts = [
+        [[-0.60,-0.22],[-0.70,-0.42],[-0.55,-0.58],[-0.32,-0.52],[-0.24,-0.30],[-0.40,-0.12],[-0.55,-0.05]],
+        [[-0.22,0.04],[-0.08,0.14],[-0.03,0.44],[-0.14,0.62],[-0.28,0.42],[-0.30,0.14]],
+        [[0.06,-0.34],[0.22,-0.40],[0.32,-0.24],[0.34,0.04],[0.26,0.34],[0.18,0.54],[0.08,0.42],[0.05,0.10]],
+        [[0.26,-0.44],[0.54,-0.54],[0.72,-0.34],[0.70,-0.04],[0.54,0.14],[0.34,0.05],[0.28,-0.20]],
+        [[0.56,0.42],[0.70,0.35],[0.72,0.54],[0.56,0.58],[0.48,0.50]]
+      ];
+      const clouds = [];
+      for (let i=0; i<14; i++){
+        clouds.push({ x:(r()-0.5)*1.6, y:(r()-0.5)*1.6, s:0.14+r()*0.16, a:0.55+r()*0.35 });
+      }
+      SURFACES[p.key] = { conts, clouds };
+    }
+    else if (p.key === 'jupiter'){
+      const bands = [];
+      for (let i=0; i<13; i++){
+        bands.push({ y:-1+(i+0.5)*(2/13), h:0.08+r()*0.03, tone:r() });
+      }
+      const storms = [];
+      for (let i=0; i<8; i++){
+        storms.push({ x:(r()-0.5)*1.6, y:(r()-0.5)*1.2, s:0.06+r()*0.05 });
+      }
+      SURFACES[p.key] = { bands, storms, greatSpot:{ x:0.30, y:0.24, rx:0.24, ry:0.14 } };
+    }
+    else if (p.key === 'saturn'){
+      const bands = [];
+      for (let i=0; i<10; i++){
+        bands.push({ y:-1+(i+0.5)*(2/10), h:0.07+r()*0.03, tone:r() });
+      }
+      SURFACES[p.key] = { bands };
+    }
+    else if (p.key === 'mars'){
+      const patches = [];
+      for (let i=0; i<12; i++){
+        patches.push({ x:(r()-0.5)*1.6, y:(r()-0.5)*1.4, s:0.10+r()*0.12, dark:r()>0.4 });
+      }
+      const craters = [];
+      for (let i=0; i<16; i++){
+        craters.push({ x:(r()-0.5)*1.7, y:(r()-0.5)*1.5, s:0.03+r()*0.05 });
+      }
+      SURFACES[p.key] = { patches, craters };
+    }
+    else if (p.key === 'mercury'){
+      const craters = [];
+      for (let i=0; i<30; i++){
+        craters.push({ x:(r()-0.5)*1.85, y:(r()-0.5)*1.75, s:0.04+r()*0.10, bright:r()>0.55 });
+      }
+      SURFACES[p.key] = { craters };
+    }
+    else if (p.key === 'venus'){
+      const swirls = [];
+      for (let i=0; i<12; i++){
+        swirls.push({ x:(r()-0.5)*1.6, y:(r()-0.5)*1.4, s:0.20+r()*0.20, bright:r()>0.5 });
+      }
+      const bands = [];
+      for (let i=0; i<7; i++){
+        bands.push({ y:-1+(i+0.5)*(2/7), h:0.14+r()*0.06, tone:r() });
+      }
+      SURFACES[p.key] = { swirls, bands };
+    }
+  });
+
+  const PLANET_COLORS = {
+    mercury:{ lit:'#dbd2be', mid:'#a39784', dark:'#4f4433' },
+    venus:  { lit:'#faeaa8', mid:'#e2bf6a', dark:'#8a6528' },
+    earth:  { lit:'#84c0ea', mid:'#2e73a8', dark:'#0b2a48' },
+    mars:   { lit:'#e8935a', mid:'#c05a2c', dark:'#5a260e' },
+    jupiter:{ lit:'#f4e6b8', mid:'#cfa77a', dark:'#6a4420' },
+    saturn: { lit:'#f5edc8', mid:'#ddc68c', dark:'#7a5e2e' }
+  };
+
+  function drawSphere(x, y, R, key, seed, sunX, sunY){
+    const S = SURFACES[key] || {};
+    const dx = sunX - x, dy = sunY - y;
+    const dl = Math.hypot(dx, dy) || 1;
+    const lx = dx / dl, ly = dy / dl;
+
+    const litX = x + lx * R * 0.55;
+    const litY = y + ly * R * 0.55;
+
+    /* base sphere */
+    const base = ctx.createRadialGradient(litX, litY, R*0.05, x, y, R*1.30);
+    const cols = PLANET_COLORS[key];
+    base.addColorStop(0.00, cols.lit);
+    base.addColorStop(0.45, cols.mid);
+    base.addColorStop(1.00, cols.dark);
+    ctx.beginPath(); ctx.arc(x, y, R, 0, Math.PI*2);
+    ctx.fillStyle = base; ctx.fill();
+
+    /* clipped surface features */
+    ctx.save();
+    ctx.beginPath(); ctx.arc(x, y, R, 0, Math.PI*2); ctx.clip();
+
+    if (key === 'earth'){
+      S.conts.forEach(poly => {
+        ctx.beginPath();
+        poly.forEach((pt, i) => {
+          const px = x + pt[0] * R * 0.95;
+          const py = y + pt[1] * R * 0.95;
+          if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+        });
+        ctx.closePath();
+        ctx.fillStyle = '#3f7a35';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(40,60,25,0.55)';
+        ctx.lineWidth = 1; ctx.stroke();
+      });
+      ctx.fillStyle = 'rgba(245,250,255,0.88)';
+      ctx.beginPath(); ctx.ellipse(x, y - R*0.86, R*0.85, R*0.20, 0, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(x, y + R*0.86, R*0.80, R*0.18, 0, 0, Math.PI*2); ctx.fill();
+      S.clouds.forEach(cl => {
+        const cx = x + cl.x*R*0.9, cy = y + cl.y*R*0.9, cr = cl.s*R*2.2;
+        const cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, cr);
+        cg.addColorStop(0, 'rgba(255,255,255,' + (cl.a*0.55).toFixed(2) + ')');
+        cg.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = cg;
+        ctx.beginPath(); ctx.arc(cx, cy, cr, 0, Math.PI*2); ctx.fill();
+      });
+    }
+    else if (key === 'mercury'){
+      S.craters.forEach(cr => {
+        const cx = x + cr.x*R*0.95, cy = y + cr.y*R*0.95, rr = cr.s*R;
+        ctx.beginPath(); ctx.arc(cx, cy, rr, 0, Math.PI*2);
+        ctx.fillStyle = 'rgba(55,48,42,0.55)'; ctx.fill();
+        ctx.beginPath(); ctx.arc(cx - rr*0.20, cy - rr*0.20, rr*0.65, 0, Math.PI*2);
+        ctx.fillStyle = 'rgba(220,210,195,' + (cr.bright ? 0.42 : 0.20) + ')'; ctx.fill();
+      });
+    }
+    else if (key === 'venus'){
+      S.bands.forEach(b => {
+        const yy = y + b.y*R*0.92, hh = b.h*R;
+        const g = ctx.createLinearGradient(x - R, yy - hh, x + R, yy + hh);
+        if (b.tone < 0.5){
+          g.addColorStop(0,'rgba(190,150,60,0.20)');
+          g.addColorStop(0.5,'rgba(230,195,110,0.10)');
+          g.addColorStop(1,'rgba(190,150,60,0.20)');
+        } else {
+          g.addColorStop(0,'rgba(255,240,190,0.24)');
+          g.addColorStop(0.5,'rgba(255,245,205,0.12)');
+          g.addColorStop(1,'rgba(255,240,190,0.24)');
+        }
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.ellipse(x, yy, R*1.10, hh, 0, 0, Math.PI*2); ctx.fill();
+      });
+      S.swirls.forEach(sw => {
+        const cx = x + sw.x*R*0.85, cy = y + sw.y*R*0.85, cr = sw.s*R*2.0;
+        const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, cr);
+        if (sw.bright){
+          g.addColorStop(0,'rgba(255,248,210,0.45)');
+          g.addColorStop(1,'rgba(255,248,210,0)');
+        } else {
+          g.addColorStop(0,'rgba(190,140,55,0.32)');
+          g.addColorStop(1,'rgba(190,140,55,0)');
+        }
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(cx, cy, cr, 0, Math.PI*2); ctx.fill();
+      });
+    }
+    else if (key === 'mars'){
+      S.patches.forEach(pa => {
+        const cx = x + pa.x*R*0.90, cy = y + pa.y*R*0.90, pr = pa.s*R*2.4;
+        const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, pr);
+        if (pa.dark){
+          g.addColorStop(0,'rgba(80,32,18,0.55)');
+          g.addColorStop(1,'rgba(80,32,18,0)');
+        } else {
+          g.addColorStop(0,'rgba(245,180,120,0.40)');
+          g.addColorStop(1,'rgba(245,180,120,0)');
+        }
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(cx, cy, pr, 0, Math.PI*2); ctx.fill();
+      });
+      S.craters.forEach(cr => {
+        const cx = x + cr.x*R*0.90, cy = y + cr.y*R*0.90, rr = cr.s*R;
+        ctx.beginPath(); ctx.arc(cx, cy, rr, 0, Math.PI*2);
+        ctx.fillStyle = 'rgba(65,26,12,0.50)'; ctx.fill();
+      });
+      ctx.fillStyle = 'rgba(250,252,255,0.90)';
+      ctx.beginPath(); ctx.ellipse(x, y - R*0.92, R*0.65, R*0.14, 0, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = 'rgba(250,252,255,0.80)';
+      ctx.beginPath(); ctx.ellipse(x, y + R*0.92, R*0.55, R*0.12, 0, 0, Math.PI*2); ctx.fill();
+    }
+    else if (key === 'jupiter'){
+      S.bands.forEach(b => {
+        const yy = y + b.y*R*0.94, hh = b.h*R;
+        let col;
+        if (b.tone < 0.30)      col = 'rgba(120,80,45,0.58)';
+        else if (b.tone < 0.55) col = 'rgba(212,182,142,0.48)';
+        else if (b.tone < 0.80) col = 'rgba(245,225,190,0.58)';
+        else                    col = 'rgba(255,248,225,0.68)';
+        const g = ctx.createLinearGradient(x - R, yy - hh, x + R, yy + hh);
+        g.addColorStop(0,'rgba(0,0,0,0)');
+        g.addColorStop(0.5, col);
+        g.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.ellipse(x, yy, R*1.10, hh, 0, 0, Math.PI*2); ctx.fill();
+      });
+      S.storms.forEach(st => {
+        const cx = x + st.x*R*0.85, cy = y + st.y*R*0.85, cr = st.s*R*2.2;
+        const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, cr);
+        g.addColorStop(0,'rgba(250,230,195,0.45)');
+        g.addColorStop(1,'rgba(250,230,195,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(cx, cy, cr, 0, Math.PI*2); ctx.fill();
+      });
+      const gs = S.greatSpot;
+      const gsx = x + gs.x*R, gsy = y + gs.y*R;
+      const gsrx = gs.rx*R, gsry = gs.ry*R;
+      ctx.beginPath(); ctx.ellipse(gsx, gsy, gsrx, gsry, 0, 0, Math.PI*2);
+      const spotGrad = ctx.createRadialGradient(gsx, gsy, 0, gsx, gsy, gsrx);
+      spotGrad.addColorStop(0.00,'rgba(180,60,35,0.95)');
+      spotGrad.addColorStop(0.55,'rgba(155,50,28,0.82)');
+      spotGrad.addColorStop(1.00,'rgba(120,40,20,0.55)');
+      ctx.fillStyle = spotGrad; ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(gsx - gsrx*0.20, gsy - gsry*0.20, gsrx*0.45, gsry*0.45, 0, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(220,120,80,0.42)'; ctx.fill();
+    }
+    else if (key === 'saturn'){
+      S.bands.forEach(b => {
+        const yy = y + b.y*R*0.92, hh = b.h*R;
+        let col;
+        if (b.tone < 0.5) col = 'rgba(180,155,105,0.44)';
+        else              col = 'rgba(250,238,205,0.54)';
+        const g = ctx.createLinearGradient(x - R, yy - hh, x + R, yy + hh);
+        g.addColorStop(0,'rgba(0,0,0,0)');
+        g.addColorStop(0.5, col);
+        g.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.ellipse(x, yy, R*1.10, hh, 0, 0, Math.PI*2); ctx.fill();
+      });
+    }
+
+    ctx.restore();
+
+    /* day/night shading overlay */
+    const shade = ctx.createRadialGradient(litX, litY, R*0.02, x, y, R*1.10);
+    shade.addColorStop(0.00, 'rgba(255,255,245,0.24)');
+    shade.addColorStop(0.30, 'rgba(255,255,255,0.00)');
+    shade.addColorStop(0.62, 'rgba(0,0,0,0.38)');
+    shade.addColorStop(0.85, 'rgba(0,0,0,0.80)');
+    shade.addColorStop(1.00, 'rgba(0,0,0,0.96)');
+    ctx.beginPath(); ctx.arc(x, y, R, 0, Math.PI*2);
+    ctx.fillStyle = shade; ctx.fill();
+
+    /* specular */
+    const spR = R * 0.26;
+    const sp = ctx.createRadialGradient(
+      litX - spR*0.30, litY - spR*0.30, 0,
+      litX - spR*0.30, litY - spR*0.30, spR*1.5
+    );
+    sp.addColorStop(0.00,'rgba(255,255,255,0.32)');
+    sp.addColorStop(0.55,'rgba(255,255,255,0.09)');
+    sp.addColorStop(1.00,'rgba(255,255,255,0)');
+    ctx.fillStyle = sp;
+    ctx.beginPath(); ctx.arc(litX - spR*0.30, litY - spR*0.30, spR*1.5, 0, Math.PI*2); ctx.fill();
+
+    /* atmosphere */
+    if (key === 'earth'){
+      const atm = ctx.createRadialGradient(x, y, R*0.98, x, y, R*1.16);
+      atm.addColorStop(0.00,'rgba(140,200,255,0.00)');
+      atm.addColorStop(0.45,'rgba(140,200,255,0.44)');
+      atm.addColorStop(1.00,'rgba(140,200,255,0.00)');
+      ctx.beginPath(); ctx.arc(x, y, R*1.16, 0, Math.PI*2);
+      ctx.fillStyle = atm; ctx.fill();
+    }
+    if (key === 'venus'){
+      const atm = ctx.createRadialGradient(x, y, R*0.98, x, y, R*1.20);
+      atm.addColorStop(0.00,'rgba(255,235,170,0.00)');
+      atm.addColorStop(0.45,'rgba(255,235,170,0.42)');
+      atm.addColorStop(1.00,'rgba(255,235,170,0.00)');
+      ctx.beginPath(); ctx.arc(x, y, R*1.20, 0, Math.PI*2);
+      ctx.fillStyle = atm; ctx.fill();
+    }
+  }
+
+  /* -------- ORBITS -------- */
+  function drawOrbits(t){
+    PLANETS.forEach(p => {
+      ctx.beginPath();
+      let started = false;
+      const N = 160;
+      for (let j = 0; j <= N; j++){
+        const a = j*Math.PI*2/N;
+        const x = p.a * Math.cos(a);
+        const y = p.a * Math.sin(a);
+        const z = wellZ(x, y, t) + 0.4;
+        const scr = project(x, y, z);
+        if (!scr){ started = false; continue; }
+        if (!started){ ctx.moveTo(scr.x, scr.y); started = true; }
+        else ctx.lineTo(scr.x, scr.y);
+      }
+      ctx.strokeStyle = 'rgba(180,215,245,0.22)';
+      ctx.lineWidth = 0.7;
+      ctx.setLineDash([3, 7]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    });
+  }
+
+  /* -------- PLANETS WITH WAKES AND SHADOWS -------- */
+  function drawPlanets(t){
+    const sunScr = project(0, 0, -WELL_DEPTH * 0.72);
+
+    /* Collect planet screen positions and depths */
+    const items = [];
+    PLANETS.forEach((p, idx) => {
+      const ang = (t/p.T) + p.phase;
+      const x = p.a * Math.cos(ang);
+      const y = p.a * Math.sin(ang);
+      const zSurf = wellZ(x, y, t);
+      const zCent = zSurf + p.size * 0.6;
+      const scr = project(x, y, zCent);
+      if (!scr) return;
+      items.push({ p, idx, scr, worldR: p.size, ang });
+    });
+    items.sort((a, b) => b.scr.depth - a.scr.depth);
+
+    items.forEach(it => {
+      const { p, scr, worldR, ang } = it;
+      const size = Math.max(4, worldR * VH / 900);
+
+      /* 1. Wake — short trail on the fabric behind the planet */
+      drawWake(p, ang, t, scr);
+
+      /* 2. Shadow ellipse directly below the planet (on the fabric) */
+      const zBase = wellZ(
+        p.a * Math.cos(ang),
+        p.a * Math.sin(ang),
+        t
+      );
+      const baseScr = project(p.a * Math.cos(ang), p.a * Math.sin(ang), zBase);
+      if (baseScr){
+        const shR = size * 1.15;
+        const sh = ctx.createRadialGradient(baseScr.x, baseScr.y, 0, baseScr.x, baseScr.y, shR);
+        sh.addColorStop(0, 'rgba(0,8,20,0.55)');
+        sh.addColorStop(1, 'rgba(0,8,20,0)');
+        ctx.fillStyle = sh;
+        ctx.beginPath();
+        ctx.ellipse(baseScr.x, baseScr.y, shR, shR*0.42, 0, 0, Math.PI*2);
+        ctx.fill();
+      }
+
+      /* 3. Saturn rings behind planet */
+      if (p.key === 'saturn') drawSaturnRings(scr.x, scr.y, size, true);
+
+      /* 4. Planet body */
+      const sunX = sunScr ? sunScr.x : VW/2;
+      const sunY = sunScr ? sunScr.y : VH/2;
+      drawSphere(scr.x, scr.y, size, p.key, p.seed, sunX, sunY);
+
+      /* 5. Saturn rings in front */
+      if (p.key === 'saturn') drawSaturnRings(scr.x, scr.y, size, false);
+
+      /* 6. Name label */
+      ctx.font = 'italic ' + Math.max(10, Math.min(13, size * 0.55)) + 'px "Times New Roman", Times, Georgia, serif';
+      ctx.fillStyle = 'rgba(210,225,245,0.62)';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      const label = p.key.charAt(0).toUpperCase() + p.key.slice(1);
+      ctx.fillText(label, scr.x, scr.y + size + 6);
+    });
+  }
+
+  function drawWake(p, ang, t, currentScr){
+    /* Short arc behind the planet on the fabric */
+    const N = 30;
+    const arcSpan = 0.55;   /* radians of orbit to show as a wake */
+    const pts = [];
+    for (let i = 0; i <= N; i++){
+      const a = ang - arcSpan * (1 - i/N);
+      const x = p.a * Math.cos(a);
+      const y = p.a * Math.sin(a);
+      const z = wellZ(x, y, t) + 0.5;
+      const scr = project(x, y, z);
+      if (scr) pts.push({ scr, frac: i/N });
+    }
+    if (pts.length < 2) return;
+
+    for (let k = 1; k < pts.length; k++){
+      const a = pts[k-1].scr;
+      const b = pts[k].scr;
+      const frac = pts[k].frac;
+      /* Wake fades out behind the planet */
+      const alpha = Math.pow(frac, 2.2) * 0.55;
+      ctx.strokeStyle = wakeColor(p.key, alpha);
+      ctx.lineWidth = 0.6 + frac * 2.4;
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+    }
+  }
+
+  function wakeColor(key, a){
+    const c = {
+      mercury: '180,170,150',
+      venus:   '230,200,120',
+      earth:   '100,170,230',
+      mars:    '200,110,70',
+      jupiter: '225,200,150',
+      saturn:  '235,215,160'
+    }[key] || '200,200,200';
+    return 'rgba(' + c + ',' + a.toFixed(3) + ')';
+  }
+
+  function drawSaturnRings(cx, cy, R, behind){
+    const tilt = -0.36;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(tilt);
+
+    const bands = [
+      /* inner, outer, colour */
+      [R*1.35, R*1.55, 'rgba(200,180,130,0.30)'],
+      [R*1.55, R*1.98, 'rgba(245,225,170,0.65)'],
+      [R*1.98, R*2.09, 'rgba(40,30,18,0.55)'],
+      [R*2.09, R*2.38, 'rgba(220,200,148,0.52)'],
+      [R*2.44, R*2.50, 'rgba(235,220,180,0.36)']
+    ];
+
+    bands.forEach(([ri, ro, color]) => {
+      const rm = (ri + ro) / 2;
+      const ry = rm * 0.32;
+      ctx.beginPath();
+      if (behind){
+        ctx.ellipse(0, 0, rm, ry, 0, Math.PI, Math.PI*2);
+      } else {
+        ctx.ellipse(0, 0, rm, ry, 0, 0, Math.PI);
+      }
+      ctx.strokeStyle = color;
+      ctx.lineWidth = Math.max(1, ro - ri);
+      ctx.stroke();
+    });
+    ctx.restore();
+  }
+
+  /* -------- MAIN FRAME -------- */
+  let frameCount = 0;
+  function frame(now){
+    const t = now / 1000;
+    yaw = 0.35 + t * 0.045;   /* slow steady rotation */
+    frameCount++;
+
+    /* deep space gradient */
+    const bg = ctx.createRadialGradient(
+      VW*0.5, VH*0.40, 0,
+      VW*0.5, VH*0.40, Math.max(VW, VH)*0.95
+    );
+    bg.addColorStop(0.00,'#081536');
+    bg.addColorStop(0.42,'#04070f');
+    bg.addColorStop(1.00,'#010203');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, VW, VH);
+
+    /* stars */
+    for (let i = 0; i < stars.length; i++){
+      const s = stars[i];
+      const tw = 0.65 + 0.35 * Math.sin(t * s.tw + s.ph);
+      ctx.fillStyle = 'rgba(255,255,255,' + (s.a * tw).toFixed(3) + ')';
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    drawFabric(t);
+    drawOrbits(t);
+    drawSun(t);
+    drawPlanets(t);
+
+    /* gentle vignette */
+    const vg = ctx.createRadialGradient(
+      VW*0.5, VH*0.5, Math.min(VW, VH)*0.44,
+      VW*0.5, VH*0.5, Math.max(VW, VH)*0.85
+    );
+    vg.addColorStop(0,'rgba(0,0,0,0)');
+    vg.addColorStop(1,'rgba(0,0,0,0.52)');
+    ctx.fillStyle = vg;
+    ctx.fillRect(0, 0, VW, VH);
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
 </script>
 </body>
 </html>
