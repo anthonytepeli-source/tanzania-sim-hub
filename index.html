@@ -36,8 +36,6 @@ html,body{
   -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
   transition:background .35s ease, color .35s ease;
 }
-
-/* TOP BAR */
 .topbar{
   position:sticky;top:0;z-index:100;
   background:rgba(5,8,16,0.86);
@@ -88,7 +86,6 @@ html,body{
 html.theme-light .theme-btn .sun{display:block;}
 html.theme-light .theme-btn .moon{display:none;}
 
-/* HERO */
 .hero{
   position:relative;width:100%;
   height:clamp(620px, 88vh, 920px);
@@ -143,7 +140,6 @@ html.theme-light .theme-btn .moon{display:none;}
   background:rgba(255,217,122,0.7);position:relative;top:-4px;
 }
 
-/* LEVEL TABS */
 .levels{
   background:var(--bg-elev);border-bottom:1px solid var(--rule);
   position:relative;z-index:5;transition:background .35s;
@@ -185,7 +181,6 @@ html.theme-light .theme-btn .moon{display:none;}
 .level-tab.active .num,.level-tab.active .name{color:var(--accent-warm);}
 .level-tab.active .sub{color:var(--ink-soft);}
 
-/* TOPICS */
 .topics{background:var(--bg);padding:60px 32px 88px;transition:background .35s;}
 @media(max-width:640px){ .topics{padding:44px 20px 64px;} }
 .topics-inner{max-width:1280px;margin:0 auto;}
@@ -269,7 +264,6 @@ html.theme-light .theme-btn .moon{display:none;}
   letter-spacing:0.3px;
 }
 
-/* ABOUT */
 .about{
   background:var(--bg-elev);border-top:1px solid var(--rule);
   padding:52px 32px 56px;transition:background .35s;
@@ -295,7 +289,6 @@ html.theme-light .theme-btn .moon{display:none;}
 }
 .about-inner p strong{color:var(--ink);font-weight:bold;}
 
-/* FOOTER */
 footer{
   background:var(--bg);border-top:1px solid var(--rule);
   padding:36px 32px 56px;transition:background .35s;
@@ -312,7 +305,6 @@ footer{
 .footer-inner strong{color:var(--ink);font-weight:bold;}
 .footer-inner .right{text-align:right;}
 @media(max-width:800px){ .footer-inner .right{text-align:left;} }
-
 .visitor-block{
   text-align:center;padding:0 20px;
   border-left:1px solid var(--rule-fine);
@@ -357,7 +349,6 @@ footer{
   font-size:10.5px;font-style:italic;color:var(--ink-mute);
   margin-top:10px;opacity:0.75;
 }
-
 .theme-toast{
   position:fixed;bottom:22px;left:50%;
   transform:translateX(-50%) translateY(80px);
@@ -369,7 +360,6 @@ footer{
   box-shadow:0 6px 24px rgba(0,0,0,0.4);
 }
 .theme-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-
 @media(max-width:600px){
   .hero{height:auto;min-height:560px;}
   .hero-inner{min-height:560px;}
@@ -528,7 +518,6 @@ footer{
         elToday.textContent = Number(today).toLocaleString();
         elToday.classList.remove('loading');
       }
-
       let tr = await fetch('https://abacus.jasoncameron.dev/get/' + NS + '/total', { cache: 'no-store' });
       let total = tr.ok ? (await tr.json()).value : null;
       if (total == null || total === 0){
@@ -549,16 +538,15 @@ footer{
 })();
 
 /* ============================================================
-   SLUG + LEVELS DATA
+   LEVELS DATA
    ============================================================ */
 function slugify(s){
   return s.toLowerCase().replace(/&/g,'and').replace(/[—–-]/g,'-')
     .replace(/[^\w\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-')
     .replace(/^-|-$/g,'');
 }
-
 const LEVELS = {
-  igcse:{num:'01',name:'IGCSE',sub:'Foundations · Ages 14–16',slug:'igcse',title:'IGCSE <em>Physics</em>',blurb:'The complete Cambridge IGCSE 0625 syllabus. Every topic below opens into its own simulation library.',topics:[
+  igcse:{num:'01',name:'IGCSE',sub:'Foundations · Ages 14–16',slug:'igcse',title:'IGCSE <em>Physics</em>',blurb:'The complete Cambridge IGCSE 0625 syllabus.',topics:[
     {name:'Physical Quantities & Measurement',desc:'Measurement, SI units, scalars and vectors, precision and accuracy.'},
     {name:'Motion',desc:'Speed, velocity, acceleration, motion graphs, free fall.'},
     {name:'Mass, Weight & Density',desc:'Mass vs weight, gravitational field strength, density.'},
@@ -583,7 +571,7 @@ const LEVELS = {
     {name:'Atomic Physics',desc:'Atomic structure, isotopes, radioactivity, half-life.'},
     {name:'Nuclear Physics',desc:'Nuclear fission and fusion, mass–energy equivalence.'}
   ]},
-  as:{num:'02',name:'AS Level',sub:'First-year A Level',slug:'as',title:'AS Level <em>Physics</em>',blurb:'The complete Cambridge 9702 AS syllabus. Every topic opens into its own simulation library.',topics:[
+  as:{num:'02',name:'AS Level',sub:'First-year A Level',slug:'as',title:'AS Level <em>Physics</em>',blurb:'The complete Cambridge 9702 AS syllabus.',topics:[
     {name:'Physical Quantities & Units',desc:'SI base units, derived units, homogeneity, uncertainties.'},
     {name:'Kinematics',desc:'Motion with constant acceleration, projectiles, motion graphs.'},
     {name:'Dynamics',desc:'Newton\'s laws, linear momentum, impulse, collisions.'},
@@ -596,7 +584,7 @@ const LEVELS = {
     {name:'D.C. Circuits',desc:'Kirchhoff\'s laws, potential dividers, internal resistance.'},
     {name:'Particle Physics',desc:'The Standard Model, quarks, leptons, conservation laws.'}
   ]},
-  a:{num:'03',name:'A Level',sub:'Full A Level',slug:'a',title:'A Level <em>Physics</em>',blurb:'The full Cambridge 9702 A Level syllabus, in every topic.',topics:[
+  a:{num:'03',name:'A Level',sub:'Full A Level',slug:'a',title:'A Level <em>Physics</em>',blurb:'The full Cambridge 9702 A Level syllabus.',topics:[
     {name:'Kinematics',desc:'Motion in 2D and 3D, projectiles with air resistance.'},
     {name:'Dynamics',desc:'Momentum in 2D, centre of mass, collisions at angle, impulse.'},
     {name:'Circular Motion',desc:'Angular velocity, centripetal force, motion in a vertical circle.'},
@@ -614,7 +602,7 @@ const LEVELS = {
     {name:'Medical Physics',desc:'Ultrasound, X-ray imaging, CT scans, PET, radiation safety.'},
     {name:'Astronomy & Cosmology (Option)',desc:'Standard candles, Hubble\'s law, the Big Bang, stellar evolution.'}
   ]},
-  university:{num:'04',name:'University',sub:'Undergraduate',slug:'university',title:'University <em>Physics</em>',blurb:'The full undergraduate physics curriculum — every core module from mathematical methods to general relativity.',topics:[
+  university:{num:'04',name:'University',sub:'Undergraduate',slug:'university',title:'University <em>Physics</em>',blurb:'The full undergraduate physics curriculum.',topics:[
     {name:'Mathematical Methods for Physics',desc:'Vector calculus, differential equations, linear algebra, Fourier methods.'},
     {name:'Classical Mechanics',desc:'Lagrangian and Hamiltonian mechanics, central forces, rigid bodies.'},
     {name:'Special Relativity',desc:'Lorentz transformations, four-vectors, relativistic dynamics.'},
@@ -657,7 +645,7 @@ const LEVELS = {
     {name:'Galaxy Clusters',desc:'Cluster dynamics, X-ray emission, SZ effect.'},
     {name:'Gravitational Waves',desc:'Sources, detectors, waveform analysis.'}
   ]},
-  cosmology:{num:'06',name:'Cosmology',sub:'The universe at large',slug:'cosmology',title:'<em>Cosmology</em>',blurb:'The study of the universe as a whole — its origin, expansion, composition, and ultimate fate.',topics:[
+  cosmology:{num:'06',name:'Cosmology',sub:'The universe at large',slug:'cosmology',title:'<em>Cosmology</em>',blurb:'The study of the universe as a whole.',topics:[
     {name:'Historical Cosmology',desc:'Aristotle to Hubble — the evolution of cosmological thought.'},
     {name:'Big Bang Model',desc:'The standard model of cosmology, its evidence and predictions.'},
     {name:'Cosmological Principle',desc:'Homogeneity and isotropy on large scales.'},
@@ -685,7 +673,6 @@ const LEVELS = {
 };
 const LEVEL_ORDER = ['igcse','as','a','university','astrophysics','cosmology'];
 
-/* RENDER LEVEL TABS */
 const tabsWrap = document.getElementById('levelsInner');
 LEVEL_ORDER.forEach((key, i) => {
   const L = LEVELS[key];
@@ -700,7 +687,6 @@ LEVEL_ORDER.forEach((key, i) => {
   tabsWrap.appendChild(tab);
 });
 
-/* RENDER TOPICS */
 const kickerEl = document.getElementById('topicsKicker');
 const titleEl  = document.getElementById('topicsTitle');
 const blurbEl  = document.getElementById('topicsBlurb');
@@ -741,29 +727,57 @@ function selectLevel(key, scroll){
 selectLevel('igcse', false);
 
 /* ============================================================
-   SPACETIME HERO — fully rebuilt
+   SPACETIME HERO — mobile-optimised
    ============================================================ */
 (function spacetime(){
   const canvas = document.getElementById('spaceCanvas');
   const ctx = canvas.getContext('2d', { alpha: false });
-  const DPR = Math.min(window.devicePixelRatio || 1, 2);
   let VW = 0, VH = 0;
+
+  /* ---- detect a small / low-power device ---- */
+  const MOBILE =
+    window.matchMedia('(max-width: 820px)').matches ||
+    /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ||
+    (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
+
+  /* ---- per-device configuration ---- */
+  const CFG = MOBILE ? {
+    dpr: 1,
+    rings: 22,
+    segs: 44,
+    stars: 70,
+    drawFill: false,       /* wireframe only — huge win */
+    fps: 26,
+    planetSprite: true,
+    spokesEvery: 3,
+    sunGranulation: false
+  } : {
+    dpr: Math.min(window.devicePixelRatio || 1, 2),
+    rings: 44,
+    segs: 88,
+    stars: 200,
+    drawFill: true,
+    fps: 60,
+    planetSprite: true,
+    spokesEvery: 3,
+    sunGranulation: true
+  };
 
   function resize(){
     const r = canvas.getBoundingClientRect();
     VW = Math.max(320, Math.round(r.width));
     VH = Math.max(320, Math.round(r.height));
-    canvas.width  = Math.round(VW * DPR);
-    canvas.height = Math.round(VH * DPR);
-    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    canvas.width  = Math.round(VW * CFG.dpr);
+    canvas.height = Math.round(VH * CFG.dpr);
+    ctx.setTransform(CFG.dpr, 0, 0, CFG.dpr, 0, 0);
+    buildStars();
   }
   window.addEventListener('resize', resize);
-  resize();
 
   /* -------- STARS -------- */
   let stars = [];
   function buildStars(){
-    const n = Math.round((VW * VH) / 4400);
+    const n = CFG.stars;
     stars = [];
     for (let i = 0; i < n; i++){
       stars.push({
@@ -775,8 +789,6 @@ selectLevel('igcse', false);
       });
     }
   }
-  buildStars();
-  window.addEventListener('resize', buildStars);
 
   /* -------- WELL + RIPPLES -------- */
   const WELL_DEPTH = 100;
@@ -786,36 +798,23 @@ selectLevel('igcse', false);
     const r = Math.sqrt(x*x + y*y);
     return -WELL_DEPTH / (1 + Math.pow(r / WELL_R, 1.65));
   }
-
   function rippleAt(x, y, t){
     const r = Math.sqrt(x*x + y*y);
     if (r < 25) return 0;
-
-    /* Two overlapping wave trains — strong, clearly visible */
     const wave1 = Math.sin(r * 0.055 - t * 3.4) * 5.5;
-    const wave2 = Math.sin(r * 0.032 - t * 2.2) * 4.0;
-
-    /* Envelope: strongest in the mid-region of the sheet */
+    const wave2 = MOBILE ? 0 : Math.sin(r * 0.032 - t * 2.2) * 4.0;
     const env = Math.exp(-Math.abs(r - 280) / 340);
-
-    /* Inner mask — no ripples inside the sun's immediate well */
     const innerMask = Math.min(1, Math.max(0, (r - 45) / 80));
-
-    /* Outer fade */
     const outerFade = Math.exp(-r / 780);
-
     return (wave1 + wave2) * env * innerMask * outerFade;
   }
-
-  function wellZ(x, y, t){
-    return wellBase(x, y) + rippleAt(x, y, t);
-  }
+  function wellZ(x, y, t){ return wellBase(x, y) + rippleAt(x, y, t); }
 
   /* -------- CAMERA -------- */
   let yaw = 0.35;
 
   function project(x, y, z){
-    const pitch = 0.72;                /* ~41° elevation — sees the funnel nicely */
+    const pitch = 0.72;
     const dist  = 780;
     const targetZ = -WELL_DEPTH * 0.34;
 
@@ -843,16 +842,12 @@ selectLevel('igcse', false);
     const sy = dx*Ux + dy*Uy + dz*Uz;
 
     const focal = Math.max(760, VH * 1.55);
-    return {
-      x: VW/2 + focal * sx / depth,
-      y: VH/2 - focal * sy / depth,
-      depth: depth
-    };
+    return { x: VW/2 + focal*sx/depth, y: VH/2 - focal*sy/depth, depth: depth };
   }
 
   /* -------- FABRIC -------- */
-  const RINGS = 48;
-  const SEGS = 96;
+  const RINGS = CFG.rings;
+  const SEGS = CFG.segs;
   const R_IN = 12;
   const R_OUT = 760;
 
@@ -862,62 +857,69 @@ selectLevel('igcse', false);
     ringRadii.push(R_IN * Math.pow(R_OUT / R_IN, t));
   }
 
+  /* Pre-allocate reusable arrays */
+  const zRows = [];
+  const pRows = [];
+  for (let i = 0; i <= RINGS; i++){
+    zRows.push(new Float32Array(SEGS));
+    pRows.push(new Array(SEGS));
+  }
+
   function drawFabric(t){
-    /* Compute all vertices once */
-    const z3 = [], s2 = [];
     for (let i = 0; i <= RINGS; i++){
       const r = ringRadii[i];
-      const zRow = [], pRow = [];
+      const zRow = zRows[i];
+      const pRow = pRows[i];
       for (let j = 0; j < SEGS; j++){
         const a = j * Math.PI * 2 / SEGS;
         const x = r * Math.cos(a);
         const y = r * Math.sin(a);
         const z = wellZ(x, y, t);
-        zRow.push(z);
-        pRow.push(project(x, y, z));
-      }
-      z3.push(zRow); s2.push(pRow);
-    }
-
-    /* Build quads for filled rendering with depth sorting */
-    const quads = [];
-    const D = WELL_DEPTH;
-    for (let i = 0; i < RINGS; i++){
-      const tR = i / RINGS;
-      for (let j = 0; j < SEGS; j++){
-        const j2 = (j + 1) % SEGS;
-        const p00 = s2[i][j],   p01 = s2[i][j2];
-        const p10 = s2[i+1][j], p11 = s2[i+1][j2];
-        if (!p00 || !p01 || !p10 || !p11) continue;
-        const depth = (p00.depth + p01.depth + p10.depth + p11.depth) * 0.25;
-        const zAvg  = (z3[i][j] + z3[i][j2] + z3[i+1][j] + z3[i+1][j2]) * 0.25;
-        quads.push({ p00, p01, p10, p11, depth, zAvg, tR });
+        zRow[j] = z;
+        pRow[j] = project(x, y, z);
       }
     }
-    quads.sort((a, b) => b.depth - a.depth);
 
-    /* Filled quads — deep blue-violet in the well, cyan-blue on the plain */
-    for (let k = 0; k < quads.length; k++){
-      const q = quads[k];
-      const dt = Math.max(0, Math.min(1, -q.zAvg / D));
-      const r = Math.round(24 + (1 - dt) * 82);
-      const g = Math.round(50 + (1 - dt) * 120);
-      const b = Math.round(105 + (1 - dt) * 140);
-      const edgeFade = 1 - q.tR * 0.55;
-      const alpha = 0.55 * edgeFade;
-      ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + alpha.toFixed(3) + ')';
-      ctx.beginPath();
-      ctx.moveTo(q.p00.x, q.p00.y);
-      ctx.lineTo(q.p01.x, q.p01.y);
-      ctx.lineTo(q.p11.x, q.p11.y);
-      ctx.lineTo(q.p10.x, q.p10.y);
-      ctx.closePath();
-      ctx.fill();
+    /* Filled quads only on desktop */
+    if (CFG.drawFill){
+      const quads = [];
+      const D = WELL_DEPTH;
+      for (let i = 0; i < RINGS; i++){
+        const tR = i / RINGS;
+        for (let j = 0; j < SEGS; j++){
+          const j2 = (j + 1) % SEGS;
+          const p00 = pRows[i][j],   p01 = pRows[i][j2];
+          const p10 = pRows[i+1][j], p11 = pRows[i+1][j2];
+          if (!p00 || !p01 || !p10 || !p11) continue;
+          const depth = (p00.depth + p01.depth + p10.depth + p11.depth) * 0.25;
+          const zAvg  = (zRows[i][j] + zRows[i][j2] + zRows[i+1][j] + zRows[i+1][j2]) * 0.25;
+          quads.push({ p00, p01, p10, p11, depth, zAvg, tR });
+        }
+      }
+      quads.sort((a, b) => b.depth - a.depth);
+      for (let k = 0; k < quads.length; k++){
+        const q = quads[k];
+        const dt = Math.max(0, Math.min(1, -q.zAvg / D));
+        const r = Math.round(24 + (1 - dt) * 82);
+        const g = Math.round(50 + (1 - dt) * 120);
+        const b = Math.round(105 + (1 - dt) * 140);
+        const edgeFade = 1 - q.tR * 0.55;
+        const alpha = 0.55 * edgeFade;
+        ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + alpha.toFixed(3) + ')';
+        ctx.beginPath();
+        ctx.moveTo(q.p00.x, q.p00.y);
+        ctx.lineTo(q.p01.x, q.p01.y);
+        ctx.lineTo(q.p11.x, q.p11.y);
+        ctx.lineTo(q.p10.x, q.p10.y);
+        ctx.closePath();
+        ctx.fill();
+      }
     }
 
-    /* Wireframe — bright grid so the ripples are visible */
+    /* Wireframe — the primary visual on mobile */
+    ctx.lineCap = 'round';
     for (let i = 0; i <= RINGS; i++){
-      const pRow = s2[i];
+      const pRow = pRows[i];
       const tR = i / RINGS;
       const alpha = Math.max(0, 0.68 - tR * 0.55);
       if (alpha < 0.04) continue;
@@ -933,11 +935,13 @@ selectLevel('igcse', false);
       }
       ctx.stroke();
     }
-    for (let j = 0; j < SEGS; j += 3){
+    /* Radial spokes — thinner sampling on mobile */
+    const step = CFG.spokesEvery;
+    for (let j = 0; j < SEGS; j += step){
       ctx.beginPath();
       let started = false;
       for (let i = 0; i <= RINGS; i++){
-        const p = s2[i][j];
+        const p = pRows[i][j];
         if (!p){ started = false; continue; }
         if (!started){ ctx.moveTo(p.x, p.y); started = true; }
         else ctx.lineTo(p.x, p.y);
@@ -953,11 +957,9 @@ selectLevel('igcse', false);
     const z = -WELL_DEPTH * 0.72;
     const p = project(0, 0, z);
     if (!p) return;
-
     const pulse = 1 + 0.035 * Math.sin(t * 1.6);
     const sunR = 22 * VH / 640 * pulse;
 
-    /* Wide outer glow */
     const g1 = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, sunR * 16);
     g1.addColorStop(0.00, 'rgba(255,225,150,0.42)');
     g1.addColorStop(0.20, 'rgba(255,180,95,0.20)');
@@ -966,7 +968,6 @@ selectLevel('igcse', false);
     ctx.fillStyle = g1;
     ctx.beginPath(); ctx.arc(p.x, p.y, sunR * 16, 0, Math.PI*2); ctx.fill();
 
-    /* Inner halo */
     const g2 = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, sunR * 2.6);
     g2.addColorStop(0.00, 'rgba(255,250,220,1)');
     g2.addColorStop(0.35, 'rgba(255,220,140,0.62)');
@@ -974,7 +975,6 @@ selectLevel('igcse', false);
     ctx.fillStyle = g2;
     ctx.beginPath(); ctx.arc(p.x, p.y, sunR * 2.6, 0, Math.PI*2); ctx.fill();
 
-    /* Core */
     const g3 = ctx.createRadialGradient(
       p.x - sunR*0.30, p.y - sunR*0.30, sunR*0.10,
       p.x, p.y, sunR
@@ -985,18 +985,19 @@ selectLevel('igcse', false);
     ctx.fillStyle = g3;
     ctx.beginPath(); ctx.arc(p.x, p.y, sunR, 0, Math.PI*2); ctx.fill();
 
-    /* Granulation */
-    for (let i = 0; i < 18; i++){
-      const a = i * 0.449 * Math.PI * 2;
-      const rr = sunR * 0.60;
-      const gx = p.x + Math.cos(a) * rr * 0.75;
-      const gy = p.y + Math.sin(a) * rr * 0.75;
-      const gr = sunR * 0.16;
-      const gg = ctx.createRadialGradient(gx, gy, 0, gx, gy, gr);
-      gg.addColorStop(0, 'rgba(255,255,245,0.6)');
-      gg.addColorStop(1, 'rgba(255,255,245,0)');
-      ctx.fillStyle = gg;
-      ctx.beginPath(); ctx.arc(gx, gy, gr, 0, Math.PI*2); ctx.fill();
+    if (CFG.sunGranulation){
+      for (let i = 0; i < 18; i++){
+        const a = i * 0.449 * Math.PI * 2;
+        const rr = sunR * 0.60;
+        const gx = p.x + Math.cos(a) * rr * 0.75;
+        const gy = p.y + Math.sin(a) * rr * 0.75;
+        const gr = sunR * 0.16;
+        const gg = ctx.createRadialGradient(gx, gy, 0, gx, gy, gr);
+        gg.addColorStop(0, 'rgba(255,255,245,0.6)');
+        gg.addColorStop(1, 'rgba(255,255,245,0)');
+        ctx.fillStyle = gg;
+        ctx.beginPath(); ctx.arc(gx, gy, gr, 0, Math.PI*2); ctx.fill();
+      }
     }
   }
 
@@ -1010,7 +1011,7 @@ selectLevel('igcse', false);
     { a:680, T:36,   key:'saturn',  size:12.0, seed:6, phase:6.0 }
   ];
 
-  /* deterministic rng */
+  /* Build surface feature data once at load */
   function rng(seed){
     let s = seed;
     return function(){
@@ -1018,11 +1019,10 @@ selectLevel('igcse', false);
       return s / 2147483648;
     };
   }
-
-  /* surface data per planet */
   const SURFACES = {};
   PLANETS.forEach(p => {
     const r = rng(p.seed * 7919);
+    const detail = MOBILE ? 0.5 : 1;
     if (p.key === 'earth'){
       const conts = [
         [[-0.60,-0.22],[-0.70,-0.42],[-0.55,-0.58],[-0.32,-0.52],[-0.24,-0.30],[-0.40,-0.12],[-0.55,-0.05]],
@@ -1032,55 +1032,64 @@ selectLevel('igcse', false);
         [[0.56,0.42],[0.70,0.35],[0.72,0.54],[0.56,0.58],[0.48,0.50]]
       ];
       const clouds = [];
-      for (let i=0; i<14; i++){
+      const n = Math.round(14 * detail);
+      for (let i = 0; i < n; i++){
         clouds.push({ x:(r()-0.5)*1.6, y:(r()-0.5)*1.6, s:0.14+r()*0.16, a:0.55+r()*0.35 });
       }
       SURFACES[p.key] = { conts, clouds };
     }
     else if (p.key === 'jupiter'){
       const bands = [];
-      for (let i=0; i<13; i++){
-        bands.push({ y:-1+(i+0.5)*(2/13), h:0.08+r()*0.03, tone:r() });
+      const bn = Math.round(13 * detail);
+      for (let i = 0; i < bn; i++){
+        bands.push({ y:-1+(i+0.5)*(2/bn), h:0.08+r()*0.03, tone:r() });
       }
       const storms = [];
-      for (let i=0; i<8; i++){
+      const sn = Math.round(8 * detail);
+      for (let i = 0; i < sn; i++){
         storms.push({ x:(r()-0.5)*1.6, y:(r()-0.5)*1.2, s:0.06+r()*0.05 });
       }
       SURFACES[p.key] = { bands, storms, greatSpot:{ x:0.30, y:0.24, rx:0.24, ry:0.14 } };
     }
     else if (p.key === 'saturn'){
       const bands = [];
-      for (let i=0; i<10; i++){
-        bands.push({ y:-1+(i+0.5)*(2/10), h:0.07+r()*0.03, tone:r() });
+      const bn = Math.round(10 * detail);
+      for (let i = 0; i < bn; i++){
+        bands.push({ y:-1+(i+0.5)*(2/bn), h:0.07+r()*0.03, tone:r() });
       }
       SURFACES[p.key] = { bands };
     }
     else if (p.key === 'mars'){
       const patches = [];
-      for (let i=0; i<12; i++){
+      const pn = Math.round(12 * detail);
+      for (let i = 0; i < pn; i++){
         patches.push({ x:(r()-0.5)*1.6, y:(r()-0.5)*1.4, s:0.10+r()*0.12, dark:r()>0.4 });
       }
       const craters = [];
-      for (let i=0; i<16; i++){
+      const cn = Math.round(16 * detail);
+      for (let i = 0; i < cn; i++){
         craters.push({ x:(r()-0.5)*1.7, y:(r()-0.5)*1.5, s:0.03+r()*0.05 });
       }
       SURFACES[p.key] = { patches, craters };
     }
     else if (p.key === 'mercury'){
       const craters = [];
-      for (let i=0; i<30; i++){
+      const cn = Math.round(30 * detail);
+      for (let i = 0; i < cn; i++){
         craters.push({ x:(r()-0.5)*1.85, y:(r()-0.5)*1.75, s:0.04+r()*0.10, bright:r()>0.55 });
       }
       SURFACES[p.key] = { craters };
     }
     else if (p.key === 'venus'){
       const swirls = [];
-      for (let i=0; i<12; i++){
+      const sn = Math.round(12 * detail);
+      for (let i = 0; i < sn; i++){
         swirls.push({ x:(r()-0.5)*1.6, y:(r()-0.5)*1.4, s:0.20+r()*0.20, bright:r()>0.5 });
       }
       const bands = [];
-      for (let i=0; i<7; i++){
-        bands.push({ y:-1+(i+0.5)*(2/7), h:0.14+r()*0.06, tone:r() });
+      const bn = Math.round(7 * detail);
+      for (let i = 0; i < bn; i++){
+        bands.push({ y:-1+(i+0.5)*(2/bn), h:0.14+r()*0.06, tone:r() });
       }
       SURFACES[p.key] = { swirls, bands };
     }
@@ -1095,209 +1104,277 @@ selectLevel('igcse', false);
     saturn: { lit:'#f5edc8', mid:'#ddc68c', dark:'#7a5e2e' }
   };
 
-  function drawSphere(x, y, R, key, seed, sunX, sunY){
-    const S = SURFACES[key] || {};
-    const dx = sunX - x, dy = sunY - y;
-    const dl = Math.hypot(dx, dy) || 1;
-    const lx = dx / dl, ly = dy / dl;
+  /* -------- PLANET SPRITE CACHE -------- */
+  /* Each planet is rendered once per size to an offscreen canvas, with
+     the Sun always placed to the right (angle 0). At draw time we rotate
+     the sprite by the true sun-angle so the lit side always faces the Sun. */
+  const spriteCache = new Map();
 
-    const litX = x + lx * R * 0.55;
-    const litY = y + ly * R * 0.55;
+  function makePlanetSprite(key, size){
+    const pad = key === 'saturn' ? 3.0 : 1.35;
+    const w = Math.ceil(size * pad * 2);
+    const c = document.createElement('canvas');
+    c.width = c.height = w;
+    const g = c.getContext('2d');
+    const cx = w / 2, cy = w / 2;
+    const R = size;
 
-    /* base sphere */
-    const base = ctx.createRadialGradient(litX, litY, R*0.05, x, y, R*1.30);
+    /* --- Saturn rings behind --- */
+    if (key === 'saturn'){
+      g.save();
+      g.translate(cx, cy);
+      g.rotate(-0.32);
+      const bands = [
+        [R*1.35, R*1.55, 'rgba(200,180,130,0.30)'],
+        [R*1.55, R*1.98, 'rgba(245,225,170,0.65)'],
+        [R*1.98, R*2.09, 'rgba(40,30,18,0.55)'],
+        [R*2.09, R*2.38, 'rgba(220,200,148,0.52)'],
+        [R*2.44, R*2.50, 'rgba(235,220,180,0.36)']
+      ];
+      bands.forEach(([ri, ro, color]) => {
+        const rm = (ri + ro) / 2;
+        const ry = rm * 0.32;
+        g.beginPath();
+        g.ellipse(0, 0, rm, ry, 0, Math.PI, Math.PI*2);
+        g.strokeStyle = color;
+        g.lineWidth = Math.max(1, ro - ri);
+        g.stroke();
+      });
+      g.restore();
+    }
+
+    /* --- sphere base --- */
+    const litX = cx + R * 0.55;
+    const litY = cy;
+    const base = g.createRadialGradient(litX, litY, R*0.05, cx, cy, R*1.30);
     const cols = PLANET_COLORS[key];
     base.addColorStop(0.00, cols.lit);
     base.addColorStop(0.45, cols.mid);
     base.addColorStop(1.00, cols.dark);
-    ctx.beginPath(); ctx.arc(x, y, R, 0, Math.PI*2);
-    ctx.fillStyle = base; ctx.fill();
+    g.beginPath(); g.arc(cx, cy, R, 0, Math.PI*2);
+    g.fillStyle = base; g.fill();
 
-    /* clipped surface features */
-    ctx.save();
-    ctx.beginPath(); ctx.arc(x, y, R, 0, Math.PI*2); ctx.clip();
+    /* --- surface features --- */
+    g.save();
+    g.beginPath(); g.arc(cx, cy, R, 0, Math.PI*2); g.clip();
+    const S = SURFACES[key] || {};
 
     if (key === 'earth'){
       S.conts.forEach(poly => {
-        ctx.beginPath();
+        g.beginPath();
         poly.forEach((pt, i) => {
-          const px = x + pt[0] * R * 0.95;
-          const py = y + pt[1] * R * 0.95;
-          if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+          const px = cx + pt[0] * R * 0.95;
+          const py = cy + pt[1] * R * 0.95;
+          if (i === 0) g.moveTo(px, py); else g.lineTo(px, py);
         });
-        ctx.closePath();
-        ctx.fillStyle = '#3f7a35';
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(40,60,25,0.55)';
-        ctx.lineWidth = 1; ctx.stroke();
+        g.closePath();
+        g.fillStyle = '#3f7a35'; g.fill();
+        g.strokeStyle = 'rgba(40,60,25,0.55)'; g.lineWidth = 1; g.stroke();
       });
-      ctx.fillStyle = 'rgba(245,250,255,0.88)';
-      ctx.beginPath(); ctx.ellipse(x, y - R*0.86, R*0.85, R*0.20, 0, 0, Math.PI*2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse(x, y + R*0.86, R*0.80, R*0.18, 0, 0, Math.PI*2); ctx.fill();
+      g.fillStyle = 'rgba(245,250,255,0.88)';
+      g.beginPath(); g.ellipse(cx, cy - R*0.86, R*0.85, R*0.20, 0, 0, Math.PI*2); g.fill();
+      g.beginPath(); g.ellipse(cx, cy + R*0.86, R*0.80, R*0.18, 0, 0, Math.PI*2); g.fill();
       S.clouds.forEach(cl => {
-        const cx = x + cl.x*R*0.9, cy = y + cl.y*R*0.9, cr = cl.s*R*2.2;
-        const cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, cr);
+        const px = cx + cl.x*R*0.9, py = cy + cl.y*R*0.9, pr = cl.s*R*2.2;
+        const cg = g.createRadialGradient(px, py, 0, px, py, pr);
         cg.addColorStop(0, 'rgba(255,255,255,' + (cl.a*0.55).toFixed(2) + ')');
         cg.addColorStop(1, 'rgba(255,255,255,0)');
-        ctx.fillStyle = cg;
-        ctx.beginPath(); ctx.arc(cx, cy, cr, 0, Math.PI*2); ctx.fill();
+        g.fillStyle = cg;
+        g.beginPath(); g.arc(px, py, pr, 0, Math.PI*2); g.fill();
       });
     }
     else if (key === 'mercury'){
       S.craters.forEach(cr => {
-        const cx = x + cr.x*R*0.95, cy = y + cr.y*R*0.95, rr = cr.s*R;
-        ctx.beginPath(); ctx.arc(cx, cy, rr, 0, Math.PI*2);
-        ctx.fillStyle = 'rgba(55,48,42,0.55)'; ctx.fill();
-        ctx.beginPath(); ctx.arc(cx - rr*0.20, cy - rr*0.20, rr*0.65, 0, Math.PI*2);
-        ctx.fillStyle = 'rgba(220,210,195,' + (cr.bright ? 0.42 : 0.20) + ')'; ctx.fill();
+        const px = cx + cr.x*R*0.95, py = cy + cr.y*R*0.95, pr = cr.s*R;
+        g.beginPath(); g.arc(px, py, pr, 0, Math.PI*2);
+        g.fillStyle = 'rgba(55,48,42,0.55)'; g.fill();
+        g.beginPath(); g.arc(px - pr*0.20, py - pr*0.20, pr*0.65, 0, Math.PI*2);
+        g.fillStyle = 'rgba(220,210,195,' + (cr.bright ? 0.42 : 0.20) + ')'; g.fill();
       });
     }
     else if (key === 'venus'){
       S.bands.forEach(b => {
-        const yy = y + b.y*R*0.92, hh = b.h*R;
-        const g = ctx.createLinearGradient(x - R, yy - hh, x + R, yy + hh);
+        const yy = cy + b.y*R*0.92, hh = b.h*R;
+        const lg = g.createLinearGradient(cx - R, yy - hh, cx + R, yy + hh);
         if (b.tone < 0.5){
-          g.addColorStop(0,'rgba(190,150,60,0.20)');
-          g.addColorStop(0.5,'rgba(230,195,110,0.10)');
-          g.addColorStop(1,'rgba(190,150,60,0.20)');
+          lg.addColorStop(0,'rgba(190,150,60,0.20)');
+          lg.addColorStop(0.5,'rgba(230,195,110,0.10)');
+          lg.addColorStop(1,'rgba(190,150,60,0.20)');
         } else {
-          g.addColorStop(0,'rgba(255,240,190,0.24)');
-          g.addColorStop(0.5,'rgba(255,245,205,0.12)');
-          g.addColorStop(1,'rgba(255,240,190,0.24)');
+          lg.addColorStop(0,'rgba(255,240,190,0.24)');
+          lg.addColorStop(0.5,'rgba(255,245,205,0.12)');
+          lg.addColorStop(1,'rgba(255,240,190,0.24)');
         }
-        ctx.fillStyle = g;
-        ctx.beginPath(); ctx.ellipse(x, yy, R*1.10, hh, 0, 0, Math.PI*2); ctx.fill();
+        g.fillStyle = lg;
+        g.beginPath(); g.ellipse(cx, yy, R*1.10, hh, 0, 0, Math.PI*2); g.fill();
       });
       S.swirls.forEach(sw => {
-        const cx = x + sw.x*R*0.85, cy = y + sw.y*R*0.85, cr = sw.s*R*2.0;
-        const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, cr);
+        const px = cx + sw.x*R*0.85, py = cy + sw.y*R*0.85, pr = sw.s*R*2.0;
+        const sg = g.createRadialGradient(px, py, 0, px, py, pr);
         if (sw.bright){
-          g.addColorStop(0,'rgba(255,248,210,0.45)');
-          g.addColorStop(1,'rgba(255,248,210,0)');
+          sg.addColorStop(0,'rgba(255,248,210,0.45)');
+          sg.addColorStop(1,'rgba(255,248,210,0)');
         } else {
-          g.addColorStop(0,'rgba(190,140,55,0.32)');
-          g.addColorStop(1,'rgba(190,140,55,0)');
+          sg.addColorStop(0,'rgba(190,140,55,0.32)');
+          sg.addColorStop(1,'rgba(190,140,55,0)');
         }
-        ctx.fillStyle = g;
-        ctx.beginPath(); ctx.arc(cx, cy, cr, 0, Math.PI*2); ctx.fill();
+        g.fillStyle = sg;
+        g.beginPath(); g.arc(px, py, pr, 0, Math.PI*2); g.fill();
       });
     }
     else if (key === 'mars'){
       S.patches.forEach(pa => {
-        const cx = x + pa.x*R*0.90, cy = y + pa.y*R*0.90, pr = pa.s*R*2.4;
-        const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, pr);
+        const px = cx + pa.x*R*0.90, py = cy + pa.y*R*0.90, pr = pa.s*R*2.4;
+        const pg = g.createRadialGradient(px, py, 0, px, py, pr);
         if (pa.dark){
-          g.addColorStop(0,'rgba(80,32,18,0.55)');
-          g.addColorStop(1,'rgba(80,32,18,0)');
+          pg.addColorStop(0,'rgba(80,32,18,0.55)');
+          pg.addColorStop(1,'rgba(80,32,18,0)');
         } else {
-          g.addColorStop(0,'rgba(245,180,120,0.40)');
-          g.addColorStop(1,'rgba(245,180,120,0)');
+          pg.addColorStop(0,'rgba(245,180,120,0.40)');
+          pg.addColorStop(1,'rgba(245,180,120,0)');
         }
-        ctx.fillStyle = g;
-        ctx.beginPath(); ctx.arc(cx, cy, pr, 0, Math.PI*2); ctx.fill();
+        g.fillStyle = pg;
+        g.beginPath(); g.arc(px, py, pr, 0, Math.PI*2); g.fill();
       });
       S.craters.forEach(cr => {
-        const cx = x + cr.x*R*0.90, cy = y + cr.y*R*0.90, rr = cr.s*R;
-        ctx.beginPath(); ctx.arc(cx, cy, rr, 0, Math.PI*2);
-        ctx.fillStyle = 'rgba(65,26,12,0.50)'; ctx.fill();
+        const px = cx + cr.x*R*0.90, py = cy + cr.y*R*0.90, pr = cr.s*R;
+        g.beginPath(); g.arc(px, py, pr, 0, Math.PI*2);
+        g.fillStyle = 'rgba(65,26,12,0.50)'; g.fill();
       });
-      ctx.fillStyle = 'rgba(250,252,255,0.90)';
-      ctx.beginPath(); ctx.ellipse(x, y - R*0.92, R*0.65, R*0.14, 0, 0, Math.PI*2); ctx.fill();
-      ctx.fillStyle = 'rgba(250,252,255,0.80)';
-      ctx.beginPath(); ctx.ellipse(x, y + R*0.92, R*0.55, R*0.12, 0, 0, Math.PI*2); ctx.fill();
+      g.fillStyle = 'rgba(250,252,255,0.90)';
+      g.beginPath(); g.ellipse(cx, cy - R*0.92, R*0.65, R*0.14, 0, 0, Math.PI*2); g.fill();
+      g.fillStyle = 'rgba(250,252,255,0.80)';
+      g.beginPath(); g.ellipse(cx, cy + R*0.92, R*0.55, R*0.12, 0, 0, Math.PI*2); g.fill();
     }
     else if (key === 'jupiter'){
       S.bands.forEach(b => {
-        const yy = y + b.y*R*0.94, hh = b.h*R;
+        const yy = cy + b.y*R*0.94, hh = b.h*R;
         let col;
         if (b.tone < 0.30)      col = 'rgba(120,80,45,0.58)';
         else if (b.tone < 0.55) col = 'rgba(212,182,142,0.48)';
         else if (b.tone < 0.80) col = 'rgba(245,225,190,0.58)';
         else                    col = 'rgba(255,248,225,0.68)';
-        const g = ctx.createLinearGradient(x - R, yy - hh, x + R, yy + hh);
-        g.addColorStop(0,'rgba(0,0,0,0)');
-        g.addColorStop(0.5, col);
-        g.addColorStop(1,'rgba(0,0,0,0)');
-        ctx.fillStyle = g;
-        ctx.beginPath(); ctx.ellipse(x, yy, R*1.10, hh, 0, 0, Math.PI*2); ctx.fill();
+        const lg = g.createLinearGradient(cx - R, yy - hh, cx + R, yy + hh);
+        lg.addColorStop(0,'rgba(0,0,0,0)');
+        lg.addColorStop(0.5, col);
+        lg.addColorStop(1,'rgba(0,0,0,0)');
+        g.fillStyle = lg;
+        g.beginPath(); g.ellipse(cx, yy, R*1.10, hh, 0, 0, Math.PI*2); g.fill();
       });
       S.storms.forEach(st => {
-        const cx = x + st.x*R*0.85, cy = y + st.y*R*0.85, cr = st.s*R*2.2;
-        const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, cr);
-        g.addColorStop(0,'rgba(250,230,195,0.45)');
-        g.addColorStop(1,'rgba(250,230,195,0)');
-        ctx.fillStyle = g;
-        ctx.beginPath(); ctx.arc(cx, cy, cr, 0, Math.PI*2); ctx.fill();
+        const px = cx + st.x*R*0.85, py = cy + st.y*R*0.85, pr = st.s*R*2.2;
+        const sg = g.createRadialGradient(px, py, 0, px, py, pr);
+        sg.addColorStop(0,'rgba(250,230,195,0.45)');
+        sg.addColorStop(1,'rgba(250,230,195,0)');
+        g.fillStyle = sg;
+        g.beginPath(); g.arc(px, py, pr, 0, Math.PI*2); g.fill();
       });
       const gs = S.greatSpot;
-      const gsx = x + gs.x*R, gsy = y + gs.y*R;
+      const gsx = cx + gs.x*R, gsy = cy + gs.y*R;
       const gsrx = gs.rx*R, gsry = gs.ry*R;
-      ctx.beginPath(); ctx.ellipse(gsx, gsy, gsrx, gsry, 0, 0, Math.PI*2);
-      const spotGrad = ctx.createRadialGradient(gsx, gsy, 0, gsx, gsy, gsrx);
-      spotGrad.addColorStop(0.00,'rgba(180,60,35,0.95)');
-      spotGrad.addColorStop(0.55,'rgba(155,50,28,0.82)');
-      spotGrad.addColorStop(1.00,'rgba(120,40,20,0.55)');
-      ctx.fillStyle = spotGrad; ctx.fill();
-      ctx.beginPath();
-      ctx.ellipse(gsx - gsrx*0.20, gsy - gsry*0.20, gsrx*0.45, gsry*0.45, 0, 0, Math.PI*2);
-      ctx.fillStyle = 'rgba(220,120,80,0.42)'; ctx.fill();
+      g.beginPath(); g.ellipse(gsx, gsy, gsrx, gsry, 0, 0, Math.PI*2);
+      const sg2 = g.createRadialGradient(gsx, gsy, 0, gsx, gsy, gsrx);
+      sg2.addColorStop(0.00,'rgba(180,60,35,0.95)');
+      sg2.addColorStop(0.55,'rgba(155,50,28,0.82)');
+      sg2.addColorStop(1.00,'rgba(120,40,20,0.55)');
+      g.fillStyle = sg2; g.fill();
+      g.beginPath();
+      g.ellipse(gsx - gsrx*0.20, gsy - gsry*0.20, gsrx*0.45, gsry*0.45, 0, 0, Math.PI*2);
+      g.fillStyle = 'rgba(220,120,80,0.42)'; g.fill();
     }
     else if (key === 'saturn'){
       S.bands.forEach(b => {
-        const yy = y + b.y*R*0.92, hh = b.h*R;
+        const yy = cy + b.y*R*0.92, hh = b.h*R;
         let col;
         if (b.tone < 0.5) col = 'rgba(180,155,105,0.44)';
         else              col = 'rgba(250,238,205,0.54)';
-        const g = ctx.createLinearGradient(x - R, yy - hh, x + R, yy + hh);
-        g.addColorStop(0,'rgba(0,0,0,0)');
-        g.addColorStop(0.5, col);
-        g.addColorStop(1,'rgba(0,0,0,0)');
-        ctx.fillStyle = g;
-        ctx.beginPath(); ctx.ellipse(x, yy, R*1.10, hh, 0, 0, Math.PI*2); ctx.fill();
+        const lg = g.createLinearGradient(cx - R, yy - hh, cx + R, yy + hh);
+        lg.addColorStop(0,'rgba(0,0,0,0)');
+        lg.addColorStop(0.5, col);
+        lg.addColorStop(1,'rgba(0,0,0,0)');
+        g.fillStyle = lg;
+        g.beginPath(); g.ellipse(cx, yy, R*1.10, hh, 0, 0, Math.PI*2); g.fill();
       });
     }
+    g.restore();
 
-    ctx.restore();
-
-    /* day/night shading overlay */
-    const shade = ctx.createRadialGradient(litX, litY, R*0.02, x, y, R*1.10);
+    /* --- day / night shading (sun is to the right, angle 0) --- */
+    const shade = g.createRadialGradient(litX, litY, R*0.02, cx, cy, R*1.10);
     shade.addColorStop(0.00, 'rgba(255,255,245,0.24)');
     shade.addColorStop(0.30, 'rgba(255,255,255,0.00)');
     shade.addColorStop(0.62, 'rgba(0,0,0,0.38)');
     shade.addColorStop(0.85, 'rgba(0,0,0,0.80)');
     shade.addColorStop(1.00, 'rgba(0,0,0,0.96)');
-    ctx.beginPath(); ctx.arc(x, y, R, 0, Math.PI*2);
-    ctx.fillStyle = shade; ctx.fill();
+    g.beginPath(); g.arc(cx, cy, R, 0, Math.PI*2);
+    g.fillStyle = shade; g.fill();
 
-    /* specular */
+    /* --- specular highlight --- */
     const spR = R * 0.26;
-    const sp = ctx.createRadialGradient(
-      litX - spR*0.30, litY - spR*0.30, 0,
-      litX - spR*0.30, litY - spR*0.30, spR*1.5
-    );
+    const spx = litX - spR*0.30, spy = litY - spR*0.30;
+    const sp = g.createRadialGradient(spx, spy, 0, spx, spy, spR*1.5);
     sp.addColorStop(0.00,'rgba(255,255,255,0.32)');
     sp.addColorStop(0.55,'rgba(255,255,255,0.09)');
     sp.addColorStop(1.00,'rgba(255,255,255,0)');
-    ctx.fillStyle = sp;
-    ctx.beginPath(); ctx.arc(litX - spR*0.30, litY - spR*0.30, spR*1.5, 0, Math.PI*2); ctx.fill();
+    g.fillStyle = sp;
+    g.beginPath(); g.arc(spx, spy, spR*1.5, 0, Math.PI*2); g.fill();
 
-    /* atmosphere */
+    /* --- atmosphere --- */
     if (key === 'earth'){
-      const atm = ctx.createRadialGradient(x, y, R*0.98, x, y, R*1.16);
+      const atm = g.createRadialGradient(cx, cy, R*0.98, cx, cy, R*1.16);
       atm.addColorStop(0.00,'rgba(140,200,255,0.00)');
       atm.addColorStop(0.45,'rgba(140,200,255,0.44)');
       atm.addColorStop(1.00,'rgba(140,200,255,0.00)');
-      ctx.beginPath(); ctx.arc(x, y, R*1.16, 0, Math.PI*2);
-      ctx.fillStyle = atm; ctx.fill();
+      g.beginPath(); g.arc(cx, cy, R*1.16, 0, Math.PI*2);
+      g.fillStyle = atm; g.fill();
     }
     if (key === 'venus'){
-      const atm = ctx.createRadialGradient(x, y, R*0.98, x, y, R*1.20);
+      const atm = g.createRadialGradient(cx, cy, R*0.98, cx, cy, R*1.20);
       atm.addColorStop(0.00,'rgba(255,235,170,0.00)');
       atm.addColorStop(0.45,'rgba(255,235,170,0.42)');
       atm.addColorStop(1.00,'rgba(255,235,170,0.00)');
-      ctx.beginPath(); ctx.arc(x, y, R*1.20, 0, Math.PI*2);
-      ctx.fillStyle = atm; ctx.fill();
+      g.beginPath(); g.arc(cx, cy, R*1.20, 0, Math.PI*2);
+      g.fillStyle = atm; g.fill();
     }
+
+    /* --- Saturn rings in front --- */
+    if (key === 'saturn'){
+      g.save();
+      g.translate(cx, cy);
+      g.rotate(-0.32);
+      const bands = [
+        [R*1.35, R*1.55, 'rgba(200,180,130,0.30)'],
+        [R*1.55, R*1.98, 'rgba(245,225,170,0.65)'],
+        [R*1.98, R*2.09, 'rgba(40,30,18,0.55)'],
+        [R*2.09, R*2.38, 'rgba(220,200,148,0.52)'],
+        [R*2.44, R*2.50, 'rgba(235,220,180,0.36)']
+      ];
+      bands.forEach(([ri, ro, color]) => {
+        const rm = (ri + ro) / 2;
+        const ry = rm * 0.32;
+        g.beginPath();
+        g.ellipse(0, 0, rm, ry, 0, 0, Math.PI);
+        g.strokeStyle = color;
+        g.lineWidth = Math.max(1, ro - ri);
+        g.stroke();
+      });
+      g.restore();
+    }
+
+    return c;
+  }
+
+  function getSprite(key, size){
+    const s = Math.max(6, Math.round(size));
+    const cacheKey = key + '_' + s;
+    if (spriteCache.has(cacheKey)) return spriteCache.get(cacheKey);
+    const sprite = makePlanetSprite(key, s);
+    spriteCache.set(cacheKey, sprite);
+    /* cap cache size */
+    if (spriteCache.size > 60){
+      const firstKey = spriteCache.keys().next().value;
+      spriteCache.delete(firstKey);
+    }
+    return sprite;
   }
 
   /* -------- ORBITS -------- */
@@ -1305,7 +1382,7 @@ selectLevel('igcse', false);
     PLANETS.forEach(p => {
       ctx.beginPath();
       let started = false;
-      const N = 160;
+      const N = MOBILE ? 80 : 160;
       for (let j = 0; j <= N; j++){
         const a = j*Math.PI*2/N;
         const x = p.a * Math.cos(a);
@@ -1324,13 +1401,14 @@ selectLevel('igcse', false);
     });
   }
 
-  /* -------- PLANETS WITH WAKES AND SHADOWS -------- */
+  /* -------- PLANETS -------- */
   function drawPlanets(t){
     const sunScr = project(0, 0, -WELL_DEPTH * 0.72);
+    const sunX = sunScr ? sunScr.x : VW/2;
+    const sunY = sunScr ? sunScr.y : VH/2;
 
-    /* Collect planet screen positions and depths */
     const items = [];
-    PLANETS.forEach((p, idx) => {
+    PLANETS.forEach(p => {
       const ang = (t/p.T) + p.phase;
       const x = p.a * Math.cos(ang);
       const y = p.a * Math.sin(ang);
@@ -1338,24 +1416,19 @@ selectLevel('igcse', false);
       const zCent = zSurf + p.size * 0.6;
       const scr = project(x, y, zCent);
       if (!scr) return;
-      items.push({ p, idx, scr, worldR: p.size, ang });
+      items.push({ p, scr, worldR: p.size, ang, zSurf });
     });
     items.sort((a, b) => b.scr.depth - a.scr.depth);
 
     items.forEach(it => {
-      const { p, scr, worldR, ang } = it;
+      const { p, scr, worldR, ang, zSurf } = it;
       const size = Math.max(4, worldR * VH / 900);
 
-      /* 1. Wake — short trail on the fabric behind the planet */
-      drawWake(p, ang, t, scr);
+      /* 1. Wake on the fabric behind the planet */
+      drawWake(p, ang, t, size);
 
-      /* 2. Shadow ellipse directly below the planet (on the fabric) */
-      const zBase = wellZ(
-        p.a * Math.cos(ang),
-        p.a * Math.sin(ang),
-        t
-      );
-      const baseScr = project(p.a * Math.cos(ang), p.a * Math.sin(ang), zBase);
+      /* 2. Shadow ellipse directly below the planet */
+      const baseScr = project(p.a * Math.cos(ang), p.a * Math.sin(ang), zSurf);
       if (baseScr){
         const shR = size * 1.15;
         const sh = ctx.createRadialGradient(baseScr.x, baseScr.y, 0, baseScr.x, baseScr.y, shR);
@@ -1367,18 +1440,17 @@ selectLevel('igcse', false);
         ctx.fill();
       }
 
-      /* 3. Saturn rings behind planet */
-      if (p.key === 'saturn') drawSaturnRings(scr.x, scr.y, size, true);
+      /* 3. Draw the cached planet sprite, rotated so its lit side faces the Sun */
+      const sprite = getSprite(p.key, size);
+      const sunAngle = Math.atan2(sunY - scr.y, sunX - scr.x);
 
-      /* 4. Planet body */
-      const sunX = sunScr ? sunScr.x : VW/2;
-      const sunY = sunScr ? sunScr.y : VH/2;
-      drawSphere(scr.x, scr.y, size, p.key, p.seed, sunX, sunY);
+      ctx.save();
+      ctx.translate(scr.x, scr.y);
+      ctx.rotate(sunAngle);
+      ctx.drawImage(sprite, -sprite.width/2, -sprite.height/2);
+      ctx.restore();
 
-      /* 5. Saturn rings in front */
-      if (p.key === 'saturn') drawSaturnRings(scr.x, scr.y, size, false);
-
-      /* 6. Name label */
+      /* 4. Name label */
       ctx.font = 'italic ' + Math.max(10, Math.min(13, size * 0.55)) + 'px "Times New Roman", Times, Georgia, serif';
       ctx.fillStyle = 'rgba(210,225,245,0.62)';
       ctx.textAlign = 'center';
@@ -1388,87 +1460,68 @@ selectLevel('igcse', false);
     });
   }
 
-  function drawWake(p, ang, t, currentScr){
-    /* Short arc behind the planet on the fabric */
-    const N = 30;
-    const arcSpan = 0.55;   /* radians of orbit to show as a wake */
-    const pts = [];
+  function drawWake(p, ang, t, planetSize){
+    const N = MOBILE ? 16 : 30;
+    const arcSpan = 0.55;
+    const wc = wakeColorRgb(p.key);
+    let prev = null;
     for (let i = 0; i <= N; i++){
       const a = ang - arcSpan * (1 - i/N);
       const x = p.a * Math.cos(a);
       const y = p.a * Math.sin(a);
       const z = wellZ(x, y, t) + 0.5;
       const scr = project(x, y, z);
-      if (scr) pts.push({ scr, frac: i/N });
-    }
-    if (pts.length < 2) return;
-
-    for (let k = 1; k < pts.length; k++){
-      const a = pts[k-1].scr;
-      const b = pts[k].scr;
-      const frac = pts[k].frac;
-      /* Wake fades out behind the planet */
-      const alpha = Math.pow(frac, 2.2) * 0.55;
-      ctx.strokeStyle = wakeColor(p.key, alpha);
-      ctx.lineWidth = 0.6 + frac * 2.4;
-      ctx.beginPath();
-      ctx.moveTo(a.x, a.y);
-      ctx.lineTo(b.x, b.y);
-      ctx.stroke();
-    }
-  }
-
-  function wakeColor(key, a){
-    const c = {
-      mercury: '180,170,150',
-      venus:   '230,200,120',
-      earth:   '100,170,230',
-      mars:    '200,110,70',
-      jupiter: '225,200,150',
-      saturn:  '235,215,160'
-    }[key] || '200,200,200';
-    return 'rgba(' + c + ',' + a.toFixed(3) + ')';
-  }
-
-  function drawSaturnRings(cx, cy, R, behind){
-    const tilt = -0.36;
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(tilt);
-
-    const bands = [
-      /* inner, outer, colour */
-      [R*1.35, R*1.55, 'rgba(200,180,130,0.30)'],
-      [R*1.55, R*1.98, 'rgba(245,225,170,0.65)'],
-      [R*1.98, R*2.09, 'rgba(40,30,18,0.55)'],
-      [R*2.09, R*2.38, 'rgba(220,200,148,0.52)'],
-      [R*2.44, R*2.50, 'rgba(235,220,180,0.36)']
-    ];
-
-    bands.forEach(([ri, ro, color]) => {
-      const rm = (ri + ro) / 2;
-      const ry = rm * 0.32;
-      ctx.beginPath();
-      if (behind){
-        ctx.ellipse(0, 0, rm, ry, 0, Math.PI, Math.PI*2);
-      } else {
-        ctx.ellipse(0, 0, rm, ry, 0, 0, Math.PI);
+      if (!scr){ prev = null; continue; }
+      if (prev){
+        const frac = i / N;
+        const alpha = Math.pow(frac, 2.2) * 0.55;
+        ctx.strokeStyle = 'rgba(' + wc + ',' + alpha.toFixed(3) + ')';
+        ctx.lineWidth = 0.6 + frac * 2.4;
+        ctx.beginPath();
+        ctx.moveTo(prev.x, prev.y);
+        ctx.lineTo(scr.x, scr.y);
+        ctx.stroke();
       }
-      ctx.strokeStyle = color;
-      ctx.lineWidth = Math.max(1, ro - ri);
-      ctx.stroke();
-    });
-    ctx.restore();
+      prev = scr;
+    }
   }
 
-  /* -------- MAIN FRAME -------- */
-  let frameCount = 0;
-  function frame(now){
-    const t = now / 1000;
-    yaw = 0.35 + t * 0.045;   /* slow steady rotation */
-    frameCount++;
+  function wakeColorRgb(key){
+    return {
+      mercury: '180,170,150', venus:   '230,200,120',
+      earth:   '100,170,230', mars:    '200,110,70',
+      jupiter: '225,200,150', saturn:  '235,215,160'
+    }[key] || '200,200,200';
+  }
 
-    /* deep space gradient */
+  /* -------- PAUSING -------- */
+  let heroVisible = true;
+  if ('IntersectionObserver' in window){
+    const io = new IntersectionObserver(entries => {
+      heroVisible = entries[0].isIntersecting;
+    }, { threshold: 0.02 });
+    io.observe(document.getElementById('hero'));
+  }
+  let tabVisible = !document.hidden;
+  document.addEventListener('visibilitychange', () => {
+    tabVisible = !document.hidden;
+  });
+
+  /* -------- MAIN LOOP WITH FPS LIMIT -------- */
+  const frameInterval = 1000 / CFG.fps;
+  let lastDraw = 0;
+
+  function frame(now){
+    requestAnimationFrame(frame);
+
+    if (!heroVisible || !tabVisible) return;
+    if (now - lastDraw < frameInterval) return;
+    lastDraw = now;
+
+    const t = now / 1000;
+    yaw = 0.35 + t * 0.045;
+
+    /* background */
     const bg = ctx.createRadialGradient(
       VW*0.5, VH*0.40, 0,
       VW*0.5, VH*0.40, Math.max(VW, VH)*0.95
@@ -1494,7 +1547,7 @@ selectLevel('igcse', false);
     drawSun(t);
     drawPlanets(t);
 
-    /* gentle vignette */
+    /* vignette */
     const vg = ctx.createRadialGradient(
       VW*0.5, VH*0.5, Math.min(VW, VH)*0.44,
       VW*0.5, VH*0.5, Math.max(VW, VH)*0.85
@@ -1503,9 +1556,9 @@ selectLevel('igcse', false);
     vg.addColorStop(1,'rgba(0,0,0,0.52)');
     ctx.fillStyle = vg;
     ctx.fillRect(0, 0, VW, VH);
-
-    requestAnimationFrame(frame);
   }
+
+  resize();
   requestAnimationFrame(frame);
 })();
 </script>
