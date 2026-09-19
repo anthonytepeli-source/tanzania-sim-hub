@@ -1,0 +1,1697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oscillation Simulator — SHM Cases</title>
+<style>
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;background:#ffffff;color:#000;
+    font-family:"Times New Roman", Times, Georgia, serif;
+    font-size:12pt;line-height:1.35;
+  }
+  .app{min-height:100vh;display:flex;flex-direction:column;padding:10px 20px 16px;gap:6px;}
+
+  header{
+    display:flex;align-items:baseline;justify-content:space-between;
+    gap:16px;padding-bottom:6px;border-bottom:1.5px solid #000;
+  }
+  header h1{margin:0;font-size:15pt;font-weight:bold;color:#000;}
+  header h1 .sub{font-size:10.5pt;font-weight:normal;font-style:italic;color:#000;margin-left:12px;}
+  header .status{font-size:11pt;font-style:italic;color:#000;flex:none;}
+  header .status .dot{display:inline-block;width:8px;height:8px;border-radius:50%;
+    background:#666;margin-right:6px;vertical-align:middle;}
+  header .status.running .dot{background:#0a7d2b;}
+  header .status.paused  .dot{background:#b45309;}
+
+  .case-tabs{display:flex;gap:20px;padding:2px 0 6px;flex-wrap:wrap;border-bottom:1.5px solid #000;}
+  .case-tab{background:none;border:none;padding:0 0 3px;font-family:inherit;
+    font-size:11pt;font-style:italic;color:#000;cursor:pointer;border-bottom:2px solid transparent;}
+  .case-tab.active{font-weight:bold;font-style:normal;border-bottom-color:#000;}
+
+  .stage{display:flex;flex-direction:column;gap:8px;}
+
+  .row-main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;
+    border-bottom:1.5px solid #000;padding-bottom:8px;}
+  @media(max-width:960px){.row-main{grid-template-columns:1fr;}.circ-panel{height:32vh;}}
+
+  .sim-wrap{display:flex;flex-direction:column;gap:4px;min-width:0;}
+  .sim-wrap .panel{
+    position:relative;width:100%;height:48vh;min-height:320px;max-height:480px;
+    background:#fff;display:flex;align-items:center;justify-content:center;
+    border:1px solid #d0d0d0;
+  }
+  .sim-wrap .panel canvas{display:block;background:#fff;touch-action:none;user-select:none;}
+
+  .circ-panel{
+    position:relative;height:48vh;min-height:320px;max-height:480px;
+    background:#fff;border:1px solid #d0d0d0;
+    display:flex;align-items:center;justify-content:center;min-width:0;
+  }
+  .circ-panel canvas{display:block;background:#fff;}
+
+  .control-row{display:flex;justify-content:center;gap:34px;padding:4px 0 0;flex-wrap:wrap;}
+  .btn{background:none;border:none;padding:0 0 2px;font-family:inherit;font-size:12pt;
+    color:#000;cursor:pointer;border-bottom:1.5px solid #000;font-weight:bold;}
+  .btn:active{color:#555;border-bottom-color:#555;}
+
+  .row-graphs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
+    border-bottom:1.5px solid #000;padding-bottom:8px;}
+  @media(max-width:960px){.row-graphs{grid-template-columns:1fr;}}
+  .row-graphs .panel{
+    position:relative;height:32vh;min-height:230px;max-height:300px;
+    background:#fff;border:1px solid #d0d0d0;
+    display:flex;align-items:center;justify-content:center;min-width:0;
+  }
+  .row-graphs .panel canvas{display:block;background:#fff;}
+
+  .row-bottom{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:12px;padding-bottom:6px;}
+  @media(max-width:960px){.row-bottom{grid-template-columns:1fr;}}
+  .row-bottom .panel{
+    position:relative;height:34vh;min-height:240px;max-height:320px;
+    background:#fff;border:1px solid #d0d0d0;
+    display:flex;align-items:center;justify-content:center;min-width:0;
+  }
+  .row-bottom .panel canvas{display:block;background:#fff;}
+
+  .data-strip{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;
+    border:1px solid #d0d0d0;padding:10px 14px;background:#fff;min-width:0;}
+  @media(max-width:640px){.data-strip{grid-template-columns:1fr;gap:14px;}}
+  .data-col{padding:0 12px;border-right:1px solid #d8d8d8;min-width:0;}
+  .data-col:first-child{padding-left:0;}
+  .data-col:last-child{padding-right:0;border-right:none;}
+  .data-col h3{margin:0 0 6px;font-size:11pt;font-weight:bold;font-style:italic;color:#000;}
+
+  .data-list{font-size:11pt;line-height:1.55;color:#000;}
+  .data-list .row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+  .data-list .k{font-style:italic;color:#000;}
+  .data-list .v{font-weight:bold;color:#000;white-space:nowrap;}
+  .data-list .v .u{font-weight:normal;font-style:italic;margin-left:3px;font-size:10pt;color:#000;}
+
+  .formula-block{font-size:11pt;font-style:italic;margin:0 0 6px;color:#000;}
+  .period-line{display:flex;justify-content:space-between;align-items:baseline;
+    font-size:11pt;margin-bottom:3px;color:#000;}
+  .period-line .k{font-style:italic;}
+  .period-line .v{font-weight:bold;}
+  .period-line .v .u{font-weight:normal;font-style:italic;margin-left:2px;font-size:10pt;}
+
+  .energy-item{display:grid;grid-template-columns:52px 1fr 42px;align-items:center;
+    gap:6px;margin-bottom:5px;font-size:11pt;}
+  .energy-item .lbl{font-style:italic;color:#000;}
+  .energy-item .track{height:6px;background:#e0e0e0;overflow:hidden;}
+  .energy-item .fill{height:100%;width:0%;background:#000;display:block;transition:width .05s linear;}
+  .energy-item.ke .fill{background:#0a7d2b;}
+  .energy-item.pe .fill{background:#b45309;}
+  .energy-item.total .fill{background:#1d4ed8;}
+  .energy-item .val{font-weight:bold;text-align:right;font-size:11pt;color:#000;}
+  .energy-total-line{margin-top:5px;font-size:11pt;display:flex;justify-content:space-between;color:#000;}
+  .energy-total-line .k{font-style:italic;}
+  .energy-total-line .v{font-weight:bold;}
+
+  #paramWin{
+    position:fixed;top:130px;right:20px;z-index:600;
+    background:#fff;border:1.6px solid #000;border-radius:14px;
+    box-shadow:0 4px 16px rgba(0,0,0,0.18);
+    max-width:230px;font-family:inherit;font-size:10pt;
+    user-select:none;overflow:hidden;
+  }
+  #paramWin .fw-head{display:flex;align-items:center;justify-content:space-between;
+    padding:6px 10px;background:#f6f6f6;border-bottom:1px solid #d0d0d0;
+    cursor:move;touch-action:none;}
+  #paramWin .fw-head .fw-title{font-weight:bold;font-style:italic;font-size:10.5pt;color:#000;}
+  #paramWin .fw-head .fw-grip{display:inline-block;width:14px;height:8px;
+    background-image:linear-gradient(#333 1.5px, transparent 1.5px);
+    background-size:100% 3px;opacity:.7;}
+  #paramWin .fw-body{padding:8px 10px 10px;max-height:380px;overflow-y:auto;}
+
+  .param{margin-bottom:6px;}
+  .param:last-child{margin-bottom:0;}
+  .param-row{display:flex;justify-content:space-between;align-items:baseline;
+    font-size:10pt;margin-bottom:2px;gap:6px;}
+  .param-row .name{font-style:italic;color:#000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .param-row .value{font-weight:bold;color:#000;white-space:nowrap;font-size:10pt;}
+  .param input[type="range"]{width:100%;-webkit-appearance:none;appearance:none;
+    height:3.5px;background:#000;outline:none;cursor:pointer;display:block;border-radius:0;}
+  .param input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
+    width:12px;height:12px;border-radius:50%;background:#000;border:none;cursor:grab;}
+  .param input[type="range"]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;
+    background:#000;border:none;cursor:grab;}
+
+  .toast{
+    position:fixed;bottom:18px;left:50%;
+    transform:translateX(-50%) translateY(60px);
+    background:#000;color:#fff;padding:7px 16px;
+    font-size:11.5pt;font-style:italic;font-weight:bold;
+    opacity:0;pointer-events:none;
+    transition:opacity .22s, transform .22s;z-index:900;border-radius:3px;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <div>
+      <h1>Oscillation Simulator<span class="sub">Cambridge A Level Physics · 9702 · Topic 17</span></h1>
+    </div>
+    <span class="status" id="statusTag"><span class="dot"></span><span id="statusText">Ready</span></span>
+  </header>
+
+  <nav class="case-tabs" id="caseTabs"></nav>
+
+  <div class="stage">
+    <div class="row-main">
+      <div class="sim-wrap">
+        <div class="panel" id="simPanel">
+          <canvas id="simCanvas"></canvas>
+        </div>
+        <div class="control-row">
+          <button class="btn" id="btnRelease">Release</button>
+          <button class="btn" id="btnPause">Pause</button>
+          <button class="btn" id="btnReset">Reset</button>
+        </div>
+      </div>
+      <div class="panel circ-panel" id="circPanel">
+        <canvas id="circCanvas"></canvas>
+      </div>
+    </div>
+
+    <div class="row-graphs">
+      <div class="panel"><canvas id="dispCanvas"></canvas></div>
+      <div class="panel"><canvas id="velCanvas"></canvas></div>
+      <div class="panel"><canvas id="accCanvas"></canvas></div>
+    </div>
+
+    <div class="row-bottom">
+      <div class="panel"><canvas id="enCanvas"></canvas></div>
+      <div class="data-strip">
+        <div class="data-col">
+          <h3>Live data</h3>
+          <div class="data-list">
+            <div class="row"><span class="k" id="lbl-x">Displacement <i>x</i></span><span class="v" id="readX">0.00<span class="u">m</span></span></div>
+            <div class="row"><span class="k">Phase <i>&phi;</i></span><span class="v" id="readPhi">0&deg;</span></div>
+            <div class="row"><span class="k" id="lbl-v">Velocity <i>v</i></span><span class="v" id="readV">0.000<span class="u">m/s</span></span></div>
+            <div class="row"><span class="k">Acceleration <i>a</i></span><span class="v" id="readA">0.000<span class="u">m/s²</span></span></div>
+            <div class="row"><span class="k">Time <i>t</i></span><span class="v" id="readT">0.00<span class="u">s</span></span></div>
+          </div>
+        </div>
+        <div class="data-col">
+          <h3>Theoretical period</h3>
+          <div class="formula-block" id="formulaBlock">T = 2&pi; &radic;( L / g )</div>
+          <div class="period-line"><span class="k">Calculated</span><span class="v" id="readTth">2.006<span class="u">s</span></span></div>
+          <div class="period-line"><span class="k">Measured</span><span class="v" id="readTmeas">&mdash;</span></div>
+        </div>
+        <div class="data-col">
+          <h3>Energy distribution</h3>
+          <div class="energy-item ke"><span class="lbl">Kinetic</span><span class="track"><span class="fill" id="barKE"></span></span><span class="val" id="valKE">0%</span></div>
+          <div class="energy-item pe"><span class="lbl">Potential</span><span class="track"><span class="fill" id="barPE"></span></span><span class="val" id="valPE">100%</span></div>
+          <div class="energy-item total"><span class="lbl">Total</span><span class="track"><span class="fill" id="barTE" style="width:100%;"></span></span><span class="val" id="valTE">100%</span></div>
+          <div class="energy-total-line"><span class="k">Total energy</span><span class="v" id="readEtotal">1.90 mJ</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="paramWin">
+  <div class="fw-head" id="paramHead"><span class="fw-title">Parameters</span><span class="fw-grip"></span></div>
+  <div class="fw-body" id="paramList"></div>
+</div>
+
+<div class="toast" id="toast"><span id="toastMsg">Ready</span></div>
+
+<script>
+/* ============ CONSTANTS ============ */
+const PI = Math.PI, TWO_PI = 2*PI, DEG = PI/180;
+const FONT = '"Times New Roman", Times, Georgia, serif';
+
+/* ============ STATE ============ */
+const state = {
+  caseId: 'pendulum',
+  x: 0, v: 0, t: 0, phi: 0,
+  running:false, history:[], lastCrossT:null, measuredT:null,
+  L:1.00, m:0.20, g:9.81, b:0.00, A:0.25,
+  theta0:8*DEG, k:20,
+  Lp:0.80, theta0p:30*DEG,
+  kappa:0.50, I:0.020, theta0t:45*DEG,
+  h0c:0.10,
+  Lc:0.30, Cc:0.005, Rc:5, Q0:2.0e-3,
+  F0:0.50, omega_d:8.0
+};
+
+/* ============ CASES ============ */
+const CASES = {};
+
+CASES['spring-h'] = {
+  label:'Spring (horizontal)',
+  simCaption:'Horizontal spring · block on frictionless surface',
+  xUnit:'m', vUnit:'m s⁻¹', aUnit:'m s⁻²', yUnitDeg:false, ampKey:'A',
+  params:[
+    { key:'m', label:'Mass', sym:'m', unit:'kg', min:0.05, max:2.00, step:0.01, dec:2 },
+    { key:'k', label:'Spring const.', sym:'k', unit:'N m⁻¹', min:2, max:60, step:0.5, dec:1 },
+    { key:'A', label:'Amplitude', sym:'A', unit:'m', min:0.02, max:0.60, step:0.01, dec:2 },
+    { key:'b', label:'Damping', sym:'b', unit:'s⁻¹', min:0, max:6, step:0.05, dec:2 }
+  ],
+  omega0:()=>Math.sqrt(state.k/state.m),
+  accel:(x,v)=>-(state.k/state.m)*x - state.b*v,
+  initX:()=>state.A,
+  formula:'T = 2&pi; &radic;( m / k )',
+  render:renderSpringH,
+  energyFormula:()=>0.5*state.k*state.A*state.A,
+  getHandle:()=>({x:SIM_VW*0.58+state.x*180, y:SIM_VH*0.52, r:50}),
+  dragTo:(vx)=>{let x=(vx-SIM_VW*0.58)/180; x=Math.max(-0.60,Math.min(0.60,x)); state.x=x; state.v=0; updateParamSlider('A',Math.abs(x));}
+};
+
+CASES['spring-v'] = {
+  label:'Spring (vertical)',
+  simCaption:'Vertical spring · block hanging from ceiling',
+  xUnit:'m', vUnit:'m s⁻¹', aUnit:'m s⁻²', yUnitDeg:false, ampKey:'A',
+  params:[
+    { key:'m', label:'Mass', sym:'m', unit:'kg', min:0.05, max:2.00, step:0.01, dec:2 },
+    { key:'k', label:'Spring const.', sym:'k', unit:'N m⁻¹', min:2, max:60, step:0.5, dec:1 },
+    { key:'A', label:'Amplitude', sym:'A', unit:'m', min:0.02, max:0.40, step:0.01, dec:2 },
+    { key:'b', label:'Damping', sym:'b', unit:'s⁻¹', min:0, max:6, step:0.05, dec:2 }
+  ],
+  omega0:()=>Math.sqrt(state.k/state.m),
+  accel:(x,v)=>-(state.k/state.m)*x - state.b*v,
+  initX:()=>state.A,
+  formula:'T = 2&pi; &radic;( m / k )',
+  render:renderSpringV,
+  energyFormula:()=>0.5*state.k*state.A*state.A,
+  getHandle:()=>({x:SIM_VW/2, y:SIM_VH*0.55+state.x*260, r:56}),
+  dragTo:(vx,vy)=>{let x=(vy-SIM_VH*0.55)/260; x=Math.max(-0.40,Math.min(0.40,x)); state.x=x; state.v=0; updateParamSlider('A',Math.abs(x));}
+};
+
+CASES['spring-double'] = {
+  label:'Double spring',
+  simCaption:'Double spring · mass between two springs',
+  xUnit:'m', vUnit:'m s⁻¹', aUnit:'m s⁻²', yUnitDeg:false, ampKey:'A',
+  params:[
+    { key:'m', label:'Mass', sym:'m', unit:'kg', min:0.05, max:2.00, step:0.01, dec:2 },
+    { key:'k', label:'Each spring const.', sym:'k', unit:'N m⁻¹', min:2, max:60, step:0.5, dec:1 },
+    { key:'A', label:'Amplitude', sym:'A', unit:'m', min:0.02, max:0.40, step:0.01, dec:2 },
+    { key:'b', label:'Damping', sym:'b', unit:'s⁻¹', min:0, max:6, step:0.05, dec:2 }
+  ],
+  omega0:()=>Math.sqrt(2*state.k/state.m),
+  accel:(x,v)=>-(2*state.k/state.m)*x - state.b*v,
+  initX:()=>state.A,
+  formula:'T = 2&pi; &radic;( m / 2k )',
+  render:renderSpringDouble,
+  energyFormula:()=>0.5*(2*state.k)*state.A*state.A,
+  getHandle:()=>({x:SIM_VW/2+state.x*170, y:SIM_VH*0.52, r:50}),
+  dragTo:(vx)=>{let x=(vx-SIM_VW/2)/170; x=Math.max(-0.40,Math.min(0.40,x)); state.x=x; state.v=0; updateParamSlider('A',Math.abs(x));}
+};
+
+CASES['pendulum'] = {
+  label:'Pendulum',
+  simCaption:'Pendulum · bob on a light thread',
+  xUnit:'°', vUnit:'rad s⁻¹', aUnit:'rad s⁻²', yUnitDeg:true, ampKey:'theta0',
+  params:[
+    { key:'L', label:'Length', sym:'L', unit:'m', min:0.40, max:3.00, step:0.02, dec:2 },
+    { key:'m', label:'Mass', sym:'m', unit:'kg', min:0.05, max:1.00, step:0.01, dec:2 },
+    { key:'g', label:'Gravity', sym:'g', unit:'m s⁻²', min:1.00, max:25.0, step:0.05, dec:2 },
+    { key:'b', label:'Damping', sym:'b', unit:'s⁻¹', min:0, max:10, step:0.02, dec:2 },
+    { key:'theta0', label:'Initial angle', sym:'θ', sub:'0', unit:'°', min:2, max:40, step:0.5, dec:1, scale:DEG }
+  ],
+  omega0:()=>Math.sqrt(state.g/state.L),
+  accel:(x,v)=>-(state.g/state.L)*Math.sin(x) - state.b*v,
+  initX:()=>state.theta0,
+  formula:'T = 2&pi; &radic;( L / g )',
+  render:renderPendulum,
+  energyFormula:()=>state.m*state.g*state.L*(1-Math.cos(state.theta0)),
+  getHandle:()=>{
+    const PX=SIM_VW/2, PY=80, Lv=140+state.L*70;
+    return {x:PX+Lv*Math.sin(state.x), y:PY+Lv*Math.cos(state.x), r:14+state.m*10+16};
+  },
+  dragTo:(vx,vy)=>{
+    const PX=SIM_VW/2, PY=80;
+    let th=Math.atan2(vx-PX, vy-PY);
+    const max=40*DEG;
+    th=Math.max(-max, Math.min(max, th));
+    state.x=th; state.v=0;
+    updateParamSlider('theta0', Math.abs(th)/DEG);
+  }
+};
+
+CASES['physical-pendulum'] = {
+  label:'Physical pendulum',
+  simCaption:'Physical pendulum · uniform rod pivoted at one end',
+  xUnit:'°', vUnit:'rad s⁻¹', aUnit:'rad s⁻²', yUnitDeg:true, ampKey:'theta0p',
+  params:[
+    { key:'Lp', label:'Rod length', sym:'L', unit:'m', min:0.20, max:1.80, step:0.02, dec:2 },
+    { key:'m', label:'Rod mass', sym:'m', unit:'kg', min:0.05, max:1.50, step:0.05, dec:2 },
+    { key:'g', label:'Gravity', sym:'g', unit:'m s⁻²', min:1.00, max:25.0, step:0.05, dec:2 },
+    { key:'b', label:'Damping', sym:'b', unit:'s⁻¹', min:0, max:8, step:0.02, dec:2 },
+    { key:'theta0p', label:'Initial angle', sym:'θ', sub:'0', unit:'°', min:2, max:70, step:0.5, dec:1, scale:DEG }
+  ],
+  omega0:()=>Math.sqrt(3*state.g/(2*state.Lp)),
+  accel:(x,v)=>-(3*state.g/(2*state.Lp))*Math.sin(x) - state.b*v,
+  initX:()=>state.theta0p,
+  formula:'T = 2&pi; &radic;( 2L / 3g )',
+  render:renderPhysicalPendulum,
+  energyFormula:()=>state.m*state.g*(state.Lp/2)*(1-Math.cos(state.theta0p)),
+  getHandle:()=>{
+    const PX=SIM_VW/2, PY=80, rodLen=130+state.Lp*150;
+    return {x:PX+rodLen*Math.sin(state.x), y:PY+rodLen*Math.cos(state.x), r:40};
+  },
+  dragTo:(vx,vy)=>{
+    const PX=SIM_VW/2, PY=80;
+    let th=Math.atan2(vx-PX, vy-PY);
+    const max=70*DEG;
+    th=Math.max(-max, Math.min(max, th));
+    state.x=th; state.v=0;
+    updateParamSlider('theta0p', Math.abs(th)/DEG);
+  }
+};
+
+CASES['torsional'] = {
+  label:'Torsional pendulum',
+  simCaption:'Torsional pendulum · disc suspended by a wire',
+  xUnit:'°', vUnit:'rad s⁻¹', aUnit:'rad s⁻²', yUnitDeg:true, ampKey:'theta0t',
+  params:[
+    { key:'kappa', label:'Torsion const.', sym:'κ', unit:'N m rad⁻¹', min:0.05, max:5.00, step:0.05, dec:2 },
+    { key:'I', label:'Moment of inertia', sym:'I', unit:'kg m²', min:0.005, max:0.200, step:0.005, dec:3 },
+    { key:'b', label:'Damping', sym:'b', unit:'s⁻¹', min:0, max:6, step:0.02, dec:2 },
+    { key:'theta0t', label:'Initial angle', sym:'θ', sub:'0', unit:'°', min:5, max:170, step:1, dec:0, scale:DEG }
+  ],
+  omega0:()=>Math.sqrt(state.kappa/state.I),
+  accel:(x,v)=>-(state.kappa/state.I)*x - state.b*v,
+  initX:()=>state.theta0t,
+  formula:'T = 2&pi; &radic;( I / &kappa; )',
+  render:renderTorsional,
+  energyFormula:()=>0.5*state.kappa*state.theta0t*state.theta0t,
+  getHandle:()=>{
+    const cx=SIM_VW/2, cyDisc=340, aD=130, bD=48;
+    return {x:cx+aD*Math.cos(state.x), y:cyDisc+bD*Math.sin(state.x), r:38};
+  },
+  dragTo:(vx,vy)=>{
+    const cx=SIM_VW/2, cyDisc=340, aD=130, bD=48;
+    const ux=(vx-cx)/aD, uy=(vy-cyDisc)/bD;
+    let th=Math.atan2(uy, ux);
+    const max=170*DEG;
+    th=Math.max(-max, Math.min(max, th));
+    state.x=th; state.v=0;
+    updateParamSlider('theta0t', Math.abs(th)/DEG);
+  }
+};
+
+/* NEW: Floating cylinder */
+CASES['floating'] = {
+  label:'Floating cylinder',
+  simCaption:'Floating cylinder · vertical oscillation in a liquid',
+  xUnit:'m', vUnit:'m s⁻¹', aUnit:'m s⁻²', yUnitDeg:false, ampKey:'A',
+  params:[
+    { key:'h0c', label:'Equilibrium depth', sym:'h', sub:'0', unit:'m', min:0.05, max:0.25, step:0.005, dec:3 },
+    { key:'A', label:'Amplitude', sym:'A', unit:'m', min:0.01, max:0.12, step:0.005, dec:3 },
+    { key:'b', label:'Damping', sym:'b', unit:'s⁻¹', min:0, max:6, step:0.05, dec:2 }
+  ],
+  omega0:()=>Math.sqrt(state.g/state.h0c),
+  accel:(x,v)=>-(state.g/state.h0c)*x - state.b*v,
+  initX:()=>state.A,
+  formula:'T = 2&pi; &radic;( h&#8320; / g )',
+  render:renderFloating,
+  energyFormula:()=>0.5*(state.g/state.h0c)*state.A*state.A,
+  getHandle:()=>{
+    const liquidSurface=240, scale=500, cylH=150;
+    const cylBottomEq=liquidSurface + state.h0c*scale;
+    const cylCenterEq=cylBottomEq - cylH/2;
+    return {x:SIM_VW/2, y:cylCenterEq - state.x*scale, r:58};
+  },
+  dragTo:(vx,vy)=>{
+    const liquidSurface=240, scale=500, cylH=150;
+    const cylBottomEq=liquidSurface + state.h0c*scale;
+    const cylCenterEq=cylBottomEq - cylH/2;
+    let x=(cylCenterEq - vy)/scale;
+    x=Math.max(-0.12, Math.min(0.12, x));
+    state.x=x; state.v=0;
+    updateParamSlider('A', Math.abs(x));
+  }
+};
+
+CASES['lc'] = {
+  label:'LC circuit',
+  simCaption:'LC circuit · electrical analogue of SHM',
+  xUnit:'mC', vUnit:'mA', aUnit:'mA s⁻¹', yUnitDeg:false, yScale:1000, ampKey:'Q0',
+  params:[
+    { key:'Lc', label:'Inductance', sym:'L', unit:'H', min:0.10, max:2.00, step:0.05, dec:2 },
+    { key:'Cc', label:'Capacitance', sym:'C', unit:'mF', min:1.0, max:50.0, step:0.5, dec:1, scale:0.001 },
+    { key:'Rc', label:'Resistance', sym:'R', unit:'Ω', min:0, max:100, step:1, dec:0 },
+    { key:'Q0', label:'Initial charge', sym:'q', sub:'0', unit:'mC', min:0.5, max:10, step:0.1, dec:1, scale:0.001 }
+  ],
+  omega0:()=>1/Math.sqrt(state.Lc*state.Cc),
+  accel:(x,v)=>-(1/(state.Lc*state.Cc))*x - (state.Rc/state.Lc)*v,
+  initX:()=>state.Q0,
+  formula:'T = 2&pi; &radic;( LC )',
+  render:renderLC,
+  energyFormula:()=>0.5*state.Q0*state.Q0/state.Cc,
+  getHandle:()=>{
+    const cx=SIM_VW/2, ballY=430;
+    const frac = state.Q0>1e-9 ? state.x/state.Q0 : 0;
+    return {x:cx + frac*90, y:ballY, r:30};
+  },
+  dragTo:(vx)=>{
+    const cx=SIM_VW/2;
+    let frac=(vx-cx)/90;
+    frac=Math.max(-1, Math.min(1, frac));
+    const Qmax=0.010;
+    const newQ = frac * Qmax;
+    state.Q0 = Math.max(Math.abs(newQ), 0.0005);
+    state.x = newQ;
+    state.v = 0;
+    updateParamSlider('Q0', state.Q0*1000);
+  }
+};
+
+CASES['forced'] = {
+  label:'Forced oscillation',
+  simCaption:'Forced oscillation · driven spring with damping',
+  xUnit:'m', vUnit:'m s⁻¹', aUnit:'m s⁻²', yUnitDeg:false,
+  params:[
+    { key:'m', label:'Mass', sym:'m', unit:'kg', min:0.20, max:2.00, step:0.05, dec:2 },
+    { key:'k', label:'Spring const.', sym:'k', unit:'N m⁻¹', min:5, max:40, step:0.5, dec:1 },
+    { key:'F0', label:'Drive amplitude', sym:'F', sub:'0', unit:'N', min:0.05, max:1.00, step:0.05, dec:2 },
+    { key:'omega_d', label:'Drive frequency', sym:'ω', sub:'d', unit:'rad s⁻¹', min:0.5, max:20.0, step:0.1, dec:2 },
+    { key:'b', label:'Damping', sym:'b', unit:'s⁻¹', min:0.30, max:5.00, step:0.05, dec:2 }
+  ],
+  omega0:()=>state.omega_d,
+  accel:(x,v,t)=>-(state.k/state.m)*x - state.b*v + (state.F0/state.m)*Math.cos(state.omega_d*t),
+  initX:()=>0,
+  formula:'&omega;<sub>0</sub> = &radic;( k / m )',
+  render:renderForced,
+  energyFormula:null,
+  getHandle:()=>({x:430 + state.x*90, y:SIM_VH*0.52, r:56}),
+  dragTo:(vx)=>{
+    let x=(vx-430)/90;
+    x=Math.max(-0.5, Math.min(0.5, x));
+    state.x=x; state.v=0;
+  }
+};
+
+const CASE_ORDER = ['spring-h','spring-v','spring-double','pendulum','physical-pendulum','torsional','floating','lc','forced'];
+
+/* ============ CANVAS SETUP ============ */
+const simCanvas  = document.getElementById('simCanvas');
+const circCanvas = document.getElementById('circCanvas');
+const dispCanvas = document.getElementById('dispCanvas');
+const velCanvas  = document.getElementById('velCanvas');
+const accCanvas  = document.getElementById('accCanvas');
+const enCanvas   = document.getElementById('enCanvas');
+
+const simPanel  = document.getElementById('simPanel');
+const circPanel = document.getElementById('circPanel');
+const dispPanel = dispCanvas.parentElement;
+const velPanel  = velCanvas.parentElement;
+const accPanel  = accCanvas.parentElement;
+const enPanel   = enCanvas.parentElement;
+
+const ctx  = simCanvas.getContext('2d',  {alpha:false});
+const cctx = circCanvas.getContext('2d', {alpha:false});
+const dctx = dispCanvas.getContext('2d', {alpha:false});
+const vctx = velCanvas.getContext('2d',  {alpha:false});
+const actx = accCanvas.getContext('2d',  {alpha:false});
+const ectx = enCanvas.getContext('2d',   {alpha:false});
+
+const SIM_VW = 620, SIM_VH = 520;
+const CIR_VW = 520, CIR_VH = 470;
+const GR_VW  = 400, GR_VH  = 280;
+
+function syncCanvas(canvas, g, panel, vW, vH){
+  const availW = Math.max(80, panel.clientWidth-4);
+  const availH = Math.max(60, panel.clientHeight-4);
+  const aspect = vW/vH;
+  let w=availW, h=w/aspect;
+  if (h > availH){ h=availH; w=h*aspect; }
+  w=Math.round(w); h=Math.round(h);
+  const dpr = window.devicePixelRatio || 1;
+  const needW=Math.round(w*dpr), needH=Math.round(h*dpr);
+  if (canvas.width!==needW || canvas.height!==needH){
+    canvas.width=needW; canvas.height=needH;
+    canvas.style.width=w+'px'; canvas.style.height=h+'px';
+  }
+  g.setTransform(needW/vW, 0, 0, needH/vH, 0, 0);
+  g.imageSmoothingEnabled=true; g.imageSmoothingQuality='high';
+  g.lineCap='round'; g.lineJoin='round'; g.textBaseline='alphabetic';
+}
+
+/* ============ HELPERS ============ */
+function currentCase(){ return CASES[state.caseId]; }
+function omega0(){ return currentCase().omega0(); }
+function accelFn(x, v, t){ return currentCase().accel(x, v, t); }
+function initX(){ return currentCase().initX(); }
+
+function yScale(){
+  const c = currentCase();
+  if (c.yScale) return c.yScale;
+  if (c.yUnitDeg) return 180/PI;
+  return 1;
+}
+function vScale(){
+  const c = currentCase();
+  if (c.caseId === 'lc') return 1000;
+  return 1;
+}
+function yUnit(){ return currentCase().xUnit; }
+function vUnit(){ return currentCase().vUnit; }
+
+function graphAmp(){
+  const c = currentCase();
+  if (c.caseId === 'forced'){
+    const w0 = Math.sqrt(state.k/state.m), wd = state.omega_d;
+    const denom = Math.sqrt(Math.pow(w0*w0-wd*wd,2) + Math.pow(state.b*wd,2));
+    return Math.max((state.F0/state.m)/Math.max(denom,0.001), 0.03);
+  }
+  return Math.abs(initX());
+}
+function graphAmpV(){
+  const c = currentCase();
+  if (c.caseId === 'forced'){
+    const w0 = Math.sqrt(state.k/state.m), wd = state.omega_d;
+    const denom = Math.sqrt(Math.pow(w0*w0-wd*wd,2) + Math.pow(state.b*wd,2));
+    return Math.max((state.F0/state.m)/Math.max(denom,0.001)*wd, 0.05);
+  }
+  return graphAmp() * omega0();
+}
+function graphAmpA(){ return graphAmpV() * omega0(); }
+
+function refEnergy(){
+  const c = currentCase();
+  if (c.caseId === 'pendulum') return state.m*state.g*state.L*(1-Math.cos(state.theta0));
+  if (c.caseId === 'physical-pendulum') return state.m*state.g*(state.Lp/2)*(1-Math.cos(state.theta0p));
+  if (c.caseId === 'torsional') return 0.5*state.kappa*state.theta0t*state.theta0t;
+  if (c.caseId === 'spring-h' || c.caseId === 'spring-v') return 0.5*state.k*state.A*state.A;
+  if (c.caseId === 'spring-double') return 0.5*(2*state.k)*state.A*state.A;
+  if (c.caseId === 'floating') return 0.5*(state.g/state.h0c)*state.A*state.A;
+  if (c.caseId === 'lc') return 0.5*state.Q0*state.Q0/state.Cc;
+  if (c.caseId === 'forced'){
+    const w0 = Math.sqrt(state.k/state.m), wd = state.omega_d;
+    const denom = Math.sqrt(Math.pow(w0*w0-wd*wd,2) + Math.pow(state.b*wd,2));
+    const Ast = (state.F0/state.m)/Math.max(denom,0.001);
+    return Math.max(0.5*state.k*Ast*Ast, 0.001);
+  }
+  return 1;
+}
+
+function energyFractionsAt(x, v){
+  const c = currentCase();
+  const Etot = refEnergy();
+  if (Etot <= 1e-12) return {keF:0, peF:0, totF:0};
+  let pe, ke;
+  if (c.caseId === 'pendulum'){
+    pe = state.m*state.g*state.L*(1-Math.cos(x));
+    ke = 0.5*state.m*state.L*state.L*v*v;
+  } else if (c.caseId === 'physical-pendulum'){
+    pe = state.m*state.g*(state.Lp/2)*(1-Math.cos(x));
+    ke = 0.5*state.m*(state.Lp*state.Lp/3)*v*v;
+  } else if (c.caseId === 'torsional'){
+    pe = 0.5*state.kappa*x*x;
+    ke = 0.5*state.I*v*v;
+  } else if (c.caseId === 'spring-double'){
+    pe = state.k*x*x;
+    ke = 0.5*state.m*v*v;
+  } else if (c.caseId === 'floating'){
+    pe = 0.5*(state.g/state.h0c)*x*x;
+    ke = 0.5*v*v;
+  } else if (c.caseId === 'lc'){
+    pe = 0.5*x*x/state.Cc;
+    ke = 0.5*state.Lc*v*v;
+  } else {
+    pe = 0.5*state.k*x*x;
+    ke = 0.5*state.m*v*v;
+  }
+  return { keF:ke/Etot, peF:pe/Etot, totF:(ke+pe)/Etot };
+}
+
+/* ============ PHYSICS ============ */
+const H_STEP = 0.001;
+function rk4Step(h){
+  const x=state.x, v=state.v, t=state.t;
+  const k1x=v, k1v=accelFn(x,v,t);
+  const k2x=v+0.5*h*k1v, k2v=accelFn(x+0.5*h*k1x, v+0.5*h*k1v, t+0.5*h);
+  const k3x=v+0.5*h*k2v, k3v=accelFn(x+0.5*h*k2x, v+0.5*h*k2v, t+0.5*h);
+  const k4x=v+h*k3v, k4v=accelFn(x+h*k3x, v+h*k3v, t+h);
+  const prevX = state.x;
+  state.x += (h/6)*(k1x+2*k2x+2*k3x+k4x);
+  state.v += (h/6)*(k1v+2*k2v+2*k3v+k4v);
+  state.t += h;
+  state.phi += omega0()*h;
+  while (state.phi >= TWO_PI) state.phi -= TWO_PI;
+  if (prevX < 0 && state.x >= 0){
+    if (state.lastCrossT !== null) state.measuredT = state.t - state.lastCrossT;
+    state.lastCrossT = state.t;
+  }
+}
+
+/* ============ SPRING COIL ============ */
+function drawSpring(x0,y0,x1,y1,coils,radius){
+  const dx=x1-x0, dy=y1-y0, len=Math.hypot(dx,dy);
+  if (len < 10) return;
+  const angle=Math.atan2(dy,dx);
+  ctx.save(); ctx.translate(x0,y0); ctx.rotate(angle);
+  const steps=coils*16, path=[];
+  for (let i=0;i<=steps;i++){
+    const t=i/steps;
+    path.push({x:t*len, y:Math.sin(t*TWO_PI*coils)*radius});
+  }
+  ctx.beginPath(); path.forEach((p,i)=> i===0?ctx.moveTo(p.x,p.y+1):ctx.lineTo(p.x,p.y+1));
+  ctx.strokeStyle='rgba(100,116,139,0.30)'; ctx.lineWidth=3.6; ctx.stroke();
+  ctx.beginPath(); path.forEach((p,i)=> i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
+  ctx.strokeStyle='#2c3e50'; ctx.lineWidth=3; ctx.stroke();
+  ctx.restore();
+}
+
+/* ============ SIM RENDERERS ============ */
+function renderSpringH(){
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,SIM_VW,SIM_VH);
+  const yEq=SIM_VH*0.52, xWall=90, xEq=SIM_VW*0.58, scale=180;
+  const xMass=xEq+state.x*scale;
+  ctx.strokeStyle='#333'; ctx.lineWidth=1.8;
+  ctx.beginPath(); ctx.moveTo(30,yEq+80); ctx.lineTo(SIM_VW-30,yEq+80); ctx.stroke();
+  ctx.lineWidth=1; ctx.strokeStyle='#888';
+  for (let i=30;i<SIM_VW-30;i+=14){
+    ctx.beginPath(); ctx.moveTo(i,yEq+80); ctx.lineTo(i-8,yEq+90); ctx.stroke();
+  }
+  ctx.fillStyle='#2c3e50'; ctx.fillRect(xWall-12,yEq-60,12,140);
+  ctx.strokeStyle='#000'; ctx.lineWidth=1.4; ctx.strokeRect(xWall-12,yEq-60,12,140);
+  drawSpring(xWall+4,yEq,xMass-40,yEq,12,14);
+  const bw=76,bh=64,bx=xMass-bw/2,by=yEq-bh/2;
+  const mg=ctx.createLinearGradient(bx,by,bx,by+bh);
+  mg.addColorStop(0,'#f1f5f9'); mg.addColorStop(0.5,'#94a3b8'); mg.addColorStop(1,'#334155');
+  ctx.fillStyle=mg; ctx.fillRect(bx,by,bw,bh);
+  ctx.strokeStyle='#000'; ctx.lineWidth=1.6; ctx.strokeRect(bx,by,bw,bh);
+  ctx.fillStyle='#000'; ctx.font='bold 22px '+FONT;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(state.m.toFixed(2)+' kg', xMass, yEq);
+  ctx.save(); ctx.setLineDash([7,6]); ctx.strokeStyle='#333'; ctx.lineWidth=1.4;
+  ctx.beginPath(); ctx.moveTo(xEq,50); ctx.lineTo(xEq,yEq+80); ctx.stroke(); ctx.restore();
+  ctx.fillStyle='#000'; ctx.font='bold italic 20px '+FONT;
+  ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+  ctx.fillText('equilibrium', xEq, 40);
+}
+
+function renderSpringV(){
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,SIM_VW,SIM_VH);
+  const xC=SIM_VW/2, yCeil=55, yEq=SIM_VH*0.55, scale=260;
+  const yMass=yEq+state.x*scale;
+  ctx.fillStyle='#2c3e50'; ctx.fillRect(xC-130,yCeil-18,260,10);
+  ctx.strokeStyle='#2c3e50'; ctx.lineWidth=1.6;
+  for (let i=-130;i<=130;i+=16){
+    ctx.beginPath(); ctx.moveTo(xC+i,yCeil-18); ctx.lineTo(xC+i-10,yCeil-30); ctx.stroke();
+  }
+  ctx.fillStyle='#555'; ctx.fillRect(xC-24,yCeil-8,48,10);
+  ctx.strokeStyle='#000'; ctx.lineWidth=1.4; ctx.strokeRect(xC-24,yCeil-8,48,10);
+  drawSpring(xC,yCeil,xC,yMass-32,14,13);
+  const bw=86,bh=64,bx=xC-bw/2,by=yMass-bh/2;
+  const mg=ctx.createLinearGradient(bx,by,bx+bw,by+bh);
+  mg.addColorStop(0,'#f1f5f9'); mg.addColorStop(0.4,'#94a3b8'); mg.addColorStop(1,'#334155');
+  ctx.fillStyle=mg; ctx.fillRect(bx,by,bw,bh);
+  ctx.strokeStyle='#000'; ctx.lineWidth=1.6; ctx.strokeRect(bx,by,bw,bh);
+  ctx.fillStyle='#000'; ctx.font='bold 22px '+FONT;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(state.m.toFixed(2)+' kg', xC, yMass);
+  ctx.save(); ctx.setLineDash([7,6]); ctx.strokeStyle='#333'; ctx.lineWidth=1.4;
+  ctx.beginPath(); ctx.moveTo(xC-140,yEq); ctx.lineTo(xC+140,yEq); ctx.stroke(); ctx.restore();
+  ctx.fillStyle='#000'; ctx.font='bold italic 20px '+FONT;
+  ctx.textAlign='right'; ctx.textBaseline='middle';
+  ctx.fillText('equilibrium', xC-146, yEq);
+}
+
+function renderSpringDouble(){
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,SIM_VW,SIM_VH);
+  const yEq=SIM_VH*0.52, xWallL=90, xWallR=SIM_VW-90, xEq=SIM_VW/2, scale=170;
+  const xMass=xEq+state.x*scale;
+  ctx.strokeStyle='#333'; ctx.lineWidth=1.8;
+  ctx.beginPath(); ctx.moveTo(30,yEq+80); ctx.lineTo(SIM_VW-30,yEq+80); ctx.stroke();
+  ctx.lineWidth=1; ctx.strokeStyle='#888';
+  for (let i=30;i<SIM_VW-30;i+=14){
+    ctx.beginPath(); ctx.moveTo(i,yEq+80); ctx.lineTo(i-8,yEq+90); ctx.stroke();
+  }
+  ctx.fillStyle='#2c3e50';
+  ctx.fillRect(xWallL-12,yEq-60,12,140); ctx.fillRect(xWallR,yEq-60,12,140);
+  ctx.strokeStyle='#000'; ctx.lineWidth=1.4;
+  ctx.strokeRect(xWallL-12,yEq-60,12,140); ctx.strokeRect(xWallR,yEq-60,12,140);
+  if (xMass-38>xWallL+4) drawSpring(xWallL+4,yEq,xMass-38,yEq,10,13);
+  if (xMass+38<xWallR-4) drawSpring(xMass+38,yEq,xWallR-4,yEq,10,13);
+  const bw=76,bh=64,bx=xMass-bw/2,by=yEq-bh/2;
+  const mg=ctx.createLinearGradient(bx,by,bx,by+bh);
+  mg.addColorStop(0,'#f1f5f9'); mg.addColorStop(0.5,'#94a3b8'); mg.addColorStop(1,'#334155');
+  ctx.fillStyle=mg; ctx.fillRect(bx,by,bw,bh);
+  ctx.strokeStyle='#000'; ctx.lineWidth=1.6; ctx.strokeRect(bx,by,bw,bh);
+  ctx.fillStyle='#000'; ctx.font='bold 22px '+FONT;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(state.m.toFixed(2)+' kg', xMass, yEq);
+  ctx.save(); ctx.setLineDash([7,6]); ctx.strokeStyle='#333'; ctx.lineWidth=1.4;
+  ctx.beginPath(); ctx.moveTo(xEq,50); ctx.lineTo(xEq,yEq+80); ctx.stroke(); ctx.restore();
+  ctx.fillStyle='#000'; ctx.font='bold italic 20px '+FONT;
+  ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+  ctx.fillText('equilibrium', xEq, 40);
+}
+
+function renderPendulum(){
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,SIM_VW,SIM_VH);
+  const PX=SIM_VW/2, PY=80, Lv=140+state.L*70, br=14+state.m*10, th=state.x;
+  const bx=PX+Lv*Math.sin(th), by=PY+Lv*Math.cos(th);
+  ctx.fillStyle='#2c3e50'; ctx.fillRect(PX-120,PY-16,240,8);
+  ctx.strokeStyle='#2c3e50'; ctx.lineWidth=1.6;
+  for (let i=-120;i<=120;i+=14){
+    ctx.beginPath(); ctx.moveTo(PX+i,PY-16); ctx.lineTo(PX+i-9,PY-26); ctx.stroke();
+  }
+  const t0=Math.abs(state.theta0);
+  if (t0>0.01){
+    ctx.save(); ctx.beginPath();
+    ctx.arc(PX,PY,Lv,PI/2-t0,PI/2+t0,false);
+    ctx.strokeStyle='#c8c8c8'; ctx.lineWidth=1.2; ctx.setLineDash([4,5]); ctx.stroke();
+    ctx.restore();
+  }
+  ctx.save(); ctx.setLineDash([7,6]); ctx.strokeStyle='#555'; ctx.lineWidth=1.2;
+  ctx.beginPath(); ctx.moveTo(PX,PY); ctx.lineTo(PX,PY+Lv+30); ctx.stroke(); ctx.restore();
+  ctx.beginPath(); ctx.moveTo(PX,PY); ctx.lineTo(bx,by);
+  ctx.strokeStyle='#111'; ctx.lineWidth=2; ctx.stroke();
+  ctx.beginPath(); ctx.arc(PX,PY,7,0,TWO_PI); ctx.fillStyle='#111'; ctx.fill();
+  ctx.beginPath(); ctx.arc(PX,PY,3,0,TWO_PI); ctx.fillStyle='#aaa'; ctx.fill();
+  const grad=ctx.createRadialGradient(bx-br*0.35,by-br*0.35,br*0.12,bx,by,br);
+  grad.addColorStop(0,'#fff'); grad.addColorStop(0.35,'#cbd5e1');
+  grad.addColorStop(0.75,'#64748b'); grad.addColorStop(1,'#1e293b');
+  ctx.beginPath(); ctx.arc(bx,by,br,0,TWO_PI); ctx.fillStyle=grad; ctx.fill();
+  ctx.strokeStyle='#000'; ctx.lineWidth=1.6; ctx.stroke();
+  ctx.beginPath(); ctx.arc(bx-br*0.32,by-br*0.32,br*0.22,0,TWO_PI);
+  ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.fill();
+  if (Math.abs(th)>0.008){
+    const arcR=60;
+    ctx.save(); ctx.beginPath();
+    ctx.arc(PX,PY,arcR,PI/2-th,PI/2,th>0);
+    ctx.strokeStyle='#1d4ed8'; ctx.lineWidth=2; ctx.stroke(); ctx.restore();
+    const midAng=PI/2-th/2;
+    ctx.fillStyle='#1d4ed8'; ctx.font='bold italic 26px '+FONT;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('θ', PX+(arcR+22)*Math.cos(midAng), PY+(arcR+22)*Math.sin(midAng));
+  }
+}
+
+function renderPhysicalPendulum(){
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,SIM_VW,SIM_VH);
+  const PX=SIM_VW/2, PY=80, rodLen=130+state.Lp*150, rodW=16, th=state.x;
+  ctx.fillStyle='#2c3e50'; ctx.fillRect(PX-120,PY-16,240,8);
+  ctx.strokeStyle='#2c3e50'; ctx.lineWidth=1.6;
+  for (let i=-120;i<=120;i+=14){
+    ctx.beginPath(); ctx.moveTo(PX+i,PY-16); ctx.lineTo(PX+i-9,PY-26); ctx.stroke();
+  }
+  ctx.save(); ctx.setLineDash([7,6]); ctx.strokeStyle='#555'; ctx.lineWidth=1.2;
+  ctx.beginPath(); ctx.moveTo(PX,PY); ctx.lineTo(PX,PY+rodLen+30); ctx.stroke(); ctx.restore();
+  ctx.save(); ctx.translate(PX,PY); ctx.rotate(th);
+  const rg=ctx.createLinearGradient(-rodW/2,0,rodW/2,0);
+  rg.addColorStop(0,'#f1f5f9'); rg.addColorStop(0.45,'#94a3b8'); rg.addColorStop(1,'#334155');
+  ctx.fillStyle=rg; ctx.fillRect(-rodW/2,0,rodW,rodLen);
+  ctx.strokeStyle='#000'; ctx.lineWidth=1.6; ctx.strokeRect(-rodW/2,0,rodW,rodLen);
+  ctx.restore();
+  const cmx=PX+(rodLen/2)*Math.sin(th), cmy=PY+(rodLen/2)*Math.cos(th);
+  ctx.beginPath(); ctx.arc(cmx,cmy,7,0,TWO_PI); ctx.fillStyle='#b91c1c'; ctx.fill();
+  ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
+  ctx.beginPath(); ctx.arc(PX,PY,7,0,TWO_PI); ctx.fillStyle='#111'; ctx.fill();
+}
+
+function renderTorsional(){
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,SIM_VW,SIM_VH);
+  const cx=SIM_VW/2, cyCeil=80, cyDisc=340, aD=130, bD=48, th=state.x;
+  ctx.fillStyle='#2c3e50'; ctx.fillRect(cx-110,cyCeil-14,220,8);
+  ctx.strokeStyle='#2c3e50'; ctx.lineWidth=1.6;
+  for (let i=-110;i<=110;i+=14){
+    ctx.beginPath(); ctx.moveTo(cx+i,cyCeil-14); ctx.lineTo(cx+i-9,cyCeil-24); ctx.stroke();
+  }
+  ctx.strokeStyle='#2c3e50'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(cx,cyCeil); ctx.lineTo(cx,cyDisc); ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(cx,cyDisc,aD,bD,0,0,TWO_PI);
+  const dg=ctx.createRadialGradient(cx-aD*0.3,cyDisc-bD*0.3,10,cx,cyDisc,aD);
+  dg.addColorStop(0,'#f1f5f9'); dg.addColorStop(0.55,'#94a3b8'); dg.addColorStop(1,'#334155');
+  ctx.fillStyle=dg; ctx.fill(); ctx.strokeStyle='#000'; ctx.lineWidth=2.4; ctx.stroke();
+  const rdx=aD*Math.cos(th), rdy=bD*Math.sin(th);
+  ctx.strokeStyle='#b91c1c'; ctx.lineWidth=3.5;
+  ctx.beginPath(); ctx.moveTo(cx-rdx,cyDisc-rdy); ctx.lineTo(cx+rdx,cyDisc+rdy); ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx,cyDisc,6,0,TWO_PI); ctx.fillStyle='#111'; ctx.fill();
+}
+
+/* NEW: Floating cylinder in liquid */
+function renderFloating(){
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,SIM_VW,SIM_VH);
+
+  const cx = SIM_VW/2;
+  const beakerL = cx - 150, beakerR = cx + 150;
+  const beakerTop = 50, beakerBot = 490;
+  const liquidSurface = 240;
+  const scale = 500;
+
+  /* beaker interior */
+  ctx.fillStyle='#f4fafd';
+  ctx.fillRect(beakerL, beakerTop, beakerR-beakerL, beakerBot-beakerTop);
+
+  /* liquid */
+  const lgrad = ctx.createLinearGradient(0, liquidSurface, 0, beakerBot);
+  lgrad.addColorStop(0,'#a2d5ee'); lgrad.addColorStop(0.35,'#5aa9d4');
+  lgrad.addColorStop(0.75,'#1d6ba0'); lgrad.addColorStop(1,'#0a3a5c');
+  ctx.fillStyle = lgrad;
+  ctx.fillRect(beakerL, liquidSurface, beakerR-beakerL, beakerBot-liquidSurface);
+
+  /* liquid surface shimmer */
+  ctx.strokeStyle = '#d8ecf7'; ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(beakerL, liquidSurface);
+  ctx.lineTo(beakerR, liquidSurface);
+  ctx.stroke();
+
+  /* cylinder geometry */
+  const cylW = 80, cylH = 150;
+  const h0px = state.h0c * scale;
+  const xPx = state.x * scale;
+  const cylBottomEq = liquidSurface + h0px;
+  const cylBottom = cylBottomEq - xPx;
+  const cylTop = cylBottom - cylH;
+  const cylL = cx - cylW/2, cylR = cx + cylW/2;
+  const cylTopEq = cylBottomEq - cylH;
+
+  /* equilibrium dashed line + label */
+  ctx.save(); ctx.setLineDash([7,6]);
+  ctx.strokeStyle='#666'; ctx.lineWidth=1.4;
+  ctx.beginPath();
+  ctx.moveTo(beakerL-70, cylTopEq);
+  ctx.lineTo(beakerR+70, cylTopEq);
+  ctx.stroke();
+  ctx.restore();
+  ctx.fillStyle='#000'; ctx.font='bold italic 17px '+FONT;
+  ctx.textAlign='right'; ctx.textBaseline='middle';
+  ctx.fillText('equilibrium', beakerL-76, cylTopEq);
+
+  /* cylinder body */
+  const cgrad = ctx.createLinearGradient(cylL, 0, cylR, 0);
+  cgrad.addColorStop(0,'#b45309'); cgrad.addColorStop(0.4,'#fbbf24');
+  cgrad.addColorStop(0.7,'#f59e0b'); cgrad.addColorStop(1,'#78350f');
+  ctx.fillStyle = cgrad;
+  ctx.fillRect(cylL, cylTop, cylW, cylH);
+  ctx.strokeStyle='#000'; ctx.lineWidth=1.8;
+  ctx.strokeRect(cylL, cylTop, cylW, cylH);
+
+  /* grain lines on cylinder */
+  ctx.strokeStyle='rgba(0,0,0,0.18)'; ctx.lineWidth=1;
+  for (let yy = cylTop+12; yy < cylTop+cylH-6; yy += 16){
+    ctx.beginPath();
+    ctx.moveTo(cylL+6, yy);
+    ctx.lineTo(cylR-6, yy);
+    ctx.stroke();
+  }
+
+  /* top cap (ellipse) */
+  ctx.beginPath();
+  ctx.ellipse(cx, cylTop, cylW/2, 6, 0, 0, TWO_PI);
+  ctx.fillStyle = '#d97706';
+  ctx.fill();
+  ctx.strokeStyle='#000'; ctx.lineWidth=1.6; ctx.stroke();
+
+  /* submerged portion tinted */
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(beakerL, liquidSurface, beakerR-beakerL, beakerBot-liquidSurface);
+  ctx.clip();
+  ctx.fillStyle = 'rgba(30, 100, 160, 0.48)';
+  ctx.fillRect(cylL, cylTop, cylW, cylH);
+  ctx.restore();
+
+  /* beaker walls */
+  ctx.strokeStyle='#1a3a52'; ctx.lineWidth=2.6;
+  ctx.beginPath();
+  ctx.moveTo(beakerL, beakerTop);
+  ctx.lineTo(beakerL, beakerBot);
+  ctx.lineTo(beakerR, beakerBot);
+  ctx.lineTo(beakerR, beakerTop);
+  ctx.stroke();
+
+  /* glass shine */
+  ctx.strokeStyle='rgba(255,255,255,0.85)'; ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.moveTo(beakerL+8, beakerTop+20); ctx.lineTo(beakerL+8, beakerBot-20); ctx.stroke();
+
+  /* displacement arrow */
+  if (Math.abs(state.x) > 0.003){
+    const xa = beakerR + 30;
+    ctx.strokeStyle='#1d4ed8'; ctx.fillStyle='#1d4ed8'; ctx.lineWidth=2.2;
+    ctx.beginPath(); ctx.moveTo(xa, cylTopEq); ctx.lineTo(xa, cylTop); ctx.stroke();
+    const dir = Math.sign(cylTop - cylTopEq) || 1;
+    ctx.beginPath();
+    ctx.moveTo(xa, cylTop);
+    ctx.lineTo(xa-7, cylTop - dir*10);
+    ctx.lineTo(xa+7, cylTop - dir*10);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(xa, cylTopEq);
+    ctx.lineTo(xa-7, cylTopEq + dir*10);
+    ctx.lineTo(xa+7, cylTopEq + dir*10);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle='#1d4ed8'; ctx.font='bold italic 22px '+FONT;
+    ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText('x', xa+12, (cylTopEq + cylTop)/2);
+  }
+}
+
+function renderLC(){
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,SIM_VW,SIM_VH);
+  const xL=140, xR=480, yT=170, yB=380;
+  const coilStartX=xL+80, coilEndX=xR-80;
+  const capGapHalf=24, capMid=(xL+xR)/2;
+  const capL=capMid-capGapHalf, capR=capMid+capGapHalf;
+  ctx.strokeStyle='#111'; ctx.lineWidth=2.8;
+  ctx.beginPath(); ctx.moveTo(xL,yT); ctx.lineTo(coilStartX,yT); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(coilEndX,yT); ctx.lineTo(xR,yT); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(xR,yT); ctx.lineTo(xR,yB); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(xR,yB); ctx.lineTo(capR,yB); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(capL,yB); ctx.lineTo(xL,yB); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(xL,yB); ctx.lineTo(xL,yT); ctx.stroke();
+  drawSpring(coilStartX,yT,coilEndX,yT,6,15);
+  ctx.strokeStyle='#111'; ctx.lineWidth=4;
+  ctx.beginPath(); ctx.moveTo(capL,yB-30); ctx.lineTo(capL,yB+30); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(capR,yB-30); ctx.lineTo(capR,yB+30); ctx.stroke();
+  ctx.fillStyle='#000'; ctx.font='bold italic 22px '+FONT;
+  ctx.textAlign='center'; ctx.textBaseline='bottom';
+  ctx.fillText('L', (coilStartX+coilEndX)/2, yT-30);
+  ctx.textBaseline='top'; ctx.fillText('C', capMid, yB+46);
+
+  /* charge indicator ball */
+  const frac = state.Q0 > 1e-9 ? state.x/state.Q0 : 0;
+  const ballX = SIM_VW/2 + frac*90;
+  const ballY = 430;
+  ctx.strokeStyle='#888'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(SIM_VW/2-95, ballY); ctx.lineTo(SIM_VW/2+95, ballY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(SIM_VW/2, ballY-10); ctx.lineTo(SIM_VW/2, ballY+10); ctx.stroke();
+  ctx.beginPath(); ctx.arc(ballX, ballY, 16, 0, TWO_PI);
+  ctx.fillStyle = frac >= 0 ? '#b91c1c' : '#1d4ed8';
+  ctx.fill();
+  ctx.strokeStyle = '#000'; ctx.lineWidth = 1.8; ctx.stroke();
+  ctx.fillStyle='#fff'; ctx.font='bold 18px '+FONT;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(frac >= 0 ? '+' : '−', ballX, ballY);
+}
+
+function renderForced(){
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,SIM_VW,SIM_VH);
+  const yEq=SIM_VH*0.52, xEq=430, scale=90;
+  const xMass=xEq+state.x*scale;
+  const xDrive=110+24*Math.cos(state.omega_d*state.t);
+  ctx.strokeStyle='#333'; ctx.lineWidth=1.8;
+  ctx.beginPath(); ctx.moveTo(30,yEq+80); ctx.lineTo(SIM_VW-30,yEq+80); ctx.stroke();
+  ctx.lineWidth=1; ctx.strokeStyle='#888';
+  for (let i=30;i<SIM_VW-30;i+=14){
+    ctx.beginPath(); ctx.moveTo(i,yEq+80); ctx.lineTo(i-8,yEq+90); ctx.stroke();
+  }
+  const dw=34, dh=110;
+  const dg=ctx.createLinearGradient(xDrive-dw/2,yEq-dh/2,xDrive+dw/2,yEq+dh/2);
+  dg.addColorStop(0,'#f1f5f9'); dg.addColorStop(0.5,'#94a3b8'); dg.addColorStop(1,'#334155');
+  ctx.fillStyle=dg; ctx.fillRect(xDrive-dw/2,yEq-dh/2,dw,dh);
+  ctx.strokeStyle='#000'; ctx.lineWidth=1.6; ctx.strokeRect(xDrive-dw/2,yEq-dh/2,dw,dh);
+  ctx.fillStyle='#b45309'; ctx.font='bold italic 20px '+FONT;
+  ctx.textAlign='center'; ctx.textBaseline='top';
+  ctx.fillText('driver', xDrive, yEq+dh/2+10);
+  if (xMass-38 > xDrive+dw/2+6) drawSpring(xDrive+dw/2,yEq,xMass-38,yEq,10,14);
+  const bw=76,bh=64,bx=xMass-bw/2,by=yEq-bh/2;
+  const mg=ctx.createLinearGradient(bx,by,bx,by+bh);
+  mg.addColorStop(0,'#f1f5f9'); mg.addColorStop(0.5,'#94a3b8'); mg.addColorStop(1,'#334155');
+  ctx.fillStyle=mg; ctx.fillRect(bx,by,bw,bh);
+  ctx.strokeStyle='#000'; ctx.lineWidth=1.6; ctx.strokeRect(bx,by,bw,bh);
+  ctx.fillStyle='#000'; ctx.font='bold 22px '+FONT;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(state.m.toFixed(2)+' kg', xMass, yEq);
+}
+
+/* ============ REFERENCE CIRCLE ============ */
+function drawReferenceCircle(){
+  cctx.fillStyle='#fff'; cctx.fillRect(0,0,CIR_VW,CIR_VH);
+  const cx=CIR_VW/2, cy=CIR_VH/2+6, R=165;
+
+  cctx.beginPath(); cctx.arc(cx,cy,R,0,TWO_PI);
+  cctx.strokeStyle='#000'; cctx.lineWidth=2; cctx.stroke();
+
+  cctx.save(); cctx.strokeStyle='#ededed'; cctx.lineWidth=1;
+  for (let k=1;k<8;k++){
+    const a=k*PI/4;
+    cctx.beginPath();
+    cctx.moveTo(cx+18*Math.cos(a),cy-18*Math.sin(a));
+    cctx.lineTo(cx+(R-6)*Math.cos(a),cy-(R-6)*Math.sin(a));
+    cctx.stroke();
+  }
+  cctx.restore();
+
+  cctx.strokeStyle='#aaa'; cctx.lineWidth=1.2;
+  cctx.beginPath(); cctx.moveTo(cx-R-40,cy); cctx.lineTo(cx+R+40,cy); cctx.stroke();
+  cctx.beginPath(); cctx.moveTo(cx,cy-R-20); cctx.lineTo(cx,cy+R+20); cctx.stroke();
+
+  cctx.fillStyle='#000'; cctx.font='bold italic 20px '+FONT;
+  cctx.textAlign='center'; cctx.textBaseline='middle';
+  const lr=R+24;
+  [{d:0,a:0},{d:90,a:PI/2},{d:180,a:PI},{d:270,a:-PI/2}].forEach(L=>{
+    cctx.fillText(L.d+'°', cx+lr*Math.cos(L.a), cy-lr*Math.sin(L.a));
+  });
+  cctx.beginPath(); cctx.arc(cx,cy,4,0,TWO_PI); cctx.fillStyle='#000'; cctx.fill();
+
+  const phi=state.phi, arcR=52;
+  if (phi>0.012){
+    cctx.beginPath(); cctx.arc(cx,cy,arcR,0,-phi,true);
+    cctx.strokeStyle='#1d4ed8'; cctx.lineWidth=2.4; cctx.stroke();
+  }
+  if (phi>0.15){
+    const bis=phi/2;
+    cctx.fillStyle='#1d4ed8'; cctx.font='bold italic 26px '+FONT;
+    cctx.textAlign='center'; cctx.textBaseline='middle';
+    cctx.fillText('φ', cx+(arcR+22)*Math.cos(bis), cy-(arcR+22)*Math.sin(bis));
+  }
+
+  const px=cx+R*Math.cos(phi), py=cy-R*Math.sin(phi);
+  cctx.beginPath(); cctx.moveTo(cx,cy); cctx.lineTo(px,py);
+  cctx.strokeStyle='#1d4ed8'; cctx.lineWidth=2.2; cctx.stroke();
+
+  cctx.save(); cctx.setLineDash([6,5]);
+  cctx.beginPath(); cctx.moveTo(px,py); cctx.lineTo(px,cy);
+  cctx.strokeStyle='#666'; cctx.lineWidth=1.4; cctx.stroke(); cctx.restore();
+
+  cctx.beginPath(); cctx.arc(px,py,9,0,TWO_PI);
+  cctx.fillStyle='#1d4ed8'; cctx.fill();
+  cctx.strokeStyle='#fff'; cctx.lineWidth=2.4; cctx.stroke();
+  cctx.fillStyle='#1d4ed8'; cctx.font='bold italic 24px '+FONT;
+  cctx.textAlign='center'; cctx.textBaseline='middle';
+  cctx.fillText('P', px+26*Math.cos(phi+0.32), py-26*Math.sin(phi+0.32));
+
+  const qx=cx+R*Math.cos(phi);
+  cctx.beginPath(); cctx.arc(qx,cy,8,0,TWO_PI);
+  cctx.fillStyle='#b91c1c'; cctx.fill();
+  cctx.strokeStyle='#fff'; cctx.lineWidth=2.4; cctx.stroke();
+  cctx.fillStyle='#b91c1c'; cctx.font='bold italic 22px '+FONT;
+  cctx.textBaseline='top';
+  cctx.fillText('Q', qx, cy+16);
+
+  const sym = (state.caseId==='lc')?'q':(currentCase().yUnitDeg?'θ':'x');
+  cctx.fillStyle='#000'; cctx.font='bold italic 20px '+FONT;
+  cctx.textAlign='left'; cctx.textBaseline='top';
+  cctx.fillText('φ = '+(phi*180/PI).toFixed(0)+'°', 14, 14);
+  cctx.fillText(sym+' = '+(state.x*yScale()).toFixed(2)+' '+yUnit(), 14, 40);
+}
+
+/* ============ GRAPH HELPERS ============ */
+/* Plot area: title occupies top 30px, no formulas — clean Cambridge-style */
+const GPAD = { l: 58, r: 14, t: 32, b: 42 };
+const G_WINDOW = 8;
+
+function fmtYAxis(v){
+  const a = Math.abs(v);
+  const sign = v<0 ? '−' : '+';
+  if (a >= 100) return sign + a.toFixed(0);
+  if (a >= 10)  return sign + a.toFixed(1);
+  return sign + a.toFixed(2);
+}
+
+function prepareGraph(g, vw, vh, yMax, unitY, yTitle, title){
+  g.fillStyle='#fff'; g.fillRect(0,0,vw,vh);
+
+  /* title centered at top */
+  g.fillStyle='#000'; g.font='bold italic 15px '+FONT;
+  g.textAlign='center'; g.textBaseline='top';
+  g.fillText(title, vw/2, 8);
+
+  const plotW = vw - GPAD.l - GPAD.r;
+  const plotH = vh - GPAD.t - GPAD.b;
+  const tNow = Math.max(state.t, G_WINDOW);
+  const tMin = tNow - G_WINDOW, tMax = tNow;
+  const gx = t => GPAD.l + (t-tMin)/(tMax-tMin)*plotW;
+  const gy = v => GPAD.t + (yMax-v)/(2*yMax)*plotH;
+
+  /* grid */
+  g.strokeStyle='#e8e8e8'; g.lineWidth=1;
+  for (let i=0;i<=8;i++){
+    const y=Math.round(GPAD.t+i*plotH/8)+0.5;
+    g.beginPath(); g.moveTo(GPAD.l,y); g.lineTo(GPAD.l+plotW,y); g.stroke();
+  }
+  for (let i=0;i<=8;i++){
+    const x=Math.round(GPAD.l+i*plotW/8)+0.5;
+    g.beginPath(); g.moveTo(x,GPAD.t); g.lineTo(x,GPAD.t+plotH); g.stroke();
+  }
+
+  /* axes through centre */
+  const y0=Math.round(gy(0))+0.5;
+  g.strokeStyle='#000'; g.lineWidth=1.6;
+  g.beginPath(); g.moveTo(GPAD.l+0.5,GPAD.t); g.lineTo(GPAD.l+0.5,GPAD.t+plotH); g.stroke();
+  g.beginPath(); g.moveTo(GPAD.l,y0); g.lineTo(GPAD.l+plotW,y0); g.stroke();
+
+  /* y-axis tick labels */
+  g.fillStyle='#000'; g.font='bold 17px '+FONT;
+  g.textAlign='right'; g.textBaseline='middle';
+  g.fillText(fmtYAxis(yMax), GPAD.l-8, gy(yMax));
+  g.fillText('0', GPAD.l-8, gy(0));
+  g.fillText(fmtYAxis(-yMax), GPAD.l-8, gy(-yMax));
+
+  /* y-axis title in solidus notation, rotated */
+  g.save();
+  g.translate(15, GPAD.t + plotH/2);
+  g.rotate(-PI/2);
+  g.textAlign='center'; g.textBaseline='middle';
+  g.fillStyle='#000'; g.font='bold italic 15px '+FONT;
+  g.fillText(yTitle, 0, 0);
+  g.restore();
+
+  /* x-axis ticks */
+  g.fillStyle='#000'; g.font='bold 15px '+FONT;
+  g.textAlign='center'; g.textBaseline='top';
+  for (let i=0;i<=8;i++){
+    const t = tMin + (tMax-tMin)*i/8;
+    g.fillText(t.toFixed(1), GPAD.l+plotW*i/8, GPAD.t+plotH+6);
+  }
+  g.font='bold italic 15px '+FONT;
+  g.textBaseline='alphabetic';
+  g.fillText('Time / s', GPAD.l+plotW/2, vh-6);
+
+  return {gx, gy, plotW, plotH, tMin, tMax};
+}
+
+function drawDispGraph(){
+  const scale=yScale();
+  const yMax=Math.max(graphAmp()*scale*1.15, 0.01);
+  const c = currentCase();
+  const id = state.caseId;
+  let yTitle;
+  if (id==='pendulum'||id==='physical-pendulum'||id==='torsional') yTitle='Angle / °';
+  else if (id==='lc')    yTitle='Charge / mC';
+  else                   yTitle='Displacement / m';
+
+  const {gx,gy,tMin}=prepareGraph(dctx, GR_VW, GR_VH, yMax, c.xUnit, yTitle, 'Displacement – time graph');
+
+  if (state.history.length>1){
+    dctx.beginPath();
+    let started=false;
+    for (const p of state.history){
+      if (p.t<tMin) continue;
+      const px=gx(p.t), py=gy(p.x*scale);
+      if (!started){dctx.moveTo(px,py);started=true;} else dctx.lineTo(px,py);
+    }
+    dctx.strokeStyle='#1d4ed8'; dctx.lineWidth=2.2; dctx.stroke();
+  }
+  if (state.history.length>0){
+    const px=gx(state.t), py=gy(state.x*scale);
+    if (px>=GPAD.l && px<=GR_VW-GPAD.r){
+      dctx.fillStyle='#fff'; dctx.beginPath(); dctx.arc(px,py,5,0,TWO_PI); dctx.fill();
+      dctx.fillStyle='#1d4ed8'; dctx.beginPath(); dctx.arc(px,py,3.5,0,TWO_PI); dctx.fill();
+    }
+  }
+}
+
+function drawVelGraph(){
+  const scale=vScale();
+  const yMax=Math.max(graphAmpV()*scale*1.15, 0.01);
+  const id=state.caseId;
+  let yTitle;
+  if (id==='pendulum'||id==='physical-pendulum'||id==='torsional') yTitle='Velocity / rad s⁻¹';
+  else if (id==='lc')    yTitle='Current / mA';
+  else                   yTitle='Velocity / m s⁻¹';
+
+  const {gx,gy,tMin}=prepareGraph(vctx, GR_VW, GR_VH, yMax, currentCase().vUnit, yTitle, 'Velocity – time graph');
+
+  if (state.history.length>1){
+    vctx.beginPath();
+    let started=false;
+    for (const p of state.history){
+      if (p.t<tMin) continue;
+      const px=gx(p.t), py=gy(p.v*scale);
+      if (!started){vctx.moveTo(px,py);started=true;} else vctx.lineTo(px,py);
+    }
+    vctx.strokeStyle='#0a7d2b'; vctx.lineWidth=2.2; vctx.stroke();
+  }
+  if (state.history.length>0){
+    const px=gx(state.t), py=gy(state.v*scale);
+    if (px>=GPAD.l && px<=GR_VW-GPAD.r){
+      vctx.fillStyle='#fff'; vctx.beginPath(); vctx.arc(px,py,5,0,TWO_PI); vctx.fill();
+      vctx.fillStyle='#0a7d2b'; vctx.beginPath(); vctx.arc(px,py,3.5,0,TWO_PI); vctx.fill();
+    }
+  }
+}
+
+function drawAccGraph(){
+  const scale=vScale();
+  const yMax=Math.max(graphAmpA()*scale*1.15, 0.01);
+  const id=state.caseId;
+  let yTitle;
+  if (id==='pendulum'||id==='physical-pendulum'||id==='torsional') yTitle='Acceleration / rad s⁻²';
+  else if (id==='lc')    yTitle='dI/dt / mA s⁻¹';
+  else                   yTitle='Acceleration / m s⁻²';
+
+  const {gx,gy,tMin}=prepareGraph(actx, GR_VW, GR_VH, yMax, currentCase().aUnit, yTitle, 'Acceleration – time graph');
+
+  if (state.history.length>1){
+    actx.beginPath();
+    let started=false;
+    for (const p of state.history){
+      if (p.t<tMin) continue;
+      const px=gx(p.t), py=gy(p.a*scale);
+      if (!started){actx.moveTo(px,py);started=true;} else actx.lineTo(px,py);
+    }
+    actx.strokeStyle='#b91c1c'; actx.lineWidth=2.2; actx.stroke();
+  }
+  if (state.history.length>0){
+    const aNow=accelFn(state.x, state.v, state.t);
+    const px=gx(state.t), py=gy(aNow*scale);
+    if (px>=GPAD.l && px<=GR_VW-GPAD.r){
+      actx.fillStyle='#fff'; actx.beginPath(); actx.arc(px,py,5,0,TWO_PI); actx.fill();
+      actx.fillStyle='#b91c1c'; actx.beginPath(); actx.arc(px,py,3.5,0,TWO_PI); actx.fill();
+    }
+  }
+}
+
+/* ENERGY GRAPH — PE, KE, total */
+function drawEnergyGraph(){
+  const yMaxHi = 1.20;
+  ectx.fillStyle='#fff'; ectx.fillRect(0,0,GR_VW,GR_VH);
+
+  ectx.fillStyle='#000'; ectx.font='bold italic 15px '+FONT;
+  ectx.textAlign='center'; ectx.textBaseline='top';
+  ectx.fillText('Energy – time graph', GR_VW/2, 8);
+
+  const plotW = GR_VW - GPAD.l - GPAD.r;
+  const plotH = GR_VH - GPAD.t - GPAD.b;
+  const tNow = Math.max(state.t, G_WINDOW);
+  const tMin = tNow - G_WINDOW, tMax = tNow;
+  const gx = t => GPAD.l + (t-tMin)/(tMax-tMin)*plotW;
+  const gy = v => GPAD.t + (yMaxHi-v)/yMaxHi*plotH;
+
+  /* grid */
+  ectx.strokeStyle='#e8e8e8'; ectx.lineWidth=1;
+  for (let i=0;i<=8;i++){
+    const y=Math.round(GPAD.t+i*plotH/8)+0.5;
+    ectx.beginPath(); ectx.moveTo(GPAD.l,y); ectx.lineTo(GPAD.l+plotW,y); ectx.stroke();
+  }
+  for (let i=0;i<=8;i++){
+    const x=Math.round(GPAD.l+i*plotW/8)+0.5;
+    ectx.beginPath(); ectx.moveTo(x,GPAD.t); ectx.lineTo(x,GPAD.t+plotH); ectx.stroke();
+  }
+
+  /* 100% reference line */
+  const y0=Math.round(gy(0))+0.5;
+  const y1=Math.round(gy(1))+0.5;
+  ectx.save(); ectx.setLineDash([6,5]);
+  ectx.strokeStyle='#1d4ed8'; ectx.lineWidth=1.4;
+  ectx.beginPath(); ectx.moveTo(GPAD.l,y1); ectx.lineTo(GPAD.l+plotW,y1); ectx.stroke();
+  ectx.restore();
+
+  /* axes */
+  ectx.strokeStyle='#000'; ectx.lineWidth=1.6;
+  ectx.beginPath(); ectx.moveTo(GPAD.l+0.5,GPAD.t); ectx.lineTo(GPAD.l+0.5,GPAD.t+plotH); ectx.stroke();
+  ectx.beginPath(); ectx.moveTo(GPAD.l,y0); ectx.lineTo(GPAD.l+plotW,y0); ectx.stroke();
+
+  /* y-axis labels */
+  ectx.fillStyle='#000'; ectx.font='bold 17px '+FONT;
+  ectx.textAlign='right'; ectx.textBaseline='middle';
+  ectx.fillText('100', GPAD.l-8, gy(1));
+  ectx.fillText('50',  GPAD.l-8, gy(0.5));
+  ectx.fillText('0',   GPAD.l-8, gy(0));
+
+  /* y-axis title */
+  ectx.save();
+  ectx.translate(15, GPAD.t + plotH/2);
+  ectx.rotate(-PI/2);
+  ectx.textAlign='center'; ectx.textBaseline='middle';
+  ectx.fillStyle='#000'; ectx.font='bold italic 15px '+FONT;
+  ectx.fillText('Energy / % of total', 0, 0);
+  ectx.restore();
+
+  /* x-axis ticks */
+  ectx.fillStyle='#000'; ectx.font='bold 15px '+FONT;
+  ectx.textAlign='center'; ectx.textBaseline='top';
+  for (let i=0;i<=8;i++){
+    const t = tMin + (tMax-tMin)*i/8;
+    ectx.fillText(t.toFixed(1), GPAD.l+plotW*i/8, GPAD.t+plotH+6);
+  }
+  ectx.font='bold italic 15px '+FONT;
+  ectx.textBaseline='alphabetic';
+  ectx.fillText('Time / s', GPAD.l+plotW/2, GR_VH-6);
+
+  /* curves */
+  if (state.history.length > 1){
+    const drawCurve = (key, color, lw)=>{
+      ectx.beginPath();
+      let started=false;
+      for (const p of state.history){
+        if (p.t<tMin) continue;
+        const fr = energyFractionsAt(p.x, p.v);
+        const v = Math.max(0, Math.min(fr[key], yMaxHi));
+        const px=gx(p.t), py=gy(v);
+        if (!started){ectx.moveTo(px,py);started=true;} else ectx.lineTo(px,py);
+      }
+      ectx.strokeStyle=color; ectx.lineWidth=lw; ectx.stroke();
+    };
+    drawCurve('totF', '#1d4ed8', 2.4);
+    drawCurve('peF',  '#b45309', 2.2);
+    drawCurve('keF',  '#0a7d2b', 2.2);
+  }
+
+  /* current markers */
+  if (state.history.length>0){
+    const fr = energyFractionsAt(state.x, state.v);
+    const px = gx(state.t);
+    if (px>=GPAD.l && px<=GR_VW-GPAD.r){
+      const put=(v,color)=>{
+        const py=gy(Math.max(0,Math.min(v,yMaxHi)));
+        ectx.fillStyle='#fff'; ectx.beginPath(); ectx.arc(px,py,5,0,TWO_PI); ectx.fill();
+        ectx.fillStyle=color; ectx.beginPath(); ectx.arc(px,py,3.2,0,TWO_PI); ectx.fill();
+      };
+      put(fr.peF,'#b45309');
+      put(fr.keF,'#0a7d2b');
+      put(fr.totF,'#1d4ed8');
+    }
+  }
+
+  /* legend */
+  ectx.font='bold italic 14px '+FONT;
+  ectx.textAlign='left'; ectx.textBaseline='top';
+  ectx.fillStyle='#0a7d2b'; ectx.fillText('KE',   GR_VW-155, GPAD.t+6);
+  ectx.fillStyle='#b45309'; ectx.fillText('PE',   GR_VW-115, GPAD.t+6);
+  ectx.fillStyle='#1d4ed8'; ectx.fillText('total',GR_VW-75,  GPAD.t+6);
+}
+
+/* ============ PARAMS PANEL ============ */
+const paramList = document.getElementById('paramList');
+
+function buildParams(){
+  paramList.innerHTML='';
+  const c = currentCase();
+  c.params.forEach(p=>{
+    const wrap = document.createElement('div');
+    wrap.className='param';
+    const hasScale = !!p.scale;
+    const val = hasScale ? state[p.key]/p.scale : state[p.key];
+    const symHtml = p.sub ? p.sym+'<sub>'+p.sub+'</sub>' : p.sym;
+
+    wrap.innerHTML =
+      '<div class="param-row">'+
+        '<span class="name">'+p.label+' <i>'+symHtml+'</i></span>'+
+        '<span class="value" id="val_'+p.key+'">'+val.toFixed(p.dec)+' '+p.unit+'</span>'+
+      '</div>'+
+      '<input type="range" id="sld_'+p.key+'" min="'+p.min+'" max="'+p.max+
+      '" step="'+p.step+'" value="'+val+'">';
+
+    paramList.appendChild(wrap);
+    const sld = wrap.querySelector('input');
+    sld.addEventListener('input', e=>{
+      const v = parseFloat(e.target.value);
+      if (hasScale) state[p.key] = v*p.scale;
+      else state[p.key] = v;
+      document.getElementById('val_'+p.key).textContent = v.toFixed(p.dec)+' '+p.unit;
+      if (p.key !== 'b' && p.key !== 'Rc') restartMotion();
+    });
+  });
+}
+
+function updateParamSlider(key, value){
+  const slider = document.getElementById('sld_'+key);
+  if (!slider) return;
+  const p = currentCase().params.find(pp=>pp.key===key);
+  if (!p) return;
+  slider.value = value;
+  const valEl = document.getElementById('val_'+key);
+  if (valEl) valEl.textContent = value.toFixed(p.dec)+' '+p.unit;
+}
+
+/* ============ READOUTS ============ */
+function fmt(v,d){
+  const s=Math.abs(v).toFixed(d);
+  return (v<0?'−':'')+s;
+}
+
+const readX=document.getElementById('readX');
+const readPhi=document.getElementById('readPhi');
+const readV=document.getElementById('readV');
+const readA=document.getElementById('readA');
+const readT=document.getElementById('readT');
+const readTth=document.getElementById('readTth');
+const readTmeas=document.getElementById('readTmeas');
+const readEtotal=document.getElementById('readEtotal');
+const barKE=document.getElementById('barKE');
+const barPE=document.getElementById('barPE');
+const barTE=document.getElementById('barTE');
+const valKE=document.getElementById('valKE');
+const valPE=document.getElementById('valPE');
+const valTE=document.getElementById('valTE');
+
+function updateReadouts(){
+  const c = currentCase();
+  const w0 = omega0(), Tth = TWO_PI/w0;
+  const scale = yScale(), vsc = vScale();
+
+  readX.innerHTML = fmt(state.x*scale, (state.caseId==='lc')?2:2) + '<span class="u">'+c.xUnit+'</span>';
+  readPhi.innerHTML = (state.phi*180/PI).toFixed(0)+'<span class="u">&deg;</span>';
+  readV.innerHTML = fmt(state.v*vsc, 3) + '<span class="u">'+c.vUnit+'</span>';
+  readA.innerHTML = fmt(accelFn(state.x, state.v, state.t)*vsc, 3) + '<span class="u">'+c.aUnit+'</span>';
+  readT.innerHTML = fmt(state.t, 2) + '<span class="u">s</span>';
+  readTth.innerHTML = Tth.toFixed(3) + '<span class="u">s</span>';
+  readTmeas.innerHTML = state.measuredT ? state.measuredT.toFixed(3)+'<span class="u">s</span>' : '&mdash;';
+
+  const fr = energyFractionsAt(state.x, state.v);
+  const keF = Math.max(0, Math.min(fr.keF, 1));
+  const peF = Math.max(0, Math.min(fr.peF, 1));
+  const tF  = Math.max(0, Math.min(fr.totF, 1));
+
+  barKE.style.width = (keF*100).toFixed(1)+'%';
+  barPE.style.width = (peF*100).toFixed(1)+'%';
+  barTE.style.width = (tF*100).toFixed(1)+'%';
+  valKE.textContent = (keF*100).toFixed(0)+'%';
+  valPE.textContent = (peF*100).toFixed(0)+'%';
+  valTE.textContent = (tF*100).toFixed(0)+'%';
+
+  const Efn = c.energyFormula;
+  if (Efn){
+    const E = Efn();
+    let eStr;
+    if (Math.abs(E)<1e-3)   eStr = (E*1e6).toFixed(2)+' µJ';
+    else if (Math.abs(E)<1) eStr = (E*1e3).toFixed(2)+' mJ';
+    else                    eStr = E.toFixed(3)+' J';
+    readEtotal.innerHTML = '<b>'+eStr+'</b>';
+  } else {
+    readEtotal.innerHTML = '<b>100 %</b>';
+  }
+}
+
+/* ============ CASE SWITCHING ============ */
+const caseTabs = document.getElementById('caseTabs');
+
+function buildTabs(){
+  caseTabs.innerHTML='';
+  CASE_ORDER.forEach(id=>{
+    const b = document.createElement('button');
+    b.className = 'case-tab' + (id===state.caseId?' active':'');
+    b.dataset.id = id;
+    b.textContent = CASES[id].label;
+    b.addEventListener('click', ()=>switchCase(id));
+    caseTabs.appendChild(b);
+  });
+}
+
+function restartMotion(){
+  state.x = initX(); state.v = 0; state.t = 0; state.phi = 0;
+  state.history = []; resetMeasurement();
+}
+
+function switchCase(id){
+  state.caseId = id;
+  document.querySelectorAll('.case-tab').forEach(b=>{
+    b.classList.toggle('active', b.dataset.id===id);
+  });
+  const c = CASES[id];
+  document.getElementById('formulaBlock').innerHTML = c.formula;
+
+  buildParams();
+  state.x = initX(); state.v = 0; state.t = 0; state.phi = 0;
+  state.history = []; state.lastCrossT = null; state.measuredT = null;
+  state.running = false;
+  setStatus('', 'Ready');
+}
+
+/* ============ LOOP ============ */
+let lastFrame = performance.now();
+let accumulator = 0;
+
+function loop(now){
+  const realDt = Math.min((now-lastFrame)/1000, 0.05);
+  lastFrame = now;
+
+  if (state.running){
+    accumulator += realDt;
+    let guard = 0;
+    while (accumulator >= H_STEP && guard < 600){
+      rk4Step(H_STEP);
+      accumulator -= H_STEP;
+      guard++;
+    }
+    state.history.push({t:state.t, x:state.x, v:state.v, a:accelFn(state.x,state.v,state.t)});
+    while (state.history.length>4000) state.history.shift();
+    if (state.t>120) state.running = false;
+  }
+
+  syncCanvas(simCanvas,  ctx,  simPanel,  SIM_VW, SIM_VH);
+  syncCanvas(circCanvas, cctx, circPanel, CIR_VW, CIR_VH);
+  syncCanvas(dispCanvas, dctx, dispPanel, GR_VW,  GR_VH);
+  syncCanvas(velCanvas,  vctx, velPanel,  GR_VW,  GR_VH);
+  syncCanvas(accCanvas,  actx, accPanel,  GR_VW,  GR_VH);
+  syncCanvas(enCanvas,   ectx, enPanel,   GR_VW,  GR_VH);
+
+  currentCase().render();
+  drawReferenceCircle();
+  drawDispGraph();
+  drawVelGraph();
+  drawAccGraph();
+  drawEnergyGraph();
+  updateReadouts();
+
+  requestAnimationFrame(loop);
+}
+
+/* ============ DRAG ============ */
+let draggingObj=false, dragCaseId=null;
+
+function pointerVirtual(evt){
+  const rect = simCanvas.getBoundingClientRect();
+  return { x:(evt.clientX-rect.left)/rect.width*SIM_VW, y:(evt.clientY-rect.top)/rect.height*SIM_VH };
+}
+function hitHandle(v){
+  const c = currentCase();
+  if (!c.getHandle) return null;
+  const h = c.getHandle();
+  const dx = v.x-h.x, dy = v.y-h.y;
+  const r = h.r+24;
+  return (dx*dx+dy*dy<r*r) ? h : null;
+}
+
+simCanvas.addEventListener('pointerdown', e=>{
+  const v = pointerVirtual(e);
+  if (hitHandle(v)){
+    draggingObj = true; dragCaseId = state.caseId;
+    state.running = false;
+    simCanvas.setPointerCapture(e.pointerId);
+    simCanvas.style.cursor = 'grabbing';
+    e.preventDefault();
+  }
+});
+
+simCanvas.addEventListener('pointermove', e=>{
+  const v = pointerVirtual(e);
+  if (draggingObj && state.caseId===dragCaseId){
+    const c = currentCase();
+    if (c.dragTo) c.dragTo(v.x, v.y);
+    state.t = 0; state.phi = state.x>=0?0:PI;
+    state.history = [{t:0,x:state.x,v:0,a:accelFn(state.x,0,0)}];
+    resetMeasurement();
+  } else {
+    simCanvas.style.cursor = hitHandle(v)?'grab':'default';
+  }
+});
+
+simCanvas.addEventListener('pointerup', e=>{
+  if (!draggingObj) return;
+  draggingObj = false;
+  const c = currentCase();
+  const A = Math.abs(state.x);
+  if (c.ampKey){
+    if (c.ampKey==='theta0')       state.theta0  = A;
+    else if (c.ampKey==='theta0p') state.theta0p = A;
+    else if (c.ampKey==='theta0t') state.theta0t = A;
+    else if (c.ampKey==='A')       state.A       = A;
+    else if (c.ampKey==='Q0')      state.Q0      = A;
+  }
+  state.v = 0; state.t = 0;
+  state.phi = state.x>=0?0:PI;
+  state.history = [{t:0,x:state.x,v:0,a:accelFn(state.x,0,0)}];
+  resetMeasurement();
+  state.running = true;
+  setStatus('running','Running');
+  buildParams();
+  simCanvas.style.cursor = 'grab';
+  dragCaseId = null;
+  showToast('New amplitude: '+A.toFixed(3));
+});
+
+simCanvas.addEventListener('pointercancel', ()=>{
+  draggingObj = false; dragCaseId = null; simCanvas.style.cursor = 'default';
+});
+
+/* ============ PARAM WINDOW DRAG ============ */
+(function(){
+  const win = document.getElementById('paramWin');
+  const head = document.getElementById('paramHead');
+  let dragging=false, offX=0, offY=0;
+  head.addEventListener('pointerdown', e=>{
+    dragging=true;
+    const r = win.getBoundingClientRect();
+    offX = e.clientX - r.left; offY = e.clientY - r.top;
+    head.setPointerCapture(e.pointerId); e.preventDefault();
+  });
+  head.addEventListener('pointermove', e=>{
+    if (!dragging) return;
+    let left = e.clientX - offX, top = e.clientY - offY;
+    left = Math.max(0, Math.min(window.innerWidth  - win.offsetWidth,  left));
+    top  = Math.max(0, Math.min(window.innerHeight - win.offsetHeight, top));
+    win.style.left = left+'px'; win.style.top = top+'px'; win.style.right = 'auto';
+  });
+  head.addEventListener('pointerup', e=>{
+    dragging=false;
+    try { head.releasePointerCapture(e.pointerId); } catch(_){}
+  });
+  head.addEventListener('pointercancel', ()=>{ dragging=false; });
+})();
+
+/* ============ BUTTONS ============ */
+function resetMeasurement(){ state.lastCrossT = null; state.measuredT = null; }
+
+document.getElementById('btnRelease').addEventListener('click', ()=>{
+  restartMotion();
+  state.running = true; setStatus('running','Running');
+  const c = currentCase();
+  if (c.caseId==='pendulum') showToast('Released from θ₀ = '+(state.theta0/DEG).toFixed(1)+'°');
+  else if (c.caseId==='physical-pendulum') showToast('Released from θ₀ = '+(state.theta0p/DEG).toFixed(1)+'°');
+  else if (c.caseId==='torsional') showToast('Released from θ₀ = '+(state.theta0t/DEG).toFixed(1)+'°');
+  else if (c.caseId==='lc') showToast('Released with q₀ = '+(state.Q0*1000).toFixed(1)+' mC');
+  else if (c.caseId==='forced') showToast('Driver at ωd = '+state.omega_d.toFixed(2)+' rad/s');
+  else if (c.caseId==='floating') showToast('Released from x₀ = '+state.A.toFixed(3)+' m');
+  else showToast('Released from x₀ = '+state.A.toFixed(3)+' m');
+});
+
+document.getElementById('btnPause').addEventListener('click', ()=>{
+  if (state.running){ state.running=false; setStatus('paused','Paused'); showToast('Paused'); }
+  else { state.running=true; setStatus('running','Running'); showToast('Resumed'); }
+});
+
+document.getElementById('btnReset').addEventListener('click', ()=>{
+  state.x=0; state.v=0; state.phi=0; state.t=0;
+  state.history=[]; state.running=false;
+  resetMeasurement(); setStatus('','Ready');
+  showToast('Reset to equilibrium');
+});
+
+function setStatus(cls, txt){
+  document.getElementById('statusTag').className = 'status' + (cls?' '+cls:'');
+  document.getElementById('statusText').textContent = txt;
+}
+
+let toastTimer = null;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 1600);
+}
+
+document.addEventListener('keydown', e=>{
+  if (e.target.tagName==='INPUT') return;
+  if (e.code==='Space'){ e.preventDefault(); document.getElementById('btnPause').click(); }
+  else if (e.key.toLowerCase()==='r'){ document.getElementById('btnRelease').click(); }
+  else if (e.key.toLowerCase()==='c'){ document.getElementById('btnReset').click(); }
+});
+
+/* ============ BOOT ============ */
+buildTabs();
+buildParams();
+switchCase(state.caseId);
+requestAnimationFrame(loop);
+setTimeout(()=>showToast('Drag any part of the system · Space = pause'), 700);
+</script>
+</body>
+</html>
