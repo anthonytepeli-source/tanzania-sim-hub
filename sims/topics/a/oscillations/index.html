@@ -49,6 +49,8 @@
   .control-row{display:flex;justify-content:center;align-items:center;gap:26px;padding:4px 0 0;flex-wrap:wrap;}
   .btn{background:none;border:none;padding:0 0 2px;font-family:inherit;font-size:12pt;color:#000;cursor:pointer;border-bottom:1.5px solid #000;font-weight:bold;}
   .btn:active{color:#555;border-bottom-color:#555;}
+  .vec-toggle{display:inline-flex;align-items:center;gap:6px;font-family:inherit;font-size:11pt;font-style:italic;cursor:pointer;user-select:none;padding-bottom:2px;border-bottom:1.5px dotted #666;}
+  .vec-toggle input{cursor:pointer;accent-color:#1d4ed8;width:14px;height:14px;}
   .form-toggle{display:inline-flex;align-items:center;gap:14px;font-family:inherit;font-size:11pt;font-style:italic;color:#000;user-select:none;padding-bottom:2px;border-bottom:1.5px dotted #666;}
   .form-toggle label{display:inline-flex;align-items:center;gap:5px;cursor:pointer;}
   .form-toggle input{cursor:pointer;accent-color:#1d4ed8;width:13px;height:13px;}
@@ -138,6 +140,10 @@
           <button class="btn" id="btnRelease">Release</button>
           <button class="btn" id="btnPause">Pause</button>
           <button class="btn" id="btnReset">Reset</button>
+          <label class="vec-toggle" title="Show x, F and v arrows on the simulation">
+            <input type="checkbox" id="vecToggle" checked>
+            <span>Vectors (x, F, v)</span>
+          </label>
           <div class="form-toggle" title="Choose the initial condition">
             <span>Initial condition:</span>
             <label><input type="radio" name="initForm" value="cos" checked> x = A cos(ωt)</label>
@@ -197,6 +203,7 @@
 <script>
 const PI = Math.PI, TWO_PI = 2*PI, DEG = PI/180;
 const FONT = '"Times New Roman", Times, Georgia, serif';
+let showVectors = true;
 
 const state = {
   caseId: 'pendulum',
@@ -228,6 +235,30 @@ function drawGridPaper(){
   for (let x = 0; x <= SIM_VW; x += 100){ ctx.moveTo(x+0.5,0); ctx.lineTo(x+0.5,SIM_VH); }
   for (let y = 0; y <= SIM_VH; y += 100){ ctx.moveTo(0,y+0.5); ctx.lineTo(SIM_VW,y+0.5); }
   ctx.stroke();
+}
+
+/* ============ VECTOR ARROW HELPER ============ */
+function drawArrow(g, x1, y1, x2, y2, color, label){
+  const dx = x2-x1, dy = y2-y1;
+  const len = Math.hypot(dx, dy);
+  if (len < 4) return;
+  const ang = Math.atan2(dy, dx);
+  const head = Math.min(12, len*0.32);
+  g.strokeStyle = color; g.fillStyle = color; g.lineWidth = 2.4;
+  g.beginPath();
+  g.moveTo(x1, y1);
+  g.lineTo(x2 - head*0.9*Math.cos(ang), y2 - head*0.9*Math.sin(ang));
+  g.stroke();
+  g.beginPath();
+  g.moveTo(x2, y2);
+  g.lineTo(x2 - head*Math.cos(ang - 0.45), y2 - head*Math.sin(ang - 0.45));
+  g.lineTo(x2 - head*Math.cos(ang + 0.45), y2 - head*Math.sin(ang + 0.45));
+  g.closePath(); g.fill();
+  if (label){
+    g.font = 'bold italic 18px ' + FONT;
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText(label, x2 + Math.cos(ang)*18, y2 + Math.sin(ang)*18);
+  }
 }
 
 const CASES = {};
@@ -696,6 +727,20 @@ function renderSpringH(){
   ctx.fillStyle='#000'; ctx.font='bold italic 20px '+FONT;
   ctx.textAlign='center'; ctx.textBaseline='alphabetic';
   ctx.fillText('equilibrium', xEq, 40);
+
+  if (showVectors){
+    drawArrow(ctx, xEq, yEq-100, xMass, yEq-100, '#1d4ed8', 'x');
+    if (Math.abs(state.x) > 0.005){
+      const Fdir = state.x > 0 ? -1 : 1;
+      const Fmag = Math.min(Math.abs(state.x)*scale*1.4, 110);
+      drawArrow(ctx, xMass, yEq+95, xMass + Fdir*Fmag, yEq+95, '#dc2626', 'F');
+    }
+    if (state.running && Math.abs(state.v) > 0.01){
+      const vdir = Math.sign(state.v);
+      const vlen = Math.min(Math.abs(state.v)*22, 100);
+      drawArrow(ctx, xMass, yEq-40, xMass + vdir*vlen, yEq-40, '#0a7d2b', 'v');
+    }
+  }
 }
 
 function renderSpringV(){
@@ -723,6 +768,20 @@ function renderSpringV(){
   ctx.fillStyle='#000'; ctx.font='bold italic 20px '+FONT;
   ctx.textAlign='right'; ctx.textBaseline='middle';
   ctx.fillText('equilibrium', xC-146, yEq);
+
+  if (showVectors){
+    drawArrow(ctx, xC+100, yEq, xC+100, yMass, '#1d4ed8', 'x');
+    if (Math.abs(state.x) > 0.005){
+      const Fdir = state.x > 0 ? -1 : 1;
+      const Fmag = Math.min(Math.abs(state.x)*scale*1.4, 130);
+      drawArrow(ctx, xC+150, yMass, xC+150, yMass + Fdir*Fmag, '#dc2626', 'F');
+    }
+    if (state.running && Math.abs(state.v) > 0.01){
+      const vdir = Math.sign(state.v);
+      const vlen = Math.min(Math.abs(state.v)*30, 110);
+      drawArrow(ctx, xC-90, yMass, xC-90, yMass + vdir*vlen, '#0a7d2b', 'v');
+    }
+  }
 }
 
 function renderSpringDouble(){
@@ -754,6 +813,20 @@ function renderSpringDouble(){
   ctx.fillStyle='#000'; ctx.font='bold italic 20px '+FONT;
   ctx.textAlign='center'; ctx.textBaseline='alphabetic';
   ctx.fillText('equilibrium', xEq, 40);
+
+  if (showVectors){
+    drawArrow(ctx, xEq, yEq-100, xMass, yEq-100, '#1d4ed8', 'x');
+    if (Math.abs(state.x) > 0.005){
+      const Fdir = state.x > 0 ? -1 : 1;
+      const Fmag = Math.min(Math.abs(state.x)*scale*1.4, 100);
+      drawArrow(ctx, xMass, yEq+95, xMass + Fdir*Fmag, yEq+95, '#dc2626', 'F');
+    }
+    if (state.running && Math.abs(state.v) > 0.01){
+      const vdir = Math.sign(state.v);
+      const vlen = Math.min(Math.abs(state.v)*22, 100);
+      drawArrow(ctx, xMass, yEq-40, xMass + vdir*vlen, yEq-40, '#0a7d2b', 'v');
+    }
+  }
 }
 
 function renderPendulum(){
@@ -795,6 +868,21 @@ function renderPendulum(){
     ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.fillText('θ', PX+(arcR+22)*Math.cos(midAng), PY+(arcR+22)*Math.sin(midAng));
   }
+
+  if (showVectors){
+    if (Math.abs(th) > 0.008){
+      const tangX = Math.cos(th), tangY = -Math.sin(th);
+      const Fdir = -Math.sign(th);
+      const Fmag = Math.min(Math.abs(th) * 300, 110);
+      drawArrow(ctx, bx, by, bx + Fdir*tangX*Fmag, by + Fdir*tangY*Fmag, '#dc2626', 'F');
+    }
+    if (state.running && Math.abs(state.v) * state.L > 0.005){
+      const tangX = Math.cos(th), tangY = -Math.sin(th);
+      const vdir = Math.sign(state.v);
+      const vlen = Math.min(Math.abs(state.v) * state.L * 90, 100);
+      drawArrow(ctx, bx, by, bx + vdir*tangX*vlen, by + vdir*tangY*vlen, '#0a7d2b', 'v');
+    }
+  }
 }
 
 function renderPhysicalPendulum(){
@@ -817,6 +905,21 @@ function renderPhysicalPendulum(){
   ctx.beginPath(); ctx.arc(cmx,cmy,7,0,TWO_PI); ctx.fillStyle='#b91c1c'; ctx.fill();
   ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
   ctx.beginPath(); ctx.arc(PX,PY,7,0,TWO_PI); ctx.fillStyle='#111'; ctx.fill();
+
+  if (showVectors){
+    if (Math.abs(th) > 0.008){
+      const tangX = Math.cos(th), tangY = -Math.sin(th);
+      const Fdir = -Math.sign(th);
+      const Fmag = Math.min(Math.abs(th) * 200, 100);
+      drawArrow(ctx, cmx, cmy, cmx + Fdir*tangX*Fmag, cmy + Fdir*tangY*Fmag, '#dc2626', 'F');
+    }
+    if (state.running && Math.abs(state.v) > 0.01){
+      const tangX = Math.cos(th), tangY = -Math.sin(th);
+      const vdir = Math.sign(state.v);
+      const vlen = Math.min(Math.abs(state.v) * 60, 90);
+      drawArrow(ctx, cmx, cmy, cmx + vdir*tangX*vlen, cmy + vdir*tangY*vlen, '#0a7d2b', 'v');
+    }
+  }
 }
 
 function renderTorsional(){
@@ -1014,20 +1117,11 @@ function renderFloating(){
   ctx.strokeStyle='rgba(255,255,255,0.85)'; ctx.lineWidth=2;
   ctx.beginPath(); ctx.moveTo(beakerL+8, beakerTop+20); ctx.lineTo(beakerL+8, beakerBot-20); ctx.stroke();
 
-  if (Math.abs(state.x) > 0.003){
-    const xa = beakerR + 30;
-    ctx.strokeStyle='#1d4ed8'; ctx.fillStyle='#1d4ed8'; ctx.lineWidth=2.2;
-    ctx.beginPath(); ctx.moveTo(xa, cylTopEq); ctx.lineTo(xa, cylTop); ctx.stroke();
-    const dir = Math.sign(cylTop - cylTopEq) || 1;
-    ctx.beginPath();
-    ctx.moveTo(xa, cylTop); ctx.lineTo(xa-7, cylTop - dir*10); ctx.lineTo(xa+7, cylTop - dir*10);
-    ctx.closePath(); ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(xa, cylTopEq); ctx.lineTo(xa-7, cylTopEq + dir*10); ctx.lineTo(xa+7, cylTopEq + dir*10);
-    ctx.closePath(); ctx.fill();
-    ctx.fillStyle='#1d4ed8'; ctx.font='bold italic 22px '+FONT;
-    ctx.textAlign='left'; ctx.textBaseline='middle';
-    ctx.fillText('x', xa+12, (cylTopEq + cylTop)/2);
+  if (showVectors && Math.abs(state.x) > 0.003){
+    drawArrow(ctx, beakerR+30, cylTopEq, beakerR+30, cylTop, '#1d4ed8', 'x');
+    const Fdir = state.x > 0 ? -1 : 1;
+    const Fmag = Math.min(Math.abs(state.x)*scale*1.2, 90);
+    drawArrow(ctx, beakerR+70, cylTop, beakerR+70, cylTop + Fdir*Fmag, '#dc2626', 'F');
   }
 }
 
@@ -1095,15 +1189,27 @@ function renderForced(){
   ctx.fillStyle='#000'; ctx.font='bold 22px '+FONT;
   ctx.textAlign='center'; ctx.textBaseline='middle';
   ctx.fillText(state.m.toFixed(2)+' kg', xMass, yEq);
+
+  if (showVectors){
+    drawArrow(ctx, xEq, yEq-100, xMass, yEq-100, '#1d4ed8', 'x');
+    if (Math.abs(state.x) > 0.005){
+      const Fdir = state.x > 0 ? -1 : 1;
+      const Fmag = Math.min(Math.abs(state.x)*scale*1.4, 80);
+      drawArrow(ctx, xMass, yEq+95, xMass + Fdir*Fmag, yEq+95, '#dc2626', 'F');
+    }
+    if (state.running && Math.abs(state.v) > 0.01){
+      const vdir = Math.sign(state.v);
+      const vlen = Math.min(Math.abs(state.v)*22, 80);
+      drawArrow(ctx, xMass, yEq-40, xMass + vdir*vlen, yEq-40, '#0a7d2b', 'v');
+    }
+  }
 }
 
 function drawReferenceCircle(){
   cctx.fillStyle='#fdfcf6'; cctx.fillRect(0,0,CIR_VW,CIR_VH);
   const cx=CIR_VW/2, cy=CIR_VH/2+6, R=165;
-
   cctx.beginPath(); cctx.arc(cx,cy,R,0,TWO_PI);
   cctx.strokeStyle='#000'; cctx.lineWidth=2; cctx.stroke();
-
   cctx.save(); cctx.strokeStyle='#ededed'; cctx.lineWidth=1;
   for (let k=1;k<8;k++){
     const a=k*PI/4;
@@ -1113,11 +1219,9 @@ function drawReferenceCircle(){
     cctx.stroke();
   }
   cctx.restore();
-
   cctx.strokeStyle='#aaa'; cctx.lineWidth=1.2;
   cctx.beginPath(); cctx.moveTo(cx-R-40,cy); cctx.lineTo(cx+R+40,cy); cctx.stroke();
   cctx.beginPath(); cctx.moveTo(cx,cy-R-20); cctx.lineTo(cx,cy+R+20); cctx.stroke();
-
   cctx.fillStyle='#000'; cctx.font='bold italic 20px '+FONT;
   cctx.textAlign='center'; cctx.textBaseline='middle';
   const lr=R+24;
@@ -1125,7 +1229,6 @@ function drawReferenceCircle(){
     cctx.fillText(L.d+'°', cx+lr*Math.cos(L.a), cy-lr*Math.sin(L.a));
   });
   cctx.beginPath(); cctx.arc(cx,cy,4,0,TWO_PI); cctx.fillStyle='#000'; cctx.fill();
-
   const phi=state.phi, arcR=52;
   if (phi>0.012){
     cctx.beginPath(); cctx.arc(cx,cy,arcR,0,-phi,true);
@@ -1137,22 +1240,18 @@ function drawReferenceCircle(){
     cctx.textAlign='center'; cctx.textBaseline='middle';
     cctx.fillText('φ', cx+(arcR+22)*Math.cos(bis), cy-(arcR+22)*Math.sin(bis));
   }
-
   const px=cx+R*Math.cos(phi), py=cy-R*Math.sin(phi);
   cctx.beginPath(); cctx.moveTo(cx,cy); cctx.lineTo(px,py);
   cctx.strokeStyle='#1d4ed8'; cctx.lineWidth=2.2; cctx.stroke();
-
   cctx.save(); cctx.setLineDash([6,5]);
   cctx.beginPath(); cctx.moveTo(px,py); cctx.lineTo(px,cy);
   cctx.strokeStyle='#666'; cctx.lineWidth=1.4; cctx.stroke(); cctx.restore();
-
   cctx.beginPath(); cctx.arc(px,py,9,0,TWO_PI);
   cctx.fillStyle='#1d4ed8'; cctx.fill();
   cctx.strokeStyle='#fff'; cctx.lineWidth=2.4; cctx.stroke();
   cctx.fillStyle='#1d4ed8'; cctx.font='bold italic 24px '+FONT;
   cctx.textAlign='center'; cctx.textBaseline='middle';
   cctx.fillText('P', px+26*Math.cos(phi+0.32), py-26*Math.sin(phi+0.32));
-
   const qx=cx+R*Math.cos(phi);
   cctx.beginPath(); cctx.arc(qx,cy,8,0,TWO_PI);
   cctx.fillStyle='#b91c1c'; cctx.fill();
@@ -1160,7 +1259,6 @@ function drawReferenceCircle(){
   cctx.fillStyle='#b91c1c'; cctx.font='bold italic 22px '+FONT;
   cctx.textBaseline='top';
   cctx.fillText('Q', qx, cy+16);
-
   const sym = (state.caseId==='lc')?'q':(currentCase().yUnitDeg?'θ':'x');
   cctx.fillStyle='#000'; cctx.font='bold italic 20px '+FONT;
   cctx.textAlign='left'; cctx.textBaseline='top';
@@ -1267,7 +1365,6 @@ function drawDispGraph(){
   const w0 = omega0();
   const A  = graphAmp();
 
-  /* reference curve */
   dctx.beginPath();
   let startedRef=false;
   const N=200;
@@ -1285,7 +1382,6 @@ function drawDispGraph(){
   dctx.stroke();
   dctx.setLineDash([]);
 
-  /* origin marker */
   if (tMin <= 0 && tMax >= 0){
     const px=gx(0), py=gy(0);
     dctx.beginPath();
@@ -1297,7 +1393,6 @@ function drawDispGraph(){
     dctx.stroke();
   }
 
-  /* real curve */
   if (state.history.length>1){
     dctx.beginPath();
     let started=false;
@@ -1333,7 +1428,6 @@ function drawVelGraph(){
   const A  = graphAmp();
   const Aomega = A * w0;
 
-  /* reference curve */
   vctx.beginPath();
   let startedRef=false;
   const N=200;
@@ -1353,7 +1447,6 @@ function drawVelGraph(){
   vctx.stroke();
   vctx.setLineDash([]);
 
-  /* real curve */
   if (state.history.length>1){
     vctx.beginPath();
     let started=false;
@@ -1491,7 +1584,6 @@ function drawEnergyGraph(){
   ectx.textBaseline='alphabetic';
   ectx.fillText('Time / s', GPAD.l+plotW/2, GR_VH-6);
 
-  /* reference PE/KE */
   const w0 = omega0();
   const drawRef = (key, color)=>{
     ectx.beginPath();
@@ -1519,7 +1611,6 @@ function drawEnergyGraph(){
   drawRef('pe','rgba(180,120,60,0.6)');
   drawRef('ke','rgba(60,140,60,0.6)');
 
-  /* real energy curves */
   if (state.history.length > 1){
     const drawCurve = (key, color, lw)=>{
       ectx.beginPath();
@@ -1854,6 +1945,12 @@ document.querySelectorAll('input[name="initForm"]').forEach(r=>{
   });
 });
 
+/* ============ VECTOR TOGGLE ============ */
+document.getElementById('vecToggle').addEventListener('change', e=>{
+  showVectors = e.target.checked;
+  showToast(showVectors ? 'Vectors on' : 'Vectors off');
+});
+
 document.getElementById('swStart').addEventListener('click', ()=>{
   state.sw.running = true;
   state.sw.t0 = performance.now();
@@ -1979,7 +2076,7 @@ buildParams();
 switchCase(state.caseId);
 updateStopwatchDisplay();
 requestAnimationFrame(loop);
-setTimeout(()=>showToast('Choose initial condition · Drag to set amplitude · Space = pause'), 700);
+setTimeout(()=>showToast('Vectors on · Drag to set amplitude · Space = pause'), 700);
 </script>
 </body>
 </html>
