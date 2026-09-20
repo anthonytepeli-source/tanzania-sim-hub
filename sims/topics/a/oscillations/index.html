@@ -6,9 +6,8 @@
 <title>Oscillation Simulator — T·SIMHUB</title>
 <style>
   *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;background:#fff;color:#000;
+  html,body{margin:0;padding:0;background:#ffffff;color:#000;
     font-family:"Times New Roman", Times, Georgia, serif;font-size:12pt;line-height:1.35;}
-
   .topbar{position:sticky;top:0;z-index:100;background:rgba(5,8,16,0.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(180,205,240,0.12);}
   .topbar-inner{max-width:1280px;margin:0 auto;padding:11px 32px;display:flex;align-items:center;justify-content:space-between;gap:20px;}
   @media(max-width:640px){.topbar-inner{padding:10px 18px;}}
@@ -19,141 +18,89 @@
   .banner .sub{font-size:12.5px;font-style:italic;color:rgba(255,255,255,0.72);}
   .banner .sub::before{content:"·";margin-right:8px;color:rgba(255,255,255,0.4);}
   @media(max-width:520px){.banner .sub{display:none;}}
-
   .status{font-size:11pt;font-style:italic;color:#fff;flex:none;}
-  .status .dot{display:inline-block;width:8px;height:8px;border-radius:50%;
-    background:#666;margin-right:6px;vertical-align:middle;transition:background .2s;}
+  .status .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#666;margin-right:6px;vertical-align:middle;transition:background .2s;}
   .status.running .dot{background:#22c55e;box-shadow:0 0 8px rgba(34,197,94,.7);}
-  .status.paused  .dot{background:#f59e0b;box-shadow:0 0 8px rgba(245,158,11,.6);}
-
+  .status.paused .dot{background:#f59e0b;box-shadow:0 0 8px rgba(245,158,11,.6);}
   .app{display:flex;flex-direction:column;padding:10px 20px 16px;gap:6px;}
-
   .case-tabs{display:flex;gap:20px;padding:6px 0 8px;flex-wrap:wrap;border-bottom:1.5px solid #000;}
-  .case-tab{background:none;border:none;padding:0 0 3px;font-family:inherit;
-    font-size:11pt;font-style:italic;color:#000;cursor:pointer;border-bottom:2px solid transparent;}
+  .case-tab{background:none;border:none;padding:0 0 3px;font-family:inherit;font-size:11pt;font-style:italic;color:#000;cursor:pointer;border-bottom:2px solid transparent;}
   .case-tab.active{font-weight:bold;font-style:normal;border-bottom-color:#000;}
-
   .stage{display:flex;flex-direction:column;gap:8px;padding-top:8px;}
-
-  .row-main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;
-    border-bottom:1.5px solid #000;padding-bottom:8px;}
+  .row-main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;border-bottom:1.5px solid #000;padding-bottom:8px;}
   @media(max-width:960px){.row-main{grid-template-columns:1fr;}.circ-panel{height:32vh;}}
-
   .sim-wrap{display:flex;flex-direction:column;gap:4px;min-width:0;}
-  .sim-wrap .panel{
-    position:relative;width:100%;height:48vh;min-height:320px;max-height:480px;
-    background:#fff;display:flex;align-items:center;justify-content:center;
-    border:1px solid #d0d0d0;
-  }
-  .sim-wrap .panel canvas{display:block;touch-action:none;user-select:none;cursor:default;}
-
-  .circ-panel{
-    position:relative;height:48vh;min-height:320px;max-height:480px;
-    background:#fff;border:1px solid #d0d0d0;
-    display:flex;align-items:center;justify-content:center;min-width:0;
-  }
+  .sim-wrap .panel{position:relative;width:100%;height:48vh;min-height:320px;max-height:480px;background:#fff;display:flex;align-items:center;justify-content:center;border:1px solid #d0d0d0;}
+  .sim-wrap .panel canvas{display:block;touch-action:none;user-select:none;}
+  .stopwatch{position:absolute;top:10px;right:10px;background:rgba(255,255,255,0.96);border:1.6px solid #000;border-radius:10px;padding:6px 10px 7px;font-family:"Times New Roman", Times, Georgia, serif;z-index:10;box-shadow:0 2px 8px rgba(0,0,0,0.12);user-select:none;min-width:170px;text-align:center;}
+  .stopwatch .sw-time{font-family:Consolas,"Courier New",monospace;font-size:19px;font-weight:bold;letter-spacing:0.5px;color:#000;line-height:1.1;}
+  .stopwatch .sw-time .sw-unit{font-family:"Times New Roman", Times, Georgia, serif;font-size:12pt;font-style:italic;font-weight:normal;margin-left:3px;}
+  .stopwatch .sw-buttons{display:flex;gap:0;margin-top:5px;border-top:1px solid #ccc;padding-top:5px;}
+  .stopwatch .sw-btn{flex:1;background:none;border:none;font-family:inherit;font-size:9.5pt;font-style:italic;color:#000;cursor:pointer;padding:2px 0;border-right:1px solid #ccc;}
+  .stopwatch .sw-btn:last-child{border-right:none;}
+  .stopwatch .sw-btn:hover{font-weight:bold;color:#1d4ed8;}
+  .stopwatch .sw-btn.primary{font-weight:bold;color:#0a7d2b;}
+  .stopwatch.running{border-color:#0a7d2b;}
+  .stopwatch.running .sw-time{color:#0a7d2b;}
+  .stopwatch.stopped{border-color:#b91c1c;}
+  .stopwatch.stopped .sw-time{color:#b91c1c;}
+  .circ-panel{position:relative;height:48vh;min-height:320px;max-height:480px;background:#fff;border:1px solid #d0d0d0;display:flex;align-items:center;justify-content:center;min-width:0;}
   .circ-panel canvas{display:block;background:#fff;}
-
-  .control-row{display:flex;justify-content:center;align-items:center;gap:30px;padding:4px 0 0;flex-wrap:wrap;}
-  .btn{background:none;border:none;padding:0 0 2px;font-family:inherit;font-size:12pt;
-    color:#000;cursor:pointer;border-bottom:1.5px solid #000;font-weight:bold;}
+  .control-row{display:flex;justify-content:center;align-items:center;gap:26px;padding:4px 0 0;flex-wrap:wrap;}
+  .btn{background:none;border:none;padding:0 0 2px;font-family:inherit;font-size:12pt;color:#000;cursor:pointer;border-bottom:1.5px solid #000;font-weight:bold;}
   .btn:active{color:#555;border-bottom-color:#555;}
-  .vec-toggle{
-    display:inline-flex;align-items:center;gap:6px;
-    font-family:inherit;font-size:11pt;font-style:italic;
-    cursor:pointer;user-select:none;padding-bottom:2px;
-    border-bottom:1.5px dotted #666;
-  }
-  .vec-toggle input{cursor:pointer;accent-color:#1d4ed8;width:14px;height:14px;}
-
-  .row-graphs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
-    border-bottom:1.5px solid #000;padding-bottom:8px;}
+  .form-toggle{display:inline-flex;align-items:center;gap:14px;font-family:inherit;font-size:11pt;font-style:italic;color:#000;user-select:none;padding-bottom:2px;border-bottom:1.5px dotted #666;}
+  .form-toggle label{display:inline-flex;align-items:center;gap:5px;cursor:pointer;}
+  .form-toggle input{cursor:pointer;accent-color:#1d4ed8;width:13px;height:13px;}
+  .row-graphs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;border-bottom:1.5px solid #000;padding-bottom:8px;}
   @media(max-width:960px){.row-graphs{grid-template-columns:1fr;}}
-  .row-graphs .panel{
-    position:relative;height:32vh;min-height:230px;max-height:300px;
-    background:#fff;border:1px solid #d0d0d0;
-    display:flex;align-items:center;justify-content:center;min-width:0;
-  }
+  .row-graphs .panel{position:relative;height:32vh;min-height:230px;max-height:300px;background:#fff;border:1px solid #d0d0d0;display:flex;align-items:center;justify-content:center;min-width:0;}
   .row-graphs .panel canvas{display:block;background:#fff;}
-
   .row-bottom{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:12px;padding-bottom:6px;}
   @media(max-width:960px){.row-bottom{grid-template-columns:1fr;}}
-  .row-bottom .panel{
-    position:relative;height:34vh;min-height:240px;max-height:320px;
-    background:#fff;border:1px solid #d0d0d0;
-    display:flex;align-items:center;justify-content:center;min-width:0;
-  }
+  .row-bottom .panel{position:relative;height:34vh;min-height:240px;max-height:320px;background:#fff;border:1px solid #d0d0d0;display:flex;align-items:center;justify-content:center;min-width:0;}
   .row-bottom .panel canvas{display:block;background:#fff;}
-
-  .data-strip{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;
-    border:1px solid #d0d0d0;padding:10px 14px;background:#fff;min-width:0;}
+  .data-strip{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border:1px solid #d0d0d0;padding:10px 14px;background:#fff;min-width:0;}
   @media(max-width:640px){.data-strip{grid-template-columns:1fr;gap:14px;}}
   .data-col{padding:0 12px;border-right:1px solid #d8d8d8;min-width:0;}
   .data-col:first-child{padding-left:0;}
   .data-col:last-child{padding-right:0;border-right:none;}
   .data-col h3{margin:0 0 6px;font-size:11pt;font-weight:bold;font-style:italic;color:#000;}
-
   .data-list{font-size:11pt;line-height:1.55;color:#000;}
   .data-list .row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
   .data-list .k{font-style:italic;color:#000;}
   .data-list .v{font-weight:bold;color:#000;white-space:nowrap;}
   .data-list .v .u{font-weight:normal;font-style:italic;margin-left:3px;font-size:10pt;color:#000;}
-
   .formula-block{font-size:11pt;font-style:italic;margin:0 0 6px;color:#000;}
-  .period-line{display:flex;justify-content:space-between;align-items:baseline;
-    font-size:11pt;margin-bottom:3px;color:#000;}
+  .period-line{display:flex;justify-content:space-between;align-items:baseline;font-size:11pt;margin-bottom:3px;color:#000;}
   .period-line .k{font-style:italic;}
   .period-line .v{font-weight:bold;}
   .period-line .v .u{font-weight:normal;font-style:italic;margin-left:2px;font-size:10pt;}
-
-  .energy-item{display:grid;grid-template-columns:52px 1fr 42px;align-items:center;
-    gap:6px;margin-bottom:5px;font-size:11pt;}
-  .energy-item .lbl{font-style:italic;color:#000;font-size:10pt;}
+  .energy-item{display:grid;grid-template-columns:52px 1fr 42px;align-items:center;gap:6px;margin-bottom:5px;font-size:11pt;}
+  .energy-item .lbl{font-style:italic;color:#000;}
   .energy-item .track{height:6px;background:#e0e0e0;overflow:hidden;}
   .energy-item .fill{height:100%;width:0%;background:#000;display:block;transition:width .05s linear;}
-  .energy-item.ke .fill{background:#e53935;}
-  .energy-item.pe .fill{background:#1a5fb4;}
-  .energy-item.total .fill{background:#26a69a;}
+  .energy-item.ke .fill{background:#0a7d2b;}
+  .energy-item.pe .fill{background:#b45309;}
+  .energy-item.total .fill{background:#1d4ed8;}
   .energy-item .val{font-weight:bold;text-align:right;font-size:11pt;color:#000;}
   .energy-total-line{margin-top:5px;font-size:11pt;display:flex;justify-content:space-between;color:#000;}
   .energy-total-line .k{font-style:italic;}
   .energy-total-line .v{font-weight:bold;}
-
-  #paramWin{
-    position:fixed;top:130px;right:20px;z-index:600;
-    background:#fff;border:1.6px solid #000;border-radius:14px;
-    box-shadow:0 4px 16px rgba(0,0,0,0.18);
-    max-width:230px;font-family:inherit;font-size:10pt;
-    user-select:none;overflow:hidden;
-  }
-  #paramWin .fw-head{display:flex;align-items:center;justify-content:space-between;
-    padding:6px 10px;background:#f6f6f6;border-bottom:1px solid #d0d0d0;
-    cursor:move;touch-action:none;}
+  #paramWin{position:fixed;top:130px;right:20px;z-index:600;background:#fff;border:1.6px solid #000;border-radius:14px;box-shadow:0 4px 16px rgba(0,0,0,0.18);max-width:230px;font-family:inherit;font-size:10pt;user-select:none;overflow:hidden;}
+  #paramWin .fw-head{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:#f6f6f6;border-bottom:1px solid #d0d0d0;cursor:move;touch-action:none;}
   #paramWin .fw-head .fw-title{font-weight:bold;font-style:italic;font-size:10.5pt;color:#000;}
-  #paramWin .fw-head .fw-grip{display:inline-block;width:14px;height:8px;
-    background-image:linear-gradient(#333 1.5px, transparent 1.5px);
-    background-size:100% 3px;opacity:.7;}
+  #paramWin .fw-head .fw-grip{display:inline-block;width:14px;height:8px;background-image:linear-gradient(#333 1.5px, transparent 1.5px);background-size:100% 3px;opacity:.7;}
   #paramWin .fw-body{padding:8px 10px 10px;max-height:380px;overflow-y:auto;}
-
   .param{margin-bottom:6px;}
   .param:last-child{margin-bottom:0;}
-  .param-row{display:flex;justify-content:space-between;align-items:baseline;
-    font-size:10pt;margin-bottom:2px;gap:6px;}
+  .param-row{display:flex;justify-content:space-between;align-items:baseline;font-size:10pt;margin-bottom:2px;gap:6px;}
   .param-row .name{font-style:italic;color:#000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .param-row .value{font-weight:bold;color:#000;white-space:nowrap;font-size:10pt;}
-  .param input[type="range"]{width:100%;-webkit-appearance:none;appearance:none;
-    height:3.5px;background:#000;outline:none;cursor:pointer;display:block;border-radius:0;}
-  .param input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
-    width:12px;height:12px;border-radius:50%;background:#000;border:none;cursor:grab;}
-  .param input[type="range"]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;
-    background:#000;border:none;cursor:grab;}
-
-  .toast{position:fixed;bottom:18px;left:50%;
-    transform:translateX(-50%) translateY(60px);
-    background:#000;color:#fff;padding:7px 16px;
-    font-size:11.5pt;font-style:italic;font-weight:bold;
-    opacity:0;pointer-events:none;
-    transition:opacity .22s, transform .22s;z-index:900;border-radius:3px;}
+  .param input[type="range"]{width:100%;-webkit-appearance:none;appearance:none;height:3.5px;background:#000;outline:none;cursor:pointer;display:block;border-radius:0;}
+  .param input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:12px;height:12px;border-radius:50%;background:#000;border:none;cursor:grab;}
+  .param input[type="range"]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#000;border:none;cursor:grab;}
+  .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(60px);background:#000;color:#fff;padding:7px 16px;font-size:11.5pt;font-style:italic;font-weight:bold;opacity:0;pointer-events:none;transition:opacity .22s, transform .22s;z-index:900;border-radius:3px;}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 </style>
 </head>
@@ -176,18 +123,31 @@
   <div class="stage">
     <div class="row-main">
       <div class="sim-wrap">
-        <div class="panel" id="simPanel"><canvas id="simCanvas"></canvas></div>
+        <div class="panel" id="simPanel">
+          <canvas id="simCanvas"></canvas>
+          <div class="stopwatch" id="stopwatch">
+            <div class="sw-time" id="swTime">0.000<span class="sw-unit">s</span></div>
+            <div class="sw-buttons">
+              <button class="sw-btn primary" id="swStart">Start</button>
+              <button class="sw-btn" id="swStop">Stop</button>
+              <button class="sw-btn" id="swReset">Reset</button>
+            </div>
+          </div>
+        </div>
         <div class="control-row">
           <button class="btn" id="btnRelease">Release</button>
           <button class="btn" id="btnPause">Pause</button>
           <button class="btn" id="btnReset">Reset</button>
-          <label class="vec-toggle" title="Show x, F and v arrows">
-            <input type="checkbox" id="vecToggle" checked>
-            <span>Vectors (x, F, v)</span>
-          </label>
+          <div class="form-toggle" title="Choose the initial condition">
+            <span>Initial condition:</span>
+            <label><input type="radio" name="initForm" value="cos" checked> x = A cos(ωt)</label>
+            <label><input type="radio" name="initForm" value="sin"> x = A sin(ωt)</label>
+          </div>
         </div>
       </div>
-      <div class="panel circ-panel" id="circPanel"><canvas id="circCanvas"></canvas></div>
+      <div class="panel circ-panel" id="circPanel">
+        <canvas id="circCanvas"></canvas>
+      </div>
     </div>
 
     <div class="row-graphs">
@@ -217,9 +177,9 @@
         </div>
         <div class="data-col">
           <h3>Energy distribution</h3>
-          <div class="energy-item ke"><span class="lbl">K = ½mv²</span><span class="track"><span class="fill" id="barKE"></span></span><span class="val" id="valKE">0%</span></div>
-          <div class="energy-item pe"><span class="lbl">U = ½kx²</span><span class="track"><span class="fill" id="barPE"></span></span><span class="val" id="valPE">100%</span></div>
-          <div class="energy-item total"><span class="lbl">E_total</span><span class="track"><span class="fill" id="barTE" style="width:100%;"></span></span><span class="val" id="valTE">100%</span></div>
+          <div class="energy-item ke"><span class="lbl">Kinetic</span><span class="track"><span class="fill" id="barKE"></span></span><span class="val" id="valKE">0%</span></div>
+          <div class="energy-item pe"><span class="lbl">Potential</span><span class="track"><span class="fill" id="barPE"></span></span><span class="val" id="valPE">100%</span></div>
+          <div class="energy-item total"><span class="lbl">Total</span><span class="track"><span class="fill" id="barTE" style="width:100%;"></span></span><span class="val" id="valTE">100%</span></div>
           <div class="energy-total-line"><span class="k">Total energy</span><span class="v" id="readEtotal">1.90 mJ</span></div>
         </div>
       </div>
@@ -237,12 +197,13 @@
 <script>
 const PI = Math.PI, TWO_PI = 2*PI, DEG = PI/180;
 const FONT = '"Times New Roman", Times, Georgia, serif';
-let showVectors = true;
 
 const state = {
   caseId: 'pendulum',
+  initForm: 'cos',
   x: 0, v: 0, t: 0, phi: 0,
   running:false, history:[], lastCrossT:null, measuredT:null,
+  sw: { running:false, t0: null, elapsed: 0 },
   L:1.00, m:0.20, g:9.81, b:0.00, A:0.25,
   theta0:8*DEG, k:20,
   Lp:0.80, theta0p:30*DEG,
@@ -253,56 +214,26 @@ const state = {
 };
 
 function drawGridPaper(){
-  ctx.fillStyle='#fdfcf6'; ctx.fillRect(0,0,SIM_VW,SIM_VH);
-  ctx.strokeStyle='rgba(140,195,140,0.42)'; ctx.lineWidth=1;
+  ctx.fillStyle = '#fdfcf6';
+  ctx.fillRect(0, 0, SIM_VW, SIM_VH);
+  ctx.strokeStyle = 'rgba(140, 195, 140, 0.42)';
+  ctx.lineWidth = 1;
   ctx.beginPath();
-  for (let x=0;x<=SIM_VW;x+=20){ ctx.moveTo(x+0.5,0); ctx.lineTo(x+0.5,SIM_VH); }
-  for (let y=0;y<=SIM_VH;y+=20){ ctx.moveTo(0,y+0.5); ctx.lineTo(SIM_VW,y+0.5); }
+  for (let x = 0; x <= SIM_VW; x += 20){ ctx.moveTo(x+0.5,0); ctx.lineTo(x+0.5,SIM_VH); }
+  for (let y = 0; y <= SIM_VH; y += 20){ ctx.moveTo(0,y+0.5); ctx.lineTo(SIM_VW,y+0.5); }
   ctx.stroke();
-  ctx.strokeStyle='rgba(225,130,130,0.55)'; ctx.lineWidth=1.2;
+  ctx.strokeStyle = 'rgba(225, 130, 130, 0.55)';
+  ctx.lineWidth = 1.2;
   ctx.beginPath();
-  for (let x=0;x<=SIM_VW;x+=100){ ctx.moveTo(x+0.5,0); ctx.lineTo(x+0.5,SIM_VH); }
-  for (let y=0;y<=SIM_VH;y+=100){ ctx.moveTo(0,y+0.5); ctx.lineTo(SIM_VW,y+0.5); }
+  for (let x = 0; x <= SIM_VW; x += 100){ ctx.moveTo(x+0.5,0); ctx.lineTo(x+0.5,SIM_VH); }
+  for (let y = 0; y <= SIM_VH; y += 100){ ctx.moveTo(0,y+0.5); ctx.lineTo(SIM_VW,y+0.5); }
   ctx.stroke();
-}
-
-function drawArrow(g, x1, y1, x2, y2, color, label){
-  const dx = x2-x1, dy = y2-y1;
-  const len = Math.hypot(dx, dy);
-  if (len < 4) return;
-  const ang = Math.atan2(dy, dx);
-  const head = Math.min(12, len*0.32);
-  g.strokeStyle = color; g.fillStyle = color; g.lineWidth = 2.4;
-  g.beginPath();
-  g.moveTo(x1, y1);
-  g.lineTo(x2 - head*0.9*Math.cos(ang), y2 - head*0.9*Math.sin(ang));
-  g.stroke();
-  g.beginPath();
-  g.moveTo(x2, y2);
-  g.lineTo(x2 - head*Math.cos(ang - 0.45), y2 - head*Math.sin(ang - 0.45));
-  g.lineTo(x2 - head*Math.cos(ang + 0.45), y2 - head*Math.sin(ang + 0.45));
-  g.closePath(); g.fill();
-  if (label){
-    g.font = 'bold italic 18px ' + FONT;
-    g.textAlign = 'center'; g.textBaseline = 'middle';
-    g.fillText(label, x2 + Math.cos(ang)*18, y2 + Math.sin(ang)*18);
-  }
-}
-
-function lineSegDist(px, py, x1, y1, x2, y2){
-  const dx = x2-x1, dy = y2-y1;
-  const l2 = dx*dx + dy*dy;
-  if (l2 < 1) return Math.hypot(px-x1, py-y1);
-  let t = ((px-x1)*dx + (py-y1)*dy) / l2;
-  t = Math.max(0, Math.min(1, t));
-  return Math.hypot(px - (x1+t*dx), py - (y1+t*dy));
 }
 
 const CASES = {};
 
 CASES['spring-h'] = {
-  label:'Spring (horizontal)',
-  xUnit:'m', vUnit:'m s⁻¹', aUnit:'m s⁻²', yUnitDeg:false, ampKey:'A',
+  label:'Spring (horizontal)', xUnit:'m', vUnit:'m s⁻¹', aUnit:'m s⁻²', yUnitDeg:false, ampKey:'A',
   params:[
     { key:'m', label:'Mass', sym:'m', unit:'kg', min:0.05, max:2.00, step:0.01, dec:2 },
     { key:'k', label:'Spring const.', sym:'k', unit:'N m⁻¹', min:2, max:60, step:0.5, dec:1 },
@@ -320,8 +251,7 @@ CASES['spring-h'] = {
 };
 
 CASES['spring-v'] = {
-  label:'Spring (vertical)',
-  xUnit:'m', vUnit:'m s⁻¹', aUnit:'m s⁻²', yUnitDeg:false, ampKey:'A',
+  label:'Spring (vertical)', xUnit:'m', vUnit:'m s⁻¹', aUnit:'m s⁻²', yUnitDeg:false, ampKey:'A',
   params:[
     { key:'m', label:'Mass', sym:'m', unit:'kg', min:0.05, max:2.00, step:0.01, dec:2 },
     { key:'k', label:'Spring const.', sym:'k', unit:'N m⁻¹', min:2, max:60, step:0.5, dec:1 },
@@ -339,8 +269,7 @@ CASES['spring-v'] = {
 };
 
 CASES['spring-double'] = {
-  label:'Double spring',
-  xUnit:'m', vUnit:'m s⁻¹', aUnit:'m s⁻²', yUnitDeg:false, ampKey:'A',
+  label:'Double spring', xUnit:'m', vUnit:'m s⁻¹', aUnit:'m s⁻²', yUnitDeg:false, ampKey:'A',
   params:[
     { key:'m', label:'Mass', sym:'m', unit:'kg', min:0.05, max:2.00, step:0.01, dec:2 },
     { key:'k', label:'Each spring const.', sym:'k', unit:'N m⁻¹', min:2, max:60, step:0.5, dec:1 },
@@ -358,8 +287,7 @@ CASES['spring-double'] = {
 };
 
 CASES['pendulum'] = {
-  label:'Pendulum',
-  xUnit:'°', vUnit:'rad s⁻¹', aUnit:'rad s⁻²', yUnitDeg:true, ampKey:'theta0',
+  label:'Pendulum', xUnit:'°', vUnit:'rad s⁻¹', aUnit:'rad s⁻²', yUnitDeg:true, ampKey:'theta0',
   params:[
     { key:'L', label:'Length', sym:'L', unit:'m', min:0.40, max:3.00, step:0.02, dec:2 },
     { key:'m', label:'Mass', sym:'m', unit:'kg', min:0.05, max:1.00, step:0.01, dec:2 },
@@ -375,7 +303,7 @@ CASES['pendulum'] = {
   energyFormula:()=>state.m*state.g*state.L*(1-Math.cos(state.theta0)),
   getHandle:()=>{
     const PX=SIM_VW/2, PY=80, Lv=140+state.L*70;
-    return {x:PX+Lv*Math.sin(state.x), y:PY+Lv*Math.cos(state.x), r:14+state.m*10+20};
+    return {x:PX+Lv*Math.sin(state.x), y:PY+Lv*Math.cos(state.x), r:14+state.m*10+16};
   },
   dragTo:(vx,vy)=>{
     const PX=SIM_VW/2, PY=80;
@@ -388,8 +316,7 @@ CASES['pendulum'] = {
 };
 
 CASES['physical-pendulum'] = {
-  label:'Physical pendulum',
-  xUnit:'°', vUnit:'rad s⁻¹', aUnit:'rad s⁻²', yUnitDeg:true, ampKey:'theta0p',
+  label:'Physical pendulum', xUnit:'°', vUnit:'rad s⁻¹', aUnit:'rad s⁻²', yUnitDeg:true, ampKey:'theta0p',
   params:[
     { key:'Lp', label:'Rod length', sym:'L', unit:'m', min:0.20, max:1.80, step:0.02, dec:2 },
     { key:'m', label:'Rod mass', sym:'m', unit:'kg', min:0.05, max:1.50, step:0.05, dec:2 },
@@ -403,27 +330,22 @@ CASES['physical-pendulum'] = {
   formula:'T = 2&pi; &radic;( 2L / 3g )',
   render:renderPhysicalPendulum,
   energyFormula:()=>state.m*state.g*(state.Lp/2)*(1-Math.cos(state.theta0p)),
-  hitTestRod: (v)=>{
-    const PX=SIM_VW/2, PY=80;
-    const rodLen = 130 + state.Lp*150;
-    const tipX = PX + rodLen*Math.sin(state.x);
-    const tipY = PY + rodLen*Math.cos(state.x);
-    return lineSegDist(v.x, v.y, PX, PY, tipX, tipY) < 34;
+  getHandle:()=>{
+    const PX=SIM_VW/2, PY=80, rodLen=130+state.Lp*150;
+    return {x:PX+rodLen*Math.sin(state.x), y:PY+rodLen*Math.cos(state.x), r:40};
   },
   dragTo:(vx,vy)=>{
     const PX=SIM_VW/2, PY=80;
-    let th = Math.atan2(vx - PX, vy - PY);
-    const max = 70*DEG;
-    th = Math.max(-max, Math.min(max, th));
-    state.x = th;
-    state.v = 0;
+    let th=Math.atan2(vx-PX, vy-PY);
+    const max=70*DEG;
+    th=Math.max(-max, Math.min(max, th));
+    state.x=th; state.v=0;
     updateParamSlider('theta0p', Math.abs(th)/DEG);
   }
 };
 
 CASES['torsional'] = {
-  label:'Torsional pendulum',
-  xUnit:'°', vUnit:'rad s⁻¹', aUnit:'rad s⁻²', yUnitDeg:true, ampKey:'theta0t',
+  label:'Torsional pendulum', xUnit:'°', vUnit:'rad s⁻¹', aUnit:'rad s⁻²', yUnitDeg:true, ampKey:'theta0t',
   params:[
     { key:'kappa', label:'Torsion const.', sym:'κ', unit:'N m rad⁻¹', min:0.05, max:5.00, step:0.05, dec:2 },
     { key:'I', label:'Moment of inertia', sym:'I', unit:'kg m²', min:0.005, max:0.200, step:0.005, dec:3 },
@@ -452,8 +374,7 @@ CASES['torsional'] = {
 };
 
 CASES['utube'] = {
-  label:'U-tube',
-  xUnit:'m', vUnit:'m s⁻¹', aUnit:'m s⁻²', yUnitDeg:false, ampKey:'A',
+  label:'U-tube', xUnit:'m', vUnit:'m s⁻¹', aUnit:'m s⁻²', yUnitDeg:false, ampKey:'A',
   params:[
     { key:'L', label:'Column length', sym:'L', unit:'m', min:0.40, max:3.00, step:0.02, dec:2 },
     { key:'A', label:'Amplitude', sym:'x', sub:'0', unit:'m', min:0.005, max:0.100, step:0.005, dec:3 },
@@ -465,9 +386,9 @@ CASES['utube'] = {
   formula:'T = 2&pi; &radic;( L / 2g )',
   render:renderUtube,
   energyFormula:()=>0.5*(2*state.g/state.L)*state.A*state.A,
-  getHandle:()=>({x:150, y:190 - state.x*600, r:44}),
+  getHandle:()=>({x:220, y:220 - state.x*800, r:35}),
   dragTo:(vx,vy)=>{
-    let x = (190 - vy) / 600;
+    let x = (220 - vy) / 800;
     x = Math.max(-0.10, Math.min(0.10, x));
     state.x = x; state.v = 0;
     updateParamSlider('A', Math.abs(x));
@@ -475,8 +396,7 @@ CASES['utube'] = {
 };
 
 CASES['floating'] = {
-  label:'Floating cylinder',
-  xUnit:'m', vUnit:'m s⁻¹', aUnit:'m s⁻²', yUnitDeg:false, ampKey:'A',
+  label:'Floating cylinder', xUnit:'m', vUnit:'m s⁻¹', aUnit:'m s⁻²', yUnitDeg:false, ampKey:'A',
   params:[
     { key:'h0c', label:'Equilibrium depth', sym:'h', sub:'0', unit:'m', min:0.05, max:0.25, step:0.005, dec:3 },
     { key:'A', label:'Amplitude', sym:'A', unit:'m', min:0.01, max:0.12, step:0.005, dec:3 },
@@ -506,8 +426,7 @@ CASES['floating'] = {
 };
 
 CASES['lc'] = {
-  label:'LC circuit',
-  xUnit:'mC', vUnit:'mA', aUnit:'mA s⁻¹', yUnitDeg:false, yScale:1000, ampKey:'Q0',
+  label:'LC circuit', xUnit:'mC', vUnit:'mA', aUnit:'mA s⁻¹', yUnitDeg:false, yScale:1000, ampKey:'Q0',
   params:[
     { key:'Lc', label:'Inductance', sym:'L', unit:'H', min:0.10, max:2.00, step:0.05, dec:2 },
     { key:'Cc', label:'Capacitance', sym:'C', unit:'mF', min:1.0, max:50.0, step:0.5, dec:1, scale:0.001 },
@@ -538,8 +457,7 @@ CASES['lc'] = {
 };
 
 CASES['forced'] = {
-  label:'Forced oscillation',
-  xUnit:'m', vUnit:'m s⁻¹', aUnit:'m s⁻²', yUnitDeg:false,
+  label:'Forced oscillation', xUnit:'m', vUnit:'m s⁻¹', aUnit:'m s⁻²', yUnitDeg:false,
   params:[
     { key:'m', label:'Mass', sym:'m', unit:'kg', min:0.20, max:2.00, step:0.05, dec:2 },
     { key:'k', label:'Spring const.', sym:'k', unit:'N m⁻¹', min:5, max:40, step:0.5, dec:1 },
@@ -624,6 +542,23 @@ function vScale(){
 }
 function yUnit(){ return currentCase().xUnit; }
 function vUnit(){ return currentCase().vUnit; }
+
+function setInitialState(){
+  const A = initX();
+  const w0 = omega0();
+  state.t = 0;
+  if (state.initForm === 'cos'){
+    state.x = A;
+    state.v = 0;
+    state.phi = 0;
+  } else {
+    state.x = 0;
+    state.v = A * w0;
+    state.phi = 3 * PI / 2;
+  }
+  state.history = [{t:0, x:state.x, v:state.v, a:accelFn(state.x, state.v, 0)}];
+  resetMeasurement();
+}
 
 function graphAmp(){
   const c = currentCase();
@@ -711,6 +646,7 @@ function rk4Step(h){
   state.t += h;
   state.phi += omega0()*h;
   while (state.phi >= TWO_PI) state.phi -= TWO_PI;
+  while (state.phi < 0) state.phi += TWO_PI;
   if (prevX < 0 && state.x >= 0){
     if (state.lastCrossT !== null) state.measuredT = state.t - state.lastCrossT;
     state.lastCrossT = state.t;
@@ -738,7 +674,6 @@ function renderSpringH(){
   drawGridPaper();
   const yEq=SIM_VH*0.52, xWall=90, xEq=SIM_VW*0.58, scale=180;
   const xMass=xEq+state.x*scale;
-
   ctx.strokeStyle='#333'; ctx.lineWidth=1.8;
   ctx.beginPath(); ctx.moveTo(30,yEq+80); ctx.lineTo(SIM_VW-30,yEq+80); ctx.stroke();
   ctx.lineWidth=1; ctx.strokeStyle='#888';
@@ -748,43 +683,25 @@ function renderSpringH(){
   ctx.fillStyle='#2c3e50'; ctx.fillRect(xWall-12,yEq-60,12,140);
   ctx.strokeStyle='#000'; ctx.lineWidth=1.4; ctx.strokeRect(xWall-12,yEq-60,12,140);
   drawSpring(xWall+4,yEq,xMass-40,yEq,12,14);
-
   const bw=76,bh=64,bx=xMass-bw/2,by=yEq-bh/2;
   const mg=ctx.createLinearGradient(bx,by,bx,by+bh);
   mg.addColorStop(0,'#f1f5f9'); mg.addColorStop(0.5,'#94a3b8'); mg.addColorStop(1,'#334155');
   ctx.fillStyle=mg; ctx.fillRect(bx,by,bw,bh);
   ctx.strokeStyle='#000'; ctx.lineWidth=1.6; ctx.strokeRect(bx,by,bw,bh);
-
-  ctx.fillStyle='#000'; ctx.font='bold 20px '+FONT;
+  ctx.fillStyle='#000'; ctx.font='bold 22px '+FONT;
   ctx.textAlign='center'; ctx.textBaseline='middle';
   ctx.fillText(state.m.toFixed(2)+' kg', xMass, yEq);
-
-  ctx.save(); ctx.setLineDash([7,6]); ctx.strokeStyle='#666'; ctx.lineWidth=1.4;
-  ctx.beginPath(); ctx.moveTo(xEq, 50); ctx.lineTo(xEq, yEq+80); ctx.stroke(); ctx.restore();
-  ctx.fillStyle='#333'; ctx.font='bold italic 16px '+FONT;
+  ctx.save(); ctx.setLineDash([7,6]); ctx.strokeStyle='#333'; ctx.lineWidth=1.4;
+  ctx.beginPath(); ctx.moveTo(xEq,50); ctx.lineTo(xEq,yEq+80); ctx.stroke(); ctx.restore();
+  ctx.fillStyle='#000'; ctx.font='bold italic 20px '+FONT;
   ctx.textAlign='center'; ctx.textBaseline='alphabetic';
-  ctx.fillText('equilibrium', xEq, 42);
-
-  if (showVectors){
-    drawArrow(ctx, xEq, yEq-100, xMass, yEq-100, '#1d4ed8', 'x');
-    if (Math.abs(state.x) > 0.005){
-      const Fdir = state.x > 0 ? -1 : 1;
-      const Fmag = Math.min(Math.abs(state.x)*scale*1.4, 110);
-      drawArrow(ctx, xMass, yEq+95, xMass + Fdir*Fmag, yEq+95, '#dc2626', 'F');
-    }
-    if (state.running && Math.abs(state.v) > 0.01){
-      const vdir = Math.sign(state.v);
-      const vlen = Math.min(Math.abs(state.v)*22, 100);
-      drawArrow(ctx, xMass, yEq-40, xMass + vdir*vlen, yEq-40, '#0a7d2b', 'v');
-    }
-  }
+  ctx.fillText('equilibrium', xEq, 40);
 }
 
 function renderSpringV(){
   drawGridPaper();
   const xC=SIM_VW/2, yCeil=55, yEq=SIM_VH*0.55, scale=260;
   const yMass=yEq+state.x*scale;
-
   ctx.fillStyle='#2c3e50'; ctx.fillRect(xC-130,yCeil-18,260,10);
   ctx.strokeStyle='#2c3e50'; ctx.lineWidth=1.6;
   for (let i=-130;i<=130;i+=16){
@@ -793,43 +710,25 @@ function renderSpringV(){
   ctx.fillStyle='#555'; ctx.fillRect(xC-24,yCeil-8,48,10);
   ctx.strokeStyle='#000'; ctx.lineWidth=1.4; ctx.strokeRect(xC-24,yCeil-8,48,10);
   drawSpring(xC,yCeil,xC,yMass-32,14,13);
-
   const bw=86,bh=64,bx=xC-bw/2,by=yMass-bh/2;
   const mg=ctx.createLinearGradient(bx,by,bx+bw,by+bh);
   mg.addColorStop(0,'#f1f5f9'); mg.addColorStop(0.4,'#94a3b8'); mg.addColorStop(1,'#334155');
   ctx.fillStyle=mg; ctx.fillRect(bx,by,bw,bh);
   ctx.strokeStyle='#000'; ctx.lineWidth=1.6; ctx.strokeRect(bx,by,bw,bh);
-
-  ctx.fillStyle='#000'; ctx.font='bold 20px '+FONT;
+  ctx.fillStyle='#000'; ctx.font='bold 22px '+FONT;
   ctx.textAlign='center'; ctx.textBaseline='middle';
   ctx.fillText(state.m.toFixed(2)+' kg', xC, yMass);
-
-  ctx.save(); ctx.setLineDash([7,6]); ctx.strokeStyle='#666'; ctx.lineWidth=1.4;
-  ctx.beginPath(); ctx.moveTo(xC-150, yEq); ctx.lineTo(xC+150, yEq); ctx.stroke(); ctx.restore();
-  ctx.fillStyle='#333'; ctx.font='bold italic 16px '+FONT;
+  ctx.save(); ctx.setLineDash([7,6]); ctx.strokeStyle='#333'; ctx.lineWidth=1.4;
+  ctx.beginPath(); ctx.moveTo(xC-140,yEq); ctx.lineTo(xC+140,yEq); ctx.stroke(); ctx.restore();
+  ctx.fillStyle='#000'; ctx.font='bold italic 20px '+FONT;
   ctx.textAlign='right'; ctx.textBaseline='middle';
-  ctx.fillText('equilibrium', xC-156, yEq);
-
-  if (showVectors){
-    drawArrow(ctx, xC+100, yEq, xC+100, yMass, '#1d4ed8', 'x');
-    if (Math.abs(state.x) > 0.005){
-      const Fdir = state.x > 0 ? -1 : 1;
-      const Fmag = Math.min(Math.abs(state.x)*scale*1.4, 130);
-      drawArrow(ctx, xC+150, yMass, xC+150, yMass + Fdir*Fmag, '#dc2626', 'F');
-    }
-    if (state.running && Math.abs(state.v) > 0.01){
-      const vdir = Math.sign(state.v);
-      const vlen = Math.min(Math.abs(state.v)*30, 110);
-      drawArrow(ctx, xC-90, yMass, xC-90, yMass + vdir*vlen, '#0a7d2b', 'v');
-    }
-  }
+  ctx.fillText('equilibrium', xC-146, yEq);
 }
 
 function renderSpringDouble(){
   drawGridPaper();
   const yEq=SIM_VH*0.52, xWallL=90, xWallR=SIM_VW-90, xEq=SIM_VW/2, scale=170;
   const xMass=xEq+state.x*scale;
-
   ctx.strokeStyle='#333'; ctx.lineWidth=1.8;
   ctx.beginPath(); ctx.moveTo(30,yEq+80); ctx.lineTo(SIM_VW-30,yEq+80); ctx.stroke();
   ctx.lineWidth=1; ctx.strokeStyle='#888';
@@ -840,46 +739,27 @@ function renderSpringDouble(){
   ctx.fillRect(xWallL-12,yEq-60,12,140); ctx.fillRect(xWallR,yEq-60,12,140);
   ctx.strokeStyle='#000'; ctx.lineWidth=1.4;
   ctx.strokeRect(xWallL-12,yEq-60,12,140); ctx.strokeRect(xWallR,yEq-60,12,140);
-
   if (xMass-38>xWallL+4) drawSpring(xWallL+4,yEq,xMass-38,yEq,10,13);
   if (xMass+38<xWallR-4) drawSpring(xMass+38,yEq,xWallR-4,yEq,10,13);
-
   const bw=76,bh=64,bx=xMass-bw/2,by=yEq-bh/2;
   const mg=ctx.createLinearGradient(bx,by,bx,by+bh);
   mg.addColorStop(0,'#f1f5f9'); mg.addColorStop(0.5,'#94a3b8'); mg.addColorStop(1,'#334155');
   ctx.fillStyle=mg; ctx.fillRect(bx,by,bw,bh);
   ctx.strokeStyle='#000'; ctx.lineWidth=1.6; ctx.strokeRect(bx,by,bw,bh);
-
-  ctx.fillStyle='#000'; ctx.font='bold 20px '+FONT;
+  ctx.fillStyle='#000'; ctx.font='bold 22px '+FONT;
   ctx.textAlign='center'; ctx.textBaseline='middle';
   ctx.fillText(state.m.toFixed(2)+' kg', xMass, yEq);
-
-  ctx.save(); ctx.setLineDash([7,6]); ctx.strokeStyle='#666'; ctx.lineWidth=1.4;
-  ctx.beginPath(); ctx.moveTo(xEq, 50); ctx.lineTo(xEq, yEq+80); ctx.stroke(); ctx.restore();
-  ctx.fillStyle='#333'; ctx.font='bold italic 16px '+FONT;
+  ctx.save(); ctx.setLineDash([7,6]); ctx.strokeStyle='#333'; ctx.lineWidth=1.4;
+  ctx.beginPath(); ctx.moveTo(xEq,50); ctx.lineTo(xEq,yEq+80); ctx.stroke(); ctx.restore();
+  ctx.fillStyle='#000'; ctx.font='bold italic 20px '+FONT;
   ctx.textAlign='center'; ctx.textBaseline='alphabetic';
-  ctx.fillText('equilibrium', xEq, 42);
-
-  if (showVectors){
-    drawArrow(ctx, xEq, yEq-100, xMass, yEq-100, '#1d4ed8', 'x');
-    if (Math.abs(state.x) > 0.005){
-      const Fdir = state.x > 0 ? -1 : 1;
-      const Fmag = Math.min(Math.abs(state.x)*scale*1.4, 100);
-      drawArrow(ctx, xMass, yEq+95, xMass + Fdir*Fmag, yEq+95, '#dc2626', 'F');
-    }
-    if (state.running && Math.abs(state.v) > 0.01){
-      const vdir = Math.sign(state.v);
-      const vlen = Math.min(Math.abs(state.v)*22, 100);
-      drawArrow(ctx, xMass, yEq-40, xMass + vdir*vlen, yEq-40, '#0a7d2b', 'v');
-    }
-  }
+  ctx.fillText('equilibrium', xEq, 40);
 }
 
 function renderPendulum(){
   drawGridPaper();
   const PX=SIM_VW/2, PY=80, Lv=140+state.L*70, br=14+state.m*10, th=state.x;
   const bx=PX+Lv*Math.sin(th), by=PY+Lv*Math.cos(th);
-
   ctx.fillStyle='#2c3e50'; ctx.fillRect(PX-120,PY-16,240,8);
   ctx.strokeStyle='#2c3e50'; ctx.lineWidth=1.6;
   for (let i=-120;i<=120;i+=14){
@@ -892,15 +772,12 @@ function renderPendulum(){
     ctx.strokeStyle='#c8c8c8'; ctx.lineWidth=1.2; ctx.setLineDash([4,5]); ctx.stroke();
     ctx.restore();
   }
-  ctx.save(); ctx.setLineDash([7,6]); ctx.strokeStyle='#666'; ctx.lineWidth=1.2;
+  ctx.save(); ctx.setLineDash([7,6]); ctx.strokeStyle='#555'; ctx.lineWidth=1.2;
   ctx.beginPath(); ctx.moveTo(PX,PY); ctx.lineTo(PX,PY+Lv+30); ctx.stroke(); ctx.restore();
-
   ctx.beginPath(); ctx.moveTo(PX,PY); ctx.lineTo(bx,by);
   ctx.strokeStyle='#111'; ctx.lineWidth=2; ctx.stroke();
-
   ctx.beginPath(); ctx.arc(PX,PY,7,0,TWO_PI); ctx.fillStyle='#111'; ctx.fill();
   ctx.beginPath(); ctx.arc(PX,PY,3,0,TWO_PI); ctx.fillStyle='#aaa'; ctx.fill();
-
   const grad=ctx.createRadialGradient(bx-br*0.35,by-br*0.35,br*0.12,bx,by,br);
   grad.addColorStop(0,'#fff'); grad.addColorStop(0.35,'#cbd5e1');
   grad.addColorStop(0.75,'#64748b'); grad.addColorStop(1,'#1e293b');
@@ -908,93 +785,43 @@ function renderPendulum(){
   ctx.strokeStyle='#000'; ctx.lineWidth=1.6; ctx.stroke();
   ctx.beginPath(); ctx.arc(bx-br*0.32,by-br*0.32,br*0.22,0,TWO_PI);
   ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.fill();
-
   if (Math.abs(th)>0.008){
     const arcR=60;
     ctx.save(); ctx.beginPath();
     ctx.arc(PX,PY,arcR,PI/2-th,PI/2,th>0);
     ctx.strokeStyle='#1d4ed8'; ctx.lineWidth=2; ctx.stroke(); ctx.restore();
     const midAng=PI/2-th/2;
-    ctx.fillStyle='#1d4ed8'; ctx.font='bold italic 22px '+FONT;
+    ctx.fillStyle='#1d4ed8'; ctx.font='bold italic 26px '+FONT;
     ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.fillText('θ', PX+(arcR+22)*Math.cos(midAng), PY+(arcR+22)*Math.sin(midAng));
-  }
-
-  if (showVectors){
-    if (Math.abs(th) > 0.008){
-      const tangX = Math.cos(th), tangY = -Math.sin(th);
-      const Fdir = -Math.sign(th);
-      const Fmag = Math.min(Math.abs(th) * 300, 110);
-      drawArrow(ctx, bx, by, bx + Fdir*tangX*Fmag, by + Fdir*tangY*Fmag, '#dc2626', 'F');
-    }
-    if (state.running && Math.abs(state.v) * state.L > 0.005){
-      const tangX = Math.cos(th), tangY = -Math.sin(th);
-      const vdir = Math.sign(state.v);
-      const vlen = Math.min(Math.abs(state.v) * state.L * 90, 100);
-      drawArrow(ctx, bx, by, bx + vdir*tangX*vlen, by + vdir*tangY*vlen, '#0a7d2b', 'v');
-    }
   }
 }
 
 function renderPhysicalPendulum(){
   drawGridPaper();
   const PX=SIM_VW/2, PY=80, rodLen=130+state.Lp*150, rodW=16, th=state.x;
-
   ctx.fillStyle='#2c3e50'; ctx.fillRect(PX-120,PY-16,240,8);
   ctx.strokeStyle='#2c3e50'; ctx.lineWidth=1.6;
   for (let i=-120;i<=120;i+=14){
     ctx.beginPath(); ctx.moveTo(PX+i,PY-16); ctx.lineTo(PX+i-9,PY-26); ctx.stroke();
   }
-  ctx.save(); ctx.setLineDash([7,6]); ctx.strokeStyle='#666'; ctx.lineWidth=1.2;
+  ctx.save(); ctx.setLineDash([7,6]); ctx.strokeStyle='#555'; ctx.lineWidth=1.2;
   ctx.beginPath(); ctx.moveTo(PX,PY); ctx.lineTo(PX,PY+rodLen+30); ctx.stroke(); ctx.restore();
-
   ctx.save(); ctx.translate(PX,PY); ctx.rotate(th);
   const rg=ctx.createLinearGradient(-rodW/2,0,rodW/2,0);
   rg.addColorStop(0,'#f1f5f9'); rg.addColorStop(0.45,'#94a3b8'); rg.addColorStop(1,'#334155');
   ctx.fillStyle=rg; ctx.fillRect(-rodW/2,0,rodW,rodLen);
   ctx.strokeStyle='#000'; ctx.lineWidth=1.6; ctx.strokeRect(-rodW/2,0,rodW,rodLen);
   ctx.restore();
-
   const cmx=PX+(rodLen/2)*Math.sin(th), cmy=PY+(rodLen/2)*Math.cos(th);
   ctx.beginPath(); ctx.arc(cmx,cmy,7,0,TWO_PI); ctx.fillStyle='#b91c1c'; ctx.fill();
   ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
-  ctx.fillStyle='#b91c1c'; ctx.font='bold italic 14px '+FONT;
-  ctx.textAlign='left'; ctx.textBaseline='middle';
-  ctx.fillText('CM', cmx+12, cmy);
-
   ctx.beginPath(); ctx.arc(PX,PY,7,0,TWO_PI); ctx.fillStyle='#111'; ctx.fill();
-
-  if (Math.abs(th) > 0.008){
-    const arcR=70;
-    ctx.save(); ctx.beginPath();
-    ctx.arc(PX,PY,arcR,PI/2-th,PI/2,th>0);
-    ctx.strokeStyle='#1d4ed8'; ctx.lineWidth=2; ctx.stroke(); ctx.restore();
-    const midAng=PI/2-th/2;
-    ctx.fillStyle='#1d4ed8'; ctx.font='bold italic 22px '+FONT;
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText('θ', PX+(arcR+22)*Math.cos(midAng), PY+(arcR+22)*Math.sin(midAng));
-  }
-
-  if (showVectors){
-    if (Math.abs(th) > 0.008){
-      const tangX = Math.cos(th), tangY = -Math.sin(th);
-      const Fdir = -Math.sign(th);
-      const Fmag = Math.min(Math.abs(th) * 200, 100);
-      drawArrow(ctx, cmx, cmy, cmx + Fdir*tangX*Fmag, cmy + Fdir*tangY*Fmag, '#dc2626', 'F');
-    }
-    if (state.running && Math.abs(state.v) > 0.01){
-      const tangX = Math.cos(th), tangY = -Math.sin(th);
-      const vdir = Math.sign(state.v);
-      const vlen = Math.min(Math.abs(state.v) * 60, 90);
-      drawArrow(ctx, cmx, cmy, cmx + vdir*tangX*vlen, cmy + vdir*tangY*vlen, '#0a7d2b', 'v');
-    }
-  }
 }
 
 function renderTorsional(){
   drawGridPaper();
   const cx=SIM_VW/2, cyCeil=80, cyDisc=340, aD=130, bD=48, th=state.x;
-
   ctx.fillStyle='#2c3e50'; ctx.fillRect(cx-110,cyCeil-14,220,8);
   ctx.strokeStyle='#2c3e50'; ctx.lineWidth=1.6;
   for (let i=-110;i<=110;i+=14){
@@ -1002,12 +829,10 @@ function renderTorsional(){
   }
   ctx.strokeStyle='#2c3e50'; ctx.lineWidth=3;
   ctx.beginPath(); ctx.moveTo(cx,cyCeil); ctx.lineTo(cx,cyDisc); ctx.stroke();
-
   ctx.beginPath(); ctx.ellipse(cx,cyDisc,aD,bD,0,0,TWO_PI);
   const dg=ctx.createRadialGradient(cx-aD*0.3,cyDisc-bD*0.3,10,cx,cyDisc,aD);
   dg.addColorStop(0,'#f1f5f9'); dg.addColorStop(0.55,'#94a3b8'); dg.addColorStop(1,'#334155');
   ctx.fillStyle=dg; ctx.fill(); ctx.strokeStyle='#000'; ctx.lineWidth=2.4; ctx.stroke();
-
   const rdx=aD*Math.cos(th), rdy=bD*Math.sin(th);
   ctx.strokeStyle='#b91c1c'; ctx.lineWidth=3.5;
   ctx.beginPath(); ctx.moveTo(cx-rdx,cyDisc-rdy); ctx.lineTo(cx+rdx,cyDisc+rdy); ctx.stroke();
@@ -1016,68 +841,45 @@ function renderTorsional(){
 
 function renderUtube(){
   drawGridPaper();
+  const cxL = 220, cxR = 400, armW = 50, wallW = 8;
+  const topY = 70, cyBend = 380;
+  const innerL = cxL - armW/2, innerR = cxR + armW/2;
+  const outerL = innerL - wallW, outerR = innerR + wallW;
+  const bendCx = (innerL + innerR) / 2;
+  const rInner = (innerR - innerL) / 2, rOuter = rInner + wallW;
+  const yEq = 220, vScalePx = 800;
+  const yL = yEq - state.x * vScalePx;
+  const yR = yEq + state.x * vScalePx;
 
-  const topY = 55;
-  const bendTopY = 340;
-
-  const innerL = 175;
-  const armW   = 52;
-  const gapW   = 60;
-  const armInnerL = innerL + armW;
-  const armInnerR = armInnerL + gapW;
-  const innerR    = armInnerR + armW;
-  const bendCx    = (innerL + innerR) / 2;
-  const innerRad  = (innerR - innerL) / 2;
-
-  const wallW  = 10;
-  const outerL = innerL - wallW;
-  const outerR = innerR + wallW;
-  const outerRad = innerRad + wallW;
-
-  const innerBottomY = bendTopY + innerRad;
-
-  const yEq  = 190;
-  const vPx  = 600;
-  const yL   = yEq - state.x * vPx;
-  const yR   = yEq + state.x * vPx;
+  ctx.beginPath();
+  ctx.moveTo(innerL, topY); ctx.lineTo(innerL, cyBend);
+  ctx.arc(bendCx, cyBend, rInner, PI, 0, true);
+  ctx.lineTo(innerR, topY); ctx.closePath();
+  ctx.fillStyle = '#f4fafd'; ctx.fill();
 
   ctx.save();
   ctx.beginPath();
-  ctx.moveTo(innerL, topY);
-  ctx.lineTo(innerL, bendTopY);
-  ctx.arc(bendCx, bendTopY, innerRad, PI, 0, true);
-  ctx.lineTo(innerR, topY);
-  ctx.closePath();
+  ctx.moveTo(innerL, topY); ctx.lineTo(innerL, cyBend);
+  ctx.arc(bendCx, cyBend, rInner, PI, 0, true);
+  ctx.lineTo(innerR, topY); ctx.closePath();
   ctx.clip();
 
-  const lg = ctx.createLinearGradient(0, yEq - 40, 0, innerBottomY);
-  lg.addColorStop(0.00, '#8ecbf0');
-  lg.addColorStop(0.35, '#4095cb');
-  lg.addColorStop(0.70, '#1d6ba0');
-  lg.addColorStop(1.00, '#0d3554');
-  ctx.fillStyle = lg;
-  ctx.fillRect(0, 0, SIM_VW, SIM_VH);
+  const lg = ctx.createLinearGradient(0, topY, 0, cyBend + rInner);
+  lg.addColorStop(0.00, '#a2d5ee'); lg.addColorStop(0.35, '#5aa9d4');
+  lg.addColorStop(0.70, '#1d6ba0'); lg.addColorStop(1.00, '#0a3a5c');
+  ctx.fillStyle = lg; ctx.fillRect(0, 0, SIM_VW, SIM_VH);
 
-  ctx.fillStyle = '#eaf3f9';
-  ctx.fillRect(innerL - 2, topY - 2, armW + 4, yL - topY + 4);
-  ctx.fillRect(innerR - armW - 2, topY - 2, armW + 4, yR - topY + 4);
+  ctx.fillStyle = '#f4fafd';
+  ctx.fillRect(innerL, topY - 5, armW, yL - topY + 5);
+  ctx.fillRect(innerR - armW, topY - 5, armW, yR - topY + 5);
 
-  ctx.fillStyle = '#fdfcf6';
-  ctx.fillRect(armInnerL, topY, armInnerR - armInnerL, bendTopY - topY);
+  const sL = ctx.createLinearGradient(innerL, 0, innerL+armW, 0);
+  sL.addColorStop(0, 'rgba(0,0,0,0.20)'); sL.addColorStop(0.5, 'rgba(255,255,255,0.10)'); sL.addColorStop(1, 'rgba(0,0,0,0.04)');
+  ctx.fillStyle = sL; ctx.fillRect(innerL, yL, armW, SIM_VH - yL);
 
-  const sL = ctx.createLinearGradient(innerL, 0, innerL + armW, 0);
-  sL.addColorStop(0, 'rgba(0,0,0,0.22)');
-  sL.addColorStop(0.5, 'rgba(255,255,255,0.10)');
-  sL.addColorStop(1, 'rgba(0,0,0,0.05)');
-  ctx.fillStyle = sL;
-  ctx.fillRect(innerL, yL, armW, innerBottomY - yL);
-
-  const sR = ctx.createLinearGradient(armInnerR, 0, innerR, 0);
-  sR.addColorStop(0, 'rgba(0,0,0,0.05)');
-  sR.addColorStop(0.5, 'rgba(255,255,255,0.10)');
-  sR.addColorStop(1, 'rgba(0,0,0,0.22)');
-  ctx.fillStyle = sR;
-  ctx.fillRect(armInnerR, yR, armW, innerBottomY - yR);
+  const sR = ctx.createLinearGradient(innerR-armW, 0, innerR, 0);
+  sR.addColorStop(0, 'rgba(0,0,0,0.04)'); sR.addColorStop(0.5, 'rgba(255,255,255,0.10)'); sR.addColorStop(1, 'rgba(0,0,0,0.20)');
+  ctx.fillStyle = sR; ctx.fillRect(innerR-armW, yR, armW, SIM_VH - yR);
 
   ctx.beginPath();
   ctx.moveTo(innerL, yL);
@@ -1085,119 +887,69 @@ function renderUtube(){
   ctx.lineTo(innerL + armW, yL + 8);
   ctx.quadraticCurveTo(innerL + armW/2, yL + 13, innerL, yL + 8);
   ctx.closePath();
-  ctx.fillStyle = 'rgba(255,255,255,0.55)';
-  ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.fill();
   ctx.beginPath();
   ctx.moveTo(innerL, yL);
   ctx.quadraticCurveTo(innerL + armW/2, yL + 5, innerL + armW, yL);
-  ctx.strokeStyle = '#e6f4ff'; ctx.lineWidth = 2.6; ctx.stroke();
+  ctx.strokeStyle = '#e8f6ff'; ctx.lineWidth = 2.2; ctx.stroke();
 
   ctx.beginPath();
-  ctx.moveTo(armInnerR, yR);
-  ctx.quadraticCurveTo(armInnerR + armW/2, yR + 5, innerR, yR);
+  ctx.moveTo(innerR-armW, yR);
+  ctx.quadraticCurveTo(innerR - armW/2, yR + 5, innerR, yR);
   ctx.lineTo(innerR, yR + 8);
-  ctx.quadraticCurveTo(armInnerR + armW/2, yR + 13, armInnerR, yR + 8);
+  ctx.quadraticCurveTo(innerR - armW/2, yR + 13, innerR-armW, yR + 8);
   ctx.closePath();
-  ctx.fillStyle = 'rgba(255,255,255,0.55)';
-  ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.fill();
   ctx.beginPath();
-  ctx.moveTo(armInnerR, yR);
-  ctx.quadraticCurveTo(armInnerR + armW/2, yR + 5, innerR, yR);
-  ctx.strokeStyle = '#e6f4ff'; ctx.lineWidth = 2.6; ctx.stroke();
+  ctx.moveTo(innerR-armW, yR);
+  ctx.quadraticCurveTo(innerR - armW/2, yR + 5, innerR, yR);
+  ctx.strokeStyle = '#e8f6ff'; ctx.lineWidth = 2.2; ctx.stroke();
 
   ctx.restore();
 
-  ctx.strokeStyle = '#0f2537';
+  ctx.beginPath();
+  ctx.moveTo(innerL, topY); ctx.lineTo(innerL, cyBend);
+  ctx.arc(bendCx, cyBend, rInner, PI, 0, true);
+  ctx.lineTo(innerR, topY);
+  ctx.strokeStyle='#1a3a52'; ctx.lineWidth=2.2; ctx.stroke();
 
   ctx.beginPath();
-  ctx.moveTo(outerL, topY);
-  ctx.lineTo(outerL, bendTopY);
-  ctx.arc(bendCx, bendTopY, outerRad, PI, 0, true);
+  ctx.moveTo(outerL, topY); ctx.lineTo(outerL, cyBend);
+  ctx.arc(bendCx, cyBend, rOuter, PI, 0, true);
   ctx.lineTo(outerR, topY);
-  ctx.lineWidth = 2.6; ctx.stroke();
+  ctx.strokeStyle='#1a3a52'; ctx.lineWidth=2.4; ctx.stroke();
 
-  ctx.beginPath(); ctx.moveTo(innerL, topY); ctx.lineTo(innerL, bendTopY); ctx.lineWidth = 2.2; ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(innerR, topY); ctx.lineTo(innerR, bendTopY); ctx.lineWidth = 2.2; ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(armInnerL, topY); ctx.lineTo(armInnerL, bendTopY); ctx.lineWidth = 2.2; ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(armInnerR, topY); ctx.lineTo(armInnerR, bendTopY); ctx.lineWidth = 2.2; ctx.stroke();
+  ctx.fillStyle='#e8eef3';
+  ctx.beginPath(); ctx.ellipse(cxL, topY, armW/2+1, 5, 0, 0, TWO_PI); ctx.fill();
+  ctx.strokeStyle='#1a3a52'; ctx.lineWidth=1.6; ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(cxR, topY, armW/2+1, 5, 0, 0, TWO_PI); ctx.fill();
+  ctx.strokeStyle='#1a3a52'; ctx.lineWidth=1.6; ctx.stroke();
 
-  ctx.beginPath();
-  ctx.arc(bendCx, bendTopY, innerRad, PI, 0, true);
-  ctx.lineWidth = 2.2; ctx.stroke();
+  ctx.strokeStyle='rgba(255,255,255,0.85)'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(innerL+8, topY+20); ctx.lineTo(innerL+8, cyBend-14); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(innerR-8, topY+20); ctx.lineTo(innerR-8, cyBend-14); ctx.stroke();
 
-  ctx.fillStyle = '#e8eef3';
-  ctx.beginPath(); ctx.ellipse(innerL + armW/2, topY, armW/2 + 1, 5, 0, 0, TWO_PI); ctx.fill();
-  ctx.strokeStyle = '#0f2537'; ctx.lineWidth = 1.6; ctx.stroke();
-  ctx.beginPath(); ctx.ellipse(armInnerR + armW/2, topY, armW/2 + 1, 5, 0, 0, TWO_PI); ctx.fill();
-  ctx.strokeStyle = '#0f2537'; ctx.lineWidth = 1.6; ctx.stroke();
-
-  ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = 1.8;
-  ctx.beginPath();
-  ctx.moveTo(innerL + 6, topY + 20); ctx.lineTo(innerL + 6, bendTopY - 10); ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(innerR - 6, topY + 20); ctx.lineTo(innerR - 6, bendTopY - 10); ctx.stroke();
-
-  ctx.save();
-  ctx.setLineDash([6, 5]);
-  ctx.strokeStyle = '#444'; ctx.lineWidth = 1.4;
-  ctx.beginPath();
-  ctx.moveTo(outerL - 55, yEq);
-  ctx.lineTo(outerR + 55, yEq);
-  ctx.stroke();
+  ctx.save(); ctx.setLineDash([7,6]);
+  ctx.strokeStyle='#666'; ctx.lineWidth=1.4;
+  ctx.beginPath(); ctx.moveTo(innerL-50, yEq); ctx.lineTo(innerR+50, yEq); ctx.stroke();
   ctx.restore();
+  ctx.fillStyle='#000'; ctx.font='bold italic 18px '+FONT;
+  ctx.textAlign='right'; ctx.textBaseline='middle';
+  ctx.fillText('equilibrium', innerL-56, yEq);
 
-  ctx.fillStyle = '#000'; ctx.font = 'bold italic 16px ' + FONT;
-  ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-  ctx.fillText('equilibrium', outerL - 62, yEq);
-
-  if (Math.abs(state.x) > 0.0015){
-    const arrowX = outerL - 25;
-    const dir = Math.sign(yL - yEq) || -1;
-    ctx.strokeStyle = '#dc2626'; ctx.fillStyle = '#dc2626'; ctx.lineWidth = 2.4;
-    ctx.beginPath();
-    ctx.moveTo(arrowX, yEq);
-    ctx.lineTo(arrowX, yL);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(arrowX, yEq);
-    ctx.lineTo(arrowX - 6, yEq + dir*10);
-    ctx.lineTo(arrowX + 6, yEq + dir*10);
-    ctx.closePath(); ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(arrowX, yL);
-    ctx.lineTo(arrowX - 6, yL - dir*10);
-    ctx.lineTo(arrowX + 6, yL - dir*10);
-    ctx.closePath(); ctx.fill();
-    ctx.fillStyle = '#dc2626'; ctx.font = 'bold italic 20px ' + FONT;
-    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-    ctx.fillText('x', arrowX - 10, (yEq + yL) / 2);
-  }
-
-  const gX = outerR + 55;
-  ctx.strokeStyle = '#111'; ctx.fillStyle = '#111'; ctx.lineWidth = 2.2;
-  ctx.beginPath(); ctx.moveTo(gX, 130); ctx.lineTo(gX, 205); ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(gX, 205);
-  ctx.lineTo(gX - 7, 194);
-  ctx.lineTo(gX + 7, 194);
-  ctx.closePath(); ctx.fill();
-  ctx.font = 'bold italic 22px ' + FONT;
-  ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-  ctx.fillText('g', gX + 10, 192);
-
-  if (Math.abs(state.x) > 0.0015){
-    const xa = outerR + 95;
-    ctx.strokeStyle = '#b91c1c'; ctx.fillStyle = '#b91c1c'; ctx.lineWidth = 1.8;
+  if (Math.abs(state.x) > 0.001){
+    const xa = innerR + 55;
+    ctx.strokeStyle='#b91c1c'; ctx.fillStyle='#b91c1c'; ctx.lineWidth=2.4;
     ctx.beginPath(); ctx.moveTo(xa, yL); ctx.lineTo(xa, yR); ctx.stroke();
     ctx.beginPath();
-    ctx.moveTo(xa, yL); ctx.lineTo(xa - 6, yL + 10); ctx.lineTo(xa + 6, yL + 10);
+    ctx.moveTo(xa, yL); ctx.lineTo(xa-7, yL+10); ctx.lineTo(xa+7, yL+10);
     ctx.closePath(); ctx.fill();
     ctx.beginPath();
-    ctx.moveTo(xa, yR); ctx.lineTo(xa - 6, yR - 10); ctx.lineTo(xa + 6, yR - 10);
+    ctx.moveTo(xa, yR); ctx.lineTo(xa-7, yR-10); ctx.lineTo(xa+7, yR-10);
     ctx.closePath(); ctx.fill();
-    ctx.fillStyle = '#000'; ctx.font = 'bold italic 16px ' + FONT;
-    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-    ctx.fillText('2x', xa + 10, (yL + yR) / 2);
+    ctx.fillStyle='#000'; ctx.font='bold 20px '+FONT;
+    ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText('2x', xa+12, (yL+yR)/2);
   }
 }
 
@@ -1206,24 +958,19 @@ function renderFloating(){
   const cx = SIM_VW/2;
   const beakerL = cx - 150, beakerR = cx + 150;
   const beakerTop = 50, beakerBot = 490;
-  const liquidSurface = 240;
-  const scale = 500;
-
+  const liquidSurface = 240, scale = 500;
   ctx.fillStyle='rgba(244,250,253,0.85)';
   ctx.fillRect(beakerL, beakerTop, beakerR-beakerL, beakerBot-beakerTop);
-
   const lgrad = ctx.createLinearGradient(0, liquidSurface, 0, beakerBot);
   lgrad.addColorStop(0,'#a2d5ee'); lgrad.addColorStop(0.35,'#5aa9d4');
   lgrad.addColorStop(0.75,'#1d6ba0'); lgrad.addColorStop(1,'#0a3a5c');
   ctx.fillStyle = lgrad;
   ctx.fillRect(beakerL, liquidSurface, beakerR-beakerL, beakerBot-liquidSurface);
-
   ctx.strokeStyle = '#d8ecf7'; ctx.lineWidth = 2;
   ctx.beginPath(); ctx.moveTo(beakerL, liquidSurface); ctx.lineTo(beakerR, liquidSurface); ctx.stroke();
 
   const cylW = 80, cylH = 150;
-  const h0px = state.h0c * scale;
-  const xPx = state.x * scale;
+  const h0px = state.h0c * scale, xPx = state.x * scale;
   const cylBottomEq = liquidSurface + h0px;
   const cylBottom = cylBottomEq - xPx;
   const cylTop = cylBottom - cylH;
@@ -1231,17 +978,15 @@ function renderFloating(){
   const cylTopEq = cylBottomEq - cylH;
 
   ctx.save(); ctx.setLineDash([7,6]); ctx.strokeStyle='#666'; ctx.lineWidth=1.4;
-  ctx.beginPath(); ctx.moveTo(beakerL-70, cylTopEq); ctx.lineTo(beakerR+70, cylTopEq); ctx.stroke();
-  ctx.restore();
-  ctx.fillStyle='#333'; ctx.font='bold italic 16px '+FONT;
+  ctx.beginPath(); ctx.moveTo(beakerL-70, cylTopEq); ctx.lineTo(beakerR+70, cylTopEq); ctx.stroke(); ctx.restore();
+  ctx.fillStyle='#000'; ctx.font='bold italic 17px '+FONT;
   ctx.textAlign='right'; ctx.textBaseline='middle';
   ctx.fillText('equilibrium', beakerL-76, cylTopEq);
 
   const cgrad = ctx.createLinearGradient(cylL, 0, cylR, 0);
   cgrad.addColorStop(0,'#b45309'); cgrad.addColorStop(0.4,'#fbbf24');
   cgrad.addColorStop(0.7,'#f59e0b'); cgrad.addColorStop(1,'#78350f');
-  ctx.fillStyle = cgrad;
-  ctx.fillRect(cylL, cylTop, cylW, cylH);
+  ctx.fillStyle = cgrad; ctx.fillRect(cylL, cylTop, cylW, cylH);
   ctx.strokeStyle='#000'; ctx.lineWidth=1.8; ctx.strokeRect(cylL, cylTop, cylW, cylH);
 
   ctx.strokeStyle='rgba(0,0,0,0.18)'; ctx.lineWidth=1;
@@ -1267,14 +1012,22 @@ function renderFloating(){
   ctx.lineTo(beakerR, beakerBot); ctx.lineTo(beakerR, beakerTop); ctx.stroke();
 
   ctx.strokeStyle='rgba(255,255,255,0.85)'; ctx.lineWidth=2;
-  ctx.beginPath();
-  ctx.moveTo(beakerL+8, beakerTop+20); ctx.lineTo(beakerL+8, beakerBot-20); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(beakerL+8, beakerTop+20); ctx.lineTo(beakerL+8, beakerBot-20); ctx.stroke();
 
-  if (showVectors && Math.abs(state.x) > 0.003){
-    drawArrow(ctx, beakerR+30, cylTopEq, beakerR+30, cylTop, '#1d4ed8', 'x');
-    const Fdir = state.x > 0 ? -1 : 1;
-    const Fmag = Math.min(Math.abs(state.x)*scale*1.2, 90);
-    drawArrow(ctx, beakerR+70, cylTop, beakerR+70, cylTop + Fdir*Fmag, '#dc2626', 'F');
+  if (Math.abs(state.x) > 0.003){
+    const xa = beakerR + 30;
+    ctx.strokeStyle='#1d4ed8'; ctx.fillStyle='#1d4ed8'; ctx.lineWidth=2.2;
+    ctx.beginPath(); ctx.moveTo(xa, cylTopEq); ctx.lineTo(xa, cylTop); ctx.stroke();
+    const dir = Math.sign(cylTop - cylTopEq) || 1;
+    ctx.beginPath();
+    ctx.moveTo(xa, cylTop); ctx.lineTo(xa-7, cylTop - dir*10); ctx.lineTo(xa+7, cylTop - dir*10);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(xa, cylTopEq); ctx.lineTo(xa-7, cylTopEq + dir*10); ctx.lineTo(xa+7, cylTopEq + dir*10);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle='#1d4ed8'; ctx.font='bold italic 22px '+FONT;
+    ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText('x', xa+12, (cylTopEq + cylTop)/2);
   }
 }
 
@@ -1284,7 +1037,6 @@ function renderLC(){
   const coilStartX=xL+80, coilEndX=xR-80;
   const capGapHalf=24, capMid=(xL+xR)/2;
   const capL=capMid-capGapHalf, capR=capMid+capGapHalf;
-
   ctx.strokeStyle='#111'; ctx.lineWidth=2.8;
   ctx.beginPath(); ctx.moveTo(xL,yT); ctx.lineTo(coilStartX,yT); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(coilEndX,yT); ctx.lineTo(xR,yT); ctx.stroke();
@@ -1293,7 +1045,6 @@ function renderLC(){
   ctx.beginPath(); ctx.moveTo(capL,yB); ctx.lineTo(xL,yB); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(xL,yB); ctx.lineTo(xL,yT); ctx.stroke();
   drawSpring(coilStartX,yT,coilEndX,yT,6,15);
-
   ctx.strokeStyle='#111'; ctx.lineWidth=4;
   ctx.beginPath(); ctx.moveTo(capL,yB-30); ctx.lineTo(capL,yB+30); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(capR,yB-30); ctx.lineTo(capR,yB+30); ctx.stroke();
@@ -1303,8 +1054,7 @@ function renderLC(){
   ctx.textBaseline='top'; ctx.fillText('C', capMid, yB+46);
 
   const frac = state.Q0 > 1e-9 ? state.x/state.Q0 : 0;
-  const ballX = SIM_VW/2 + frac*90;
-  const ballY = 430;
+  const ballX = SIM_VW/2 + frac*90, ballY = 430;
   ctx.strokeStyle='#888'; ctx.lineWidth=1;
   ctx.beginPath(); ctx.moveTo(SIM_VW/2-95, ballY); ctx.lineTo(SIM_VW/2+95, ballY); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(SIM_VW/2, ballY-10); ctx.lineTo(SIM_VW/2, ballY+10); ctx.stroke();
@@ -1322,7 +1072,6 @@ function renderForced(){
   const yEq=SIM_VH*0.52, xEq=430, scale=90;
   const xMass=xEq+state.x*scale;
   const xDrive=110+24*Math.cos(state.omega_d*state.t);
-
   ctx.strokeStyle='#333'; ctx.lineWidth=1.8;
   ctx.beginPath(); ctx.moveTo(30,yEq+80); ctx.lineTo(SIM_VW-30,yEq+80); ctx.stroke();
   ctx.lineWidth=1; ctx.strokeStyle='#888';
@@ -1334,40 +1083,18 @@ function renderForced(){
   dg.addColorStop(0,'#f1f5f9'); dg.addColorStop(0.5,'#94a3b8'); dg.addColorStop(1,'#334155');
   ctx.fillStyle=dg; ctx.fillRect(xDrive-dw/2,yEq-dh/2,dw,dh);
   ctx.strokeStyle='#000'; ctx.lineWidth=1.6; ctx.strokeRect(xDrive-dw/2,yEq-dh/2,dw,dh);
-  ctx.fillStyle='#b45309'; ctx.font='bold italic 18px '+FONT;
+  ctx.fillStyle='#b45309'; ctx.font='bold italic 20px '+FONT;
   ctx.textAlign='center'; ctx.textBaseline='top';
   ctx.fillText('driver', xDrive, yEq+dh/2+10);
   if (xMass-38 > xDrive+dw/2+6) drawSpring(xDrive+dw/2,yEq,xMass-38,yEq,10,14);
-
   const bw=76,bh=64,bx=xMass-bw/2,by=yEq-bh/2;
   const mg=ctx.createLinearGradient(bx,by,bx,by+bh);
   mg.addColorStop(0,'#f1f5f9'); mg.addColorStop(0.5,'#94a3b8'); mg.addColorStop(1,'#334155');
   ctx.fillStyle=mg; ctx.fillRect(bx,by,bw,bh);
   ctx.strokeStyle='#000'; ctx.lineWidth=1.6; ctx.strokeRect(bx,by,bw,bh);
-
-  ctx.fillStyle='#000'; ctx.font='bold 20px '+FONT;
+  ctx.fillStyle='#000'; ctx.font='bold 22px '+FONT;
   ctx.textAlign='center'; ctx.textBaseline='middle';
   ctx.fillText(state.m.toFixed(2)+' kg', xMass, yEq);
-
-  ctx.save(); ctx.setLineDash([7,6]); ctx.strokeStyle='#666'; ctx.lineWidth=1.4;
-  ctx.beginPath(); ctx.moveTo(xEq, 50); ctx.lineTo(xEq, yEq+80); ctx.stroke(); ctx.restore();
-  ctx.fillStyle='#333'; ctx.font='bold italic 16px '+FONT;
-  ctx.textAlign='center'; ctx.textBaseline='alphabetic';
-  ctx.fillText('equilibrium', xEq, 42);
-
-  if (showVectors){
-    drawArrow(ctx, xEq, yEq-100, xMass, yEq-100, '#1d4ed8', 'x');
-    if (Math.abs(state.x) > 0.005){
-      const Fdir = state.x > 0 ? -1 : 1;
-      const Fmag = Math.min(Math.abs(state.x)*scale*1.4, 80);
-      drawArrow(ctx, xMass, yEq+95, xMass + Fdir*Fmag, yEq+95, '#dc2626', 'F');
-    }
-    if (state.running && Math.abs(state.v) > 0.01){
-      const vdir = Math.sign(state.v);
-      const vlen = Math.min(Math.abs(state.v)*22, 80);
-      drawArrow(ctx, xMass, yEq-40, xMass + vdir*vlen, yEq-40, '#0a7d2b', 'v');
-    }
-  }
 }
 
 function drawReferenceCircle(){
@@ -1391,7 +1118,7 @@ function drawReferenceCircle(){
   cctx.beginPath(); cctx.moveTo(cx-R-40,cy); cctx.lineTo(cx+R+40,cy); cctx.stroke();
   cctx.beginPath(); cctx.moveTo(cx,cy-R-20); cctx.lineTo(cx,cy+R+20); cctx.stroke();
 
-  cctx.fillStyle='#000'; cctx.font='bold italic 18px '+FONT;
+  cctx.fillStyle='#000'; cctx.font='bold italic 20px '+FONT;
   cctx.textAlign='center'; cctx.textBaseline='middle';
   const lr=R+24;
   [{d:0,a:0},{d:90,a:PI/2},{d:180,a:PI},{d:270,a:-PI/2}].forEach(L=>{
@@ -1406,7 +1133,7 @@ function drawReferenceCircle(){
   }
   if (phi>0.15){
     const bis=phi/2;
-    cctx.fillStyle='#1d4ed8'; cctx.font='bold italic 24px '+FONT;
+    cctx.fillStyle='#1d4ed8'; cctx.font='bold italic 26px '+FONT;
     cctx.textAlign='center'; cctx.textBaseline='middle';
     cctx.fillText('φ', cx+(arcR+22)*Math.cos(bis), cy-(arcR+22)*Math.sin(bis));
   }
@@ -1422,7 +1149,7 @@ function drawReferenceCircle(){
   cctx.beginPath(); cctx.arc(px,py,9,0,TWO_PI);
   cctx.fillStyle='#1d4ed8'; cctx.fill();
   cctx.strokeStyle='#fff'; cctx.lineWidth=2.4; cctx.stroke();
-  cctx.fillStyle='#1d4ed8'; cctx.font='bold italic 22px '+FONT;
+  cctx.fillStyle='#1d4ed8'; cctx.font='bold italic 24px '+FONT;
   cctx.textAlign='center'; cctx.textBaseline='middle';
   cctx.fillText('P', px+26*Math.cos(phi+0.32), py-26*Math.sin(phi+0.32));
 
@@ -1430,18 +1157,18 @@ function drawReferenceCircle(){
   cctx.beginPath(); cctx.arc(qx,cy,8,0,TWO_PI);
   cctx.fillStyle='#b91c1c'; cctx.fill();
   cctx.strokeStyle='#fff'; cctx.lineWidth=2.4; cctx.stroke();
-  cctx.fillStyle='#b91c1c'; cctx.font='bold italic 20px '+FONT;
+  cctx.fillStyle='#b91c1c'; cctx.font='bold italic 22px '+FONT;
   cctx.textBaseline='top';
   cctx.fillText('Q', qx, cy+16);
 
   const sym = (state.caseId==='lc')?'q':(currentCase().yUnitDeg?'θ':'x');
-  cctx.fillStyle='#000'; cctx.font='bold italic 18px '+FONT;
+  cctx.fillStyle='#000'; cctx.font='bold italic 20px '+FONT;
   cctx.textAlign='left'; cctx.textBaseline='top';
   cctx.fillText('φ = '+(phi*180/PI).toFixed(0)+'°', 14, 14);
-  cctx.fillText(sym+' = '+(state.x*yScale()).toFixed(2)+' '+yUnit(), 14, 38);
+  cctx.fillText(sym+' = '+(state.x*yScale()).toFixed(2)+' '+yUnit(), 14, 40);
 }
 
-const GPAD = { l: 58, r: 14, t: 32, b: 42 };
+const GPAD = { l: 58, r: 14, t: 44, b: 42 };
 const G_WINDOW = 8;
 
 function fmtYAxis(v){
@@ -1452,12 +1179,30 @@ function fmtYAxis(v){
   return sign + a.toFixed(2);
 }
 
-function prepareGraph(g, vw, vh, yMax, unitY, yTitle, title){
+function graphFormulaLine(kind){
+  if (state.initForm === 'cos'){
+    if (kind === 'disp') return 'x = A cos(ωt)';
+    if (kind === 'vel')  return 'v = −Aω sin(ωt)';
+    if (kind === 'acc')  return 'a = −Aω² cos(ωt)';
+    if (kind === 'en')   return 'K = ½mv²   U = ½kx²';
+  } else {
+    if (kind === 'disp') return 'x = A sin(ωt)';
+    if (kind === 'vel')  return 'v = Aω cos(ωt)';
+    if (kind === 'acc')  return 'a = −Aω² sin(ωt)';
+    if (kind === 'en')   return 'K = ½mv²   U = ½kx²';
+  }
+  return '';
+}
+
+function prepareGraph(g, vw, vh, yMax, unitY, yTitle, title, formulaKind){
   g.fillStyle='#fff'; g.fillRect(0,0,vw,vh);
 
-  g.fillStyle='#000'; g.font='bold italic 14px '+FONT;
+  g.fillStyle='#000'; g.font='bold italic 15px '+FONT;
   g.textAlign='center'; g.textBaseline='top';
   g.fillText(title, vw/2, 8);
+
+  g.fillStyle='#1d4ed8'; g.font='italic 12px '+FONT;
+  g.fillText(graphFormulaLine(formulaKind), vw/2, 26);
 
   const plotW = vw - GPAD.l - GPAD.r;
   const plotH = vh - GPAD.t - GPAD.b;
@@ -1481,7 +1226,7 @@ function prepareGraph(g, vw, vh, yMax, unitY, yTitle, title){
   g.beginPath(); g.moveTo(GPAD.l+0.5,GPAD.t); g.lineTo(GPAD.l+0.5,GPAD.t+plotH); g.stroke();
   g.beginPath(); g.moveTo(GPAD.l,y0); g.lineTo(GPAD.l+plotW,y0); g.stroke();
 
-  g.fillStyle='#000'; g.font='bold 15px '+FONT;
+  g.fillStyle='#000'; g.font='bold 17px '+FONT;
   g.textAlign='right'; g.textBaseline='middle';
   g.fillText(fmtYAxis(yMax), GPAD.l-8, gy(yMax));
   g.fillText('0', GPAD.l-8, gy(0));
@@ -1491,17 +1236,17 @@ function prepareGraph(g, vw, vh, yMax, unitY, yTitle, title){
   g.translate(15, GPAD.t + plotH/2);
   g.rotate(-PI/2);
   g.textAlign='center'; g.textBaseline='middle';
-  g.fillStyle='#000'; g.font='bold italic 14px '+FONT;
+  g.fillStyle='#000'; g.font='bold italic 15px '+FONT;
   g.fillText(yTitle, 0, 0);
   g.restore();
 
-  g.fillStyle='#000'; g.font='bold 14px '+FONT;
+  g.fillStyle='#000'; g.font='bold 15px '+FONT;
   g.textAlign='center'; g.textBaseline='top';
   for (let i=0;i<=8;i++){
     const t = tMin + (tMax-tMin)*i/8;
     g.fillText(t.toFixed(1), GPAD.l+plotW*i/8, GPAD.t+plotH+6);
   }
-  g.font='bold italic 14px '+FONT;
+  g.font='bold italic 15px '+FONT;
   g.textBaseline='alphabetic';
   g.fillText('Time / s', GPAD.l+plotW/2, vh-6);
 
@@ -1514,11 +1259,45 @@ function drawDispGraph(){
   const id = state.caseId;
   let yTitle;
   if (id==='pendulum'||id==='physical-pendulum'||id==='torsional') yTitle='Angle / °';
-  else if (id==='lc')    yTitle='Charge / mC';
-  else                   yTitle='Displacement / m';
+  else if (id==='lc') yTitle='Charge / mC';
+  else yTitle='Displacement / m';
 
-  const {gx,gy,tMin}=prepareGraph(dctx, GR_VW, GR_VH, yMax, currentCase().xUnit, yTitle, 'Displacement – time');
+  const {gx,gy,tMin,tMax}=prepareGraph(dctx, GR_VW, GR_VH, yMax, currentCase().xUnit, yTitle, 'Displacement – time', 'disp');
 
+  const w0 = omega0();
+  const A  = graphAmp();
+
+  /* reference curve */
+  dctx.beginPath();
+  let startedRef=false;
+  const N=200;
+  for (let i=0;i<=N;i++){
+    const t = tMin + (tMax-tMin)*i/N;
+    if (t < 0) continue;
+    const val = state.initForm === 'cos' ? A*Math.cos(w0*t) : A*Math.sin(w0*t);
+    const px=gx(t), py=gy(val*scale);
+    if (!startedRef){ dctx.moveTo(px,py); startedRef=true; }
+    else dctx.lineTo(px,py);
+  }
+  dctx.strokeStyle='rgba(150,150,150,0.55)';
+  dctx.lineWidth=1.4;
+  dctx.setLineDash([4,4]);
+  dctx.stroke();
+  dctx.setLineDash([]);
+
+  /* origin marker */
+  if (tMin <= 0 && tMax >= 0){
+    const px=gx(0), py=gy(0);
+    dctx.beginPath();
+    dctx.arc(px, py, 5, 0, TWO_PI);
+    dctx.fillStyle='rgba(255,255,255,0.95)';
+    dctx.fill();
+    dctx.strokeStyle='#000';
+    dctx.lineWidth=1.5;
+    dctx.stroke();
+  }
+
+  /* real curve */
   if (state.history.length>1){
     dctx.beginPath();
     let started=false;
@@ -1527,8 +1306,9 @@ function drawDispGraph(){
       const px=gx(p.t), py=gy(p.x*scale);
       if (!started){dctx.moveTo(px,py);started=true;} else dctx.lineTo(px,py);
     }
-    dctx.strokeStyle='#1d4ed8'; dctx.lineWidth=2; dctx.stroke();
+    dctx.strokeStyle='#1d4ed8'; dctx.lineWidth=2.2; dctx.stroke();
   }
+
   if (state.history.length>0){
     const px=gx(state.t), py=gy(state.x*scale);
     if (px>=GPAD.l && px<=GR_VW-GPAD.r){
@@ -1544,11 +1324,36 @@ function drawVelGraph(){
   const id=state.caseId;
   let yTitle;
   if (id==='pendulum'||id==='physical-pendulum'||id==='torsional') yTitle='Velocity / rad s⁻¹';
-  else if (id==='lc')    yTitle='Current / mA';
-  else                   yTitle='Velocity / m s⁻¹';
+  else if (id==='lc') yTitle='Current / mA';
+  else yTitle='Velocity / m s⁻¹';
 
-  const {gx,gy,tMin}=prepareGraph(vctx, GR_VW, GR_VH, yMax, currentCase().vUnit, yTitle, 'Velocity – time');
+  const {gx,gy,tMin,tMax}=prepareGraph(vctx, GR_VW, GR_VH, yMax, currentCase().vUnit, yTitle, 'Velocity – time', 'vel');
 
+  const w0 = omega0();
+  const A  = graphAmp();
+  const Aomega = A * w0;
+
+  /* reference curve */
+  vctx.beginPath();
+  let startedRef=false;
+  const N=200;
+  for (let i=0;i<=N;i++){
+    const t = tMin + (tMax-tMin)*i/N;
+    if (t < 0) continue;
+    const val = state.initForm === 'cos'
+      ? -Aomega*Math.sin(w0*t)
+      :  Aomega*Math.cos(w0*t);
+    const px=gx(t), py=gy(val*scale);
+    if (!startedRef){ vctx.moveTo(px,py); startedRef=true; }
+    else vctx.lineTo(px,py);
+  }
+  vctx.strokeStyle='rgba(150,150,150,0.55)';
+  vctx.lineWidth=1.4;
+  vctx.setLineDash([4,4]);
+  vctx.stroke();
+  vctx.setLineDash([]);
+
+  /* real curve */
   if (state.history.length>1){
     vctx.beginPath();
     let started=false;
@@ -1557,8 +1362,9 @@ function drawVelGraph(){
       const px=gx(p.t), py=gy(p.v*scale);
       if (!started){vctx.moveTo(px,py);started=true;} else vctx.lineTo(px,py);
     }
-    vctx.strokeStyle='#0a7d2b'; vctx.lineWidth=2; vctx.stroke();
+    vctx.strokeStyle='#0a7d2b'; vctx.lineWidth=2.2; vctx.stroke();
   }
+
   if (state.history.length>0){
     const px=gx(state.t), py=gy(state.v*scale);
     if (px>=GPAD.l && px<=GR_VW-GPAD.r){
@@ -1574,10 +1380,33 @@ function drawAccGraph(){
   const id=state.caseId;
   let yTitle;
   if (id==='pendulum'||id==='physical-pendulum'||id==='torsional') yTitle='Acceleration / rad s⁻²';
-  else if (id==='lc')    yTitle='dI/dt / mA s⁻¹';
-  else                   yTitle='Acceleration / m s⁻²';
+  else if (id==='lc') yTitle='dI/dt / mA s⁻¹';
+  else yTitle='Acceleration / m s⁻²';
 
-  const {gx,gy,tMin}=prepareGraph(actx, GR_VW, GR_VH, yMax, currentCase().aUnit, yTitle, 'Acceleration – time');
+  const {gx,gy,tMin,tMax}=prepareGraph(actx, GR_VW, GR_VH, yMax, currentCase().aUnit, yTitle, 'Acceleration – time', 'acc');
+
+  const w0 = omega0();
+  const A  = graphAmp();
+  const Aomega2 = A * w0 * w0;
+
+  actx.beginPath();
+  let startedRef=false;
+  const N=200;
+  for (let i=0;i<=N;i++){
+    const t = tMin + (tMax-tMin)*i/N;
+    if (t < 0) continue;
+    const val = state.initForm === 'cos'
+      ? -Aomega2*Math.cos(w0*t)
+      : -Aomega2*Math.sin(w0*t);
+    const px=gx(t), py=gy(val*scale);
+    if (!startedRef){ actx.moveTo(px,py); startedRef=true; }
+    else actx.lineTo(px,py);
+  }
+  actx.strokeStyle='rgba(150,150,150,0.55)';
+  actx.lineWidth=1.4;
+  actx.setLineDash([4,4]);
+  actx.stroke();
+  actx.setLineDash([]);
 
   if (state.history.length>1){
     actx.beginPath();
@@ -1587,8 +1416,9 @@ function drawAccGraph(){
       const px=gx(p.t), py=gy(p.a*scale);
       if (!started){actx.moveTo(px,py);started=true;} else actx.lineTo(px,py);
     }
-    actx.strokeStyle='#b91c1c'; actx.lineWidth=2; actx.stroke();
+    actx.strokeStyle='#b91c1c'; actx.lineWidth=2.2; actx.stroke();
   }
+
   if (state.history.length>0){
     const aNow=accelFn(state.x, state.v, state.t);
     const px=gx(state.t), py=gy(aNow*scale);
@@ -1599,236 +1429,135 @@ function drawAccGraph(){
   }
 }
 
-/* ============================================================
-   ENERGY GRAPH — Cambridge-style analytic curves
-   Smooth sin²/cos² curves drawn from t = 0 up to the current
-   simulation time. Before Release (state.t = 0), nothing is
-   drawn. Once you press Release, the curves begin to trace out
-   from the left, growing as the oscillation progresses, exactly
-   like the reference textbook figure. Once the 8-second window
-   fills, the graph scrolls in sync with the other three plots.
-   ============================================================ */
 function drawEnergyGraph(){
-  ectx.fillStyle = '#fff';
-  ectx.fillRect(0, 0, GR_VW, GR_VH);
+  const yMaxHi = 1.20;
+  ectx.fillStyle='#fff'; ectx.fillRect(0,0,GR_VW,GR_VH);
+
+  ectx.fillStyle='#000'; ectx.font='bold italic 15px '+FONT;
+  ectx.textAlign='center'; ectx.textBaseline='top';
+  ectx.fillText('Energy – time', GR_VW/2, 8);
+  ectx.fillStyle='#1d4ed8'; ectx.font='italic 12px '+FONT;
+  ectx.fillText(graphFormulaLine('en'), GR_VW/2, 26);
 
   const plotW = GR_VW - GPAD.l - GPAD.r;
-  const plotH = GR_VH - GPAD.t - GPAD.b - 18;
-  const yMax = 1.10;
-
+  const plotH = GR_VH - GPAD.t - GPAD.b;
   const tNow = Math.max(state.t, G_WINDOW);
-  const tMin = tNow - G_WINDOW;
-  const tMax = tNow;
-  const gx = t => GPAD.l + (t - tMin) / G_WINDOW * plotW;
-  const gy = v => GPAD.t + (yMax - v) / yMax * plotH;
+  const tMin = tNow - G_WINDOW, tMax = tNow;
+  const gx = t => GPAD.l + (t-tMin)/(tMax-tMin)*plotW;
+  const gy = v => GPAD.t + (yMaxHi-v)/yMaxHi*plotH;
 
-  /* horizontal grid */
-  ectx.strokeStyle = '#ececec';
-  ectx.lineWidth = 1;
-  for (let i = 0; i <= 4; i++){
-    const y = Math.round(GPAD.t + i*plotH/4) + 0.5;
-    ectx.beginPath();
-    ectx.moveTo(GPAD.l, y);
-    ectx.lineTo(GPAD.l + plotW, y);
-    ectx.stroke();
+  ectx.strokeStyle='#e8e8e8'; ectx.lineWidth=1;
+  for (let i=0;i<=8;i++){
+    const y=Math.round(GPAD.t+i*plotH/8)+0.5;
+    ectx.beginPath(); ectx.moveTo(GPAD.l,y); ectx.lineTo(GPAD.l+plotW,y); ectx.stroke();
+  }
+  for (let i=0;i<=8;i++){
+    const x=Math.round(GPAD.l+i*plotW/8)+0.5;
+    ectx.beginPath(); ectx.moveTo(x,GPAD.t); ectx.lineTo(x,GPAD.t+plotH); ectx.stroke();
   }
 
-  /* vertical dashed T/4 guides */
-  const w0 = omega0();
-  const T = TWO_PI / w0;
-  const damping = state.b || 0;
-  const quarterStep = T / 4;
-  ectx.save();
-  ectx.setLineDash([4, 4]);
-  ectx.strokeStyle = '#c8c8c8';
-  ectx.lineWidth = 1;
-  const firstQ = Math.ceil(tMin / quarterStep) * quarterStep;
-  for (let tq = firstQ; tq <= tMax + 1e-9; tq += quarterStep){
-    const x = Math.round(gx(tq)) + 0.5;
-    if (x < GPAD.l - 1 || x > GPAD.l + plotW + 1) continue;
-    ectx.beginPath();
-    ectx.moveTo(x, GPAD.t);
-    ectx.lineTo(x, GPAD.t + plotH);
-    ectx.stroke();
-  }
+  const y0=Math.round(gy(0))+0.5;
+  const y1=Math.round(gy(1))+0.5;
+  ectx.save(); ectx.setLineDash([6,5]);
+  ectx.strokeStyle='#1d4ed8'; ectx.lineWidth=1.4;
+  ectx.beginPath(); ectx.moveTo(GPAD.l,y1); ectx.lineTo(GPAD.l+plotW,y1); ectx.stroke();
   ectx.restore();
 
-  /* axes */
-  const y0 = Math.round(gy(0)) + 0.5;
-  ectx.strokeStyle = '#000';
-  ectx.lineWidth = 1.6;
-  ectx.beginPath();
-  ectx.moveTo(GPAD.l + 0.5, GPAD.t);
-  ectx.lineTo(GPAD.l + 0.5, GPAD.t + plotH);
-  ectx.stroke();
-  ectx.beginPath();
-  ectx.moveTo(GPAD.l, y0);
-  ectx.lineTo(GPAD.l + plotW, y0);
-  ectx.stroke();
+  ectx.strokeStyle='#000'; ectx.lineWidth=1.6;
+  ectx.beginPath(); ectx.moveTo(GPAD.l+0.5,GPAD.t); ectx.lineTo(GPAD.l+0.5,GPAD.t+plotH); ectx.stroke();
+  ectx.beginPath(); ectx.moveTo(GPAD.l,y0); ectx.lineTo(GPAD.l+plotW,y0); ectx.stroke();
 
-  /* y-axis labels */
-  ectx.fillStyle = '#000';
-  ectx.font = 'bold 15px ' + FONT;
-  ectx.textAlign = 'right';
-  ectx.textBaseline = 'middle';
-  ectx.fillText('½kA²', GPAD.l - 8, gy(1));
-  ectx.fillText('0', GPAD.l - 8, gy(0));
+  ectx.fillStyle='#000'; ectx.font='bold 17px '+FONT;
+  ectx.textAlign='right'; ectx.textBaseline='middle';
+  ectx.fillText('100', GPAD.l-8, gy(1));
+  ectx.fillText('50', GPAD.l-8, gy(0.5));
+  ectx.fillText('0', GPAD.l-8, gy(0));
 
-  /* y-axis title */
   ectx.save();
-  ectx.translate(14, GPAD.t + plotH/2);
+  ectx.translate(15, GPAD.t + plotH/2);
   ectx.rotate(-PI/2);
-  ectx.textAlign = 'center';
-  ectx.textBaseline = 'middle';
-  ectx.fillStyle = '#000';
-  ectx.font = 'bold italic 15px ' + FONT;
-  ectx.fillText('Energy (J)', 0, 0);
+  ectx.textAlign='center'; ectx.textBaseline='middle';
+  ectx.fillStyle='#000'; ectx.font='bold italic 15px '+FONT;
+  ectx.fillText('Energy / % of total', 0, 0);
   ectx.restore();
 
-  /* x-axis labels */
-  ectx.fillStyle = '#000';
-  ectx.font = 'bold 12px ' + FONT;
-  ectx.textAlign = 'center';
-  ectx.textBaseline = 'top';
-  for (let tq = firstQ; tq <= tMax + 1e-9; tq += quarterStep){
-    const x = gx(tq);
-    if (x < GPAD.l - 4 || x > GPAD.l + plotW + 4) continue;
-    const k = Math.round(tq / quarterStep);
-    let label;
-    if (k === 0) label = '0';
-    else if (k % 4 === 0) label = (k/4) + 'T';
-    else if (k % 4 === 1) label = '¼T';
-    else if (k % 4 === 2) label = '½T';
-    else label = '¾T';
-    ectx.fillText(label, x, GPAD.t + plotH + 5);
+  ectx.fillStyle='#000'; ectx.font='bold 15px '+FONT;
+  ectx.textAlign='center'; ectx.textBaseline='top';
+  for (let i=0;i<=8;i++){
+    const t = tMin + (tMax-tMin)*i/8;
+    ectx.fillText(t.toFixed(1), GPAD.l+plotW*i/8, GPAD.t+plotH+6);
   }
-  ectx.font = 'bold italic 14px ' + FONT;
-  ectx.textBaseline = 'alphabetic';
-  ectx.fillText('Time (s)', GPAD.l + plotW/2, GR_VH - 6);
+  ectx.font='bold italic 15px '+FONT;
+  ectx.textBaseline='alphabetic';
+  ectx.fillText('Time / s', GPAD.l+plotW/2, GR_VH-6);
 
-  const COL_TOT = '#26a69a';
-  const COL_K   = '#e53935';
-  const COL_U   = '#1a5fb4';
-
-  /* ---- Analytic sin²/cos² curves ----
-     Drawn only from t = 0 up to the current simulation time.
-     Before Release, state.t = 0 so nothing is drawn.
-     After Release, curves grow smoothly from the left. */
-  const drawStart = Math.max(tMin, 0);
-  const drawEnd   = Math.min(tMax, state.t);
-
-  if (drawEnd > drawStart + 1e-9){
-    const N = 500;
-    const env = t => Math.exp(-damping * t);
-
-    /* Kinetic energy K(t) = E · sin²(ωt) — red */
+  /* reference PE/KE */
+  const w0 = omega0();
+  const drawRef = (key, color)=>{
     ectx.beginPath();
-    let started = false;
-    for (let i = 0; i <= N; i++){
-      const t = drawStart + (drawEnd - drawStart) * i / N;
+    let started=false;
+    const N=200;
+    for (let i=0;i<=N;i++){
+      const t = tMin + (tMax-tMin)*i/N;
       if (t < 0) continue;
-      const s = Math.sin(w0 * t);
-      const v = Math.min(env(t) * s * s, yMax);
-      const px = gx(t), py = gy(v);
-      if (!started){ ectx.moveTo(px, py); started = true; }
-      else ectx.lineTo(px, py);
+      let v;
+      if (state.initForm === 'cos'){
+        v = key==='pe' ? Math.pow(Math.cos(w0*t),2) : Math.pow(Math.sin(w0*t),2);
+      } else {
+        v = key==='pe' ? Math.pow(Math.sin(w0*t),2) : Math.pow(Math.cos(w0*t),2);
+      }
+      const px=gx(t), py=gy(Math.min(v, yMaxHi));
+      if (!started){ ectx.moveTo(px,py); started=true; }
+      else ectx.lineTo(px,py);
     }
-    ectx.strokeStyle = COL_K;
-    ectx.lineWidth = 2.2;
+    ectx.strokeStyle=color;
+    ectx.lineWidth=1.4;
+    ectx.setLineDash([4,4]);
     ectx.stroke();
+    ectx.setLineDash([]);
+  };
+  drawRef('pe','rgba(180,120,60,0.6)');
+  drawRef('ke','rgba(60,140,60,0.6)');
 
-    /* Potential energy U(t) = E · cos²(ωt) — blue */
-    ectx.beginPath();
-    started = false;
-    for (let i = 0; i <= N; i++){
-      const t = drawStart + (drawEnd - drawStart) * i / N;
-      if (t < 0) continue;
-      const c = Math.cos(w0 * t);
-      const v = Math.min(env(t) * c * c, yMax);
-      const px = gx(t), py = gy(v);
-      if (!started){ ectx.moveTo(px, py); started = true; }
-      else ectx.lineTo(px, py);
-    }
-    ectx.strokeStyle = COL_U;
-    ectx.lineWidth = 2.2;
-    ectx.stroke();
-
-    /* Total energy E(t) — teal */
-    ectx.beginPath();
-    started = false;
-    for (let i = 0; i <= N; i++){
-      const t = drawStart + (drawEnd - drawStart) * i / N;
-      if (t < 0) continue;
-      const v = Math.min(env(t), yMax);
-      const px = gx(t), py = gy(v);
-      if (!started){ ectx.moveTo(px, py); started = true; }
-      else ectx.lineTo(px, py);
-    }
-    ectx.strokeStyle = COL_TOT;
-    ectx.lineWidth = 2.4;
-    ectx.stroke();
+  /* real energy curves */
+  if (state.history.length > 1){
+    const drawCurve = (key, color, lw)=>{
+      ectx.beginPath();
+      let started=false;
+      for (const p of state.history){
+        if (p.t<tMin) continue;
+        const fr = energyFractionsAt(p.x, p.v);
+        const v = Math.max(0, Math.min(fr[key], yMaxHi));
+        const px=gx(p.t), py=gy(v);
+        if (!started){ectx.moveTo(px,py);started=true;} else ectx.lineTo(px,py);
+      }
+      ectx.strokeStyle=color; ectx.lineWidth=lw; ectx.stroke();
+    };
+    drawCurve('totF', '#1d4ed8', 2.4);
+    drawCurve('peF',  '#b45309', 2.2);
+    drawCurve('keF',  '#0a7d2b', 2.2);
   }
 
-  /* live phase marker — three dots at current time */
-  if (state.running && state.t > 0){
+  if (state.history.length>0){
+    const fr = energyFractionsAt(state.x, state.v);
     const px = gx(state.t);
-    if (px >= GPAD.l && px <= GPAD.l + plotW){
-      const t = state.t;
-      const env = Math.exp(-damping * t);
-      const kVal = Math.min(env * Math.pow(Math.sin(w0*t), 2), yMax);
-      const uVal = Math.min(env * Math.pow(Math.cos(w0*t), 2), yMax);
-      const eVal = Math.min(env, yMax);
-
-      const putDot = (v, color) => {
-        const py = gy(v);
-        ectx.fillStyle = '#fff';
-        ectx.beginPath(); ectx.arc(px, py, 5, 0, TWO_PI); ectx.fill();
-        ectx.fillStyle = color;
-        ectx.beginPath(); ectx.arc(px, py, 3.2, 0, TWO_PI); ectx.fill();
+    if (px>=GPAD.l && px<=GR_VW-GPAD.r){
+      const put=(v,color)=>{
+        const py=gy(Math.max(0,Math.min(v,yMaxHi)));
+        ectx.fillStyle='#fff'; ectx.beginPath(); ectx.arc(px,py,5,0,TWO_PI); ectx.fill();
+        ectx.fillStyle=color; ectx.beginPath(); ectx.arc(px,py,3.2,0,TWO_PI); ectx.fill();
       };
-      putDot(eVal, COL_TOT);
-      putDot(uVal, COL_U);
-      putDot(kVal, COL_K);
+      put(fr.peF,'#b45309');
+      put(fr.keF,'#0a7d2b');
+      put(fr.totF,'#1d4ed8');
     }
   }
 
-  /* curve labels on right edge */
-  ectx.font = 'bold italic 14px ' + FONT;
-  ectx.textAlign = 'left';
-  ectx.textBaseline = 'middle';
-  ectx.fillStyle = COL_TOT;
-  ectx.fillText('E_total', GR_VW - 58, gy(1) - 12);
-  ectx.fillStyle = COL_U;
-  ectx.fillText('U', GR_VW - 14, gy(0.62));
-  ectx.fillStyle = COL_K;
-  ectx.fillText('K', GR_VW - 14, gy(0.32));
-
-  /* legend */
-  const lY = GR_VH - 10;
-  let lX = GPAD.l;
-
-  ectx.strokeStyle = COL_TOT;
-  ectx.lineWidth = 3;
-  ectx.beginPath(); ectx.moveTo(lX, lY); ectx.lineTo(lX + 22, lY); ectx.stroke();
-  ectx.fillStyle = '#000';
-  ectx.font = 'bold italic 13px ' + FONT;
-  ectx.textAlign = 'left';
-  ectx.textBaseline = 'middle';
-  ectx.fillText('E_total', lX + 26, lY);
-
-  lX += 92;
-  ectx.strokeStyle = COL_K;
-  ectx.lineWidth = 3;
-  ectx.beginPath(); ectx.moveTo(lX, lY); ectx.lineTo(lX + 22, lY); ectx.stroke();
-  ectx.fillStyle = '#000';
-  ectx.fillText('K = ½mv²', lX + 26, lY);
-
-  lX += 110;
-  ectx.strokeStyle = COL_U;
-  ectx.lineWidth = 3;
-  ectx.beginPath(); ectx.moveTo(lX, lY); ectx.lineTo(lX + 22, lY); ectx.stroke();
-  ectx.fillStyle = '#000';
-  ectx.fillText('U = ½kx²', lX + 26, lY);
+  ectx.font='bold italic 14px '+FONT;
+  ectx.textAlign='left'; ectx.textBaseline='top';
+  ectx.fillStyle='#0a7d2b'; ectx.fillText('KE', GR_VW-155, GPAD.t+6);
+  ectx.fillStyle='#b45309'; ectx.fillText('PE', GR_VW-115, GPAD.t+6);
+  ectx.fillStyle='#1d4ed8'; ectx.fillText('total', GR_VW-75, GPAD.t+6);
 }
 
 const paramList = document.getElementById('paramList');
@@ -1922,9 +1651,9 @@ function updateReadouts(){
   if (Efn){
     const E = Efn();
     let eStr;
-    if (Math.abs(E)<1e-3)   eStr = (E*1e6).toFixed(2)+' µJ';
+    if (Math.abs(E)<1e-3) eStr = (E*1e6).toFixed(2)+' µJ';
     else if (Math.abs(E)<1) eStr = (E*1e3).toFixed(2)+' mJ';
-    else                    eStr = E.toFixed(3)+' J';
+    else eStr = E.toFixed(3)+' J';
     readEtotal.innerHTML = '<b>'+eStr+'</b>';
   } else {
     readEtotal.innerHTML = '<b>100 %</b>';
@@ -1946,8 +1675,7 @@ function buildTabs(){
 }
 
 function restartMotion(){
-  state.x = initX(); state.v = 0; state.t = 0; state.phi = 0;
-  state.history = []; resetMeasurement();
+  setInitialState();
 }
 
 function switchCase(id){
@@ -1957,12 +1685,27 @@ function switchCase(id){
   });
   const c = CASES[id];
   document.getElementById('formulaBlock').innerHTML = c.formula;
-
   buildParams();
-  state.x = initX(); state.v = 0; state.t = 0; state.phi = 0;
-  state.history = []; state.lastCrossT = null; state.measuredT = null;
+  setInitialState();
   state.running = false;
+
+  state.sw.running = false;
+  state.sw.t0 = null;
+  state.sw.elapsed = 0;
+  updateStopwatchDisplay();
+  swEl.classList.remove('running','stopped');
+
   setStatus('', 'Ready');
+}
+
+const swEl   = document.getElementById('stopwatch');
+const swTime = document.getElementById('swTime');
+
+function updateStopwatchDisplay(){
+  const t = state.sw.running && state.sw.t0 !== null
+    ? (performance.now() - state.sw.t0) / 1000
+    : state.sw.elapsed;
+  swTime.innerHTML = t.toFixed(3) + '<span class="sw-unit">s</span>';
 }
 
 let lastFrame = performance.now();
@@ -1971,6 +1714,11 @@ let accumulator = 0;
 function loop(now){
   const realDt = Math.min((now-lastFrame)/1000, 0.05);
   lastFrame = now;
+
+  if (state.sw.running && state.sw.t0 !== null){
+    state.sw.elapsed = (now - state.sw.t0) / 1000;
+    updateStopwatchDisplay();
+  }
 
   if (state.running){
     accumulator += realDt;
@@ -1985,12 +1733,12 @@ function loop(now){
     if (state.t>120) state.running = false;
   }
 
-  syncCanvas(simCanvas,  ctx,  simPanel,  SIM_VW, SIM_VH);
+  syncCanvas(simCanvas, ctx, simPanel, SIM_VW, SIM_VH);
   syncCanvas(circCanvas, cctx, circPanel, CIR_VW, CIR_VH);
-  syncCanvas(dispCanvas, dctx, dispPanel, GR_VW,  GR_VH);
-  syncCanvas(velCanvas,  vctx, velPanel,  GR_VW,  GR_VH);
-  syncCanvas(accCanvas,  actx, accPanel,  GR_VW,  GR_VH);
-  syncCanvas(enCanvas,   ectx, enPanel,   GR_VW,  GR_VH);
+  syncCanvas(dispCanvas, dctx, dispPanel, GR_VW, GR_VH);
+  syncCanvas(velCanvas, vctx, velPanel, GR_VW, GR_VH);
+  syncCanvas(accCanvas, actx, accPanel, GR_VW, GR_VH);
+  syncCanvas(enCanvas, ectx, enPanel, GR_VW, GR_VH);
 
   currentCase().render();
   drawReferenceCircle();
@@ -2007,88 +1755,67 @@ let draggingObj=false, dragCaseId=null;
 
 function pointerVirtual(evt){
   const rect = simCanvas.getBoundingClientRect();
-  return {
-    x: (evt.clientX - rect.left) / rect.width  * SIM_VW,
-    y: (evt.clientY - rect.top ) / rect.height * SIM_VH
-  };
+  return { x:(evt.clientX-rect.left)/rect.width*SIM_VW, y:(evt.clientY-rect.top)/rect.height*SIM_VH };
 }
-
 function hitHandle(v){
   const c = currentCase();
-  if (c.hitTestRod) return c.hitTestRod(v) ? {x:v.x, y:v.y} : null;
   if (!c.getHandle) return null;
   const h = c.getHandle();
-  const dx = v.x - h.x, dy = v.y - h.y;
-  const r = h.r + 24;
-  return (dx*dx + dy*dy < r*r) ? h : null;
+  const dx = v.x-h.x, dy = v.y-h.y;
+  const r = h.r+24;
+  return (dx*dx+dy*dy<r*r) ? h : null;
 }
 
-function onPointerDown(e){
+simCanvas.addEventListener('pointerdown', e=>{
   const v = pointerVirtual(e);
   if (hitHandle(v)){
-    draggingObj = true;
-    dragCaseId = state.caseId;
+    draggingObj = true; dragCaseId = state.caseId;
     state.running = false;
+    simCanvas.setPointerCapture(e.pointerId);
     simCanvas.style.cursor = 'grabbing';
     e.preventDefault();
-    window.addEventListener('pointermove', onPointerMove);
-    window.addEventListener('pointerup', onPointerUp);
-    window.addEventListener('pointercancel', onPointerCancel);
   }
-}
-function onPointerMove(e){
-  if (!draggingObj) return;
-  if (state.caseId !== dragCaseId) return;
+});
+
+simCanvas.addEventListener('pointermove', e=>{
   const v = pointerVirtual(e);
-  const c = currentCase();
-  if (c.dragTo) c.dragTo(v.x, v.y);
-  state.t = 0;
-  state.phi = state.x >= 0 ? 0 : PI;
-  state.history = [{t:0, x:state.x, v:0, a:accelFn(state.x, 0, 0)}];
-  resetMeasurement();
-}
-function onPointerUp(e){
+  if (draggingObj && state.caseId===dragCaseId){
+    const c = currentCase();
+    if (c.dragTo) c.dragTo(v.x, v.y);
+    state.t = 0; state.phi = state.x>=0?0:PI;
+    state.history = [{t:0,x:state.x,v:0,a:accelFn(state.x,0,0)}];
+    resetMeasurement();
+  } else {
+    simCanvas.style.cursor = hitHandle(v)?'grab':'default';
+  }
+});
+
+simCanvas.addEventListener('pointerup', e=>{
   if (!draggingObj) return;
   draggingObj = false;
-  window.removeEventListener('pointermove', onPointerMove);
-  window.removeEventListener('pointerup', onPointerUp);
-  window.removeEventListener('pointercancel', onPointerCancel);
-
   const c = currentCase();
   const A = Math.abs(state.x);
   if (c.ampKey){
-    if (c.ampKey==='theta0')       state.theta0  = A;
+    if (c.ampKey==='theta0') state.theta0 = A;
     else if (c.ampKey==='theta0p') state.theta0p = A;
     else if (c.ampKey==='theta0t') state.theta0t = A;
-    else if (c.ampKey==='A')       state.A       = A;
-    else if (c.ampKey==='Q0')      state.Q0      = A;
+    else if (c.ampKey==='A') state.A = A;
+    else if (c.ampKey==='Q0') state.Q0 = A;
   }
   state.v = 0; state.t = 0;
-  state.phi = state.x >= 0 ? 0 : PI;
-  state.history = [{t:0, x:state.x, v:0, a:accelFn(state.x, 0, 0)}];
+  state.phi = state.x>=0?0:PI;
+  state.history = [{t:0,x:state.x,v:0,a:accelFn(state.x,0,0)}];
   resetMeasurement();
   state.running = true;
-  setStatus('running', 'Running');
+  setStatus('running','Running');
   buildParams();
   simCanvas.style.cursor = 'grab';
   dragCaseId = null;
-  showToast('New amplitude: ' + A.toFixed(3));
-}
-function onPointerCancel(){
-  draggingObj = false;
-  window.removeEventListener('pointermove', onPointerMove);
-  window.removeEventListener('pointerup', onPointerUp);
-  window.removeEventListener('pointercancel', onPointerCancel);
-  simCanvas.style.cursor = 'default';
-  dragCaseId = null;
-}
+  showToast('New amplitude: '+A.toFixed(3));
+});
 
-simCanvas.addEventListener('pointerdown', onPointerDown);
-
-simCanvas.addEventListener('pointermove', e=>{
-  if (draggingObj) return;
-  const v = pointerVirtual(e);
-  simCanvas.style.cursor = hitHandle(v) ? 'grab' : 'default';
+simCanvas.addEventListener('pointercancel', ()=>{
+  draggingObj = false; dragCaseId = null; simCanvas.style.cursor = 'default';
 });
 
 (function(){
@@ -2104,8 +1831,8 @@ simCanvas.addEventListener('pointermove', e=>{
   head.addEventListener('pointermove', e=>{
     if (!dragging) return;
     let left = e.clientX - offX, top = e.clientY - offY;
-    left = Math.max(0, Math.min(window.innerWidth  - win.offsetWidth,  left));
-    top  = Math.max(0, Math.min(window.innerHeight - win.offsetHeight, top));
+    left = Math.max(0, Math.min(window.innerWidth - win.offsetWidth, left));
+    top = Math.max(0, Math.min(window.innerHeight - win.offsetHeight, top));
     win.style.left = left+'px'; win.style.top = top+'px'; win.style.right = 'auto';
   });
   head.addEventListener('pointerup', e=>{
@@ -2115,10 +1842,67 @@ simCanvas.addEventListener('pointermove', e=>{
   head.addEventListener('pointercancel', ()=>{ dragging=false; });
 })();
 
+document.querySelectorAll('input[name="initForm"]').forEach(r=>{
+  r.addEventListener('change', e=>{
+    state.initForm = e.target.value;
+    setInitialState();
+    state.running = false;
+    setStatus('','Ready');
+    showToast(state.initForm === 'cos'
+      ? 'Form: x = A cos(ωt) — release from amplitude'
+      : 'Form: x = A sin(ωt) — release through equilibrium');
+  });
+});
+
+document.getElementById('swStart').addEventListener('click', ()=>{
+  state.sw.running = true;
+  state.sw.t0 = performance.now();
+  state.sw.elapsed = 0;
+  swEl.classList.add('running');
+  swEl.classList.remove('stopped');
+  setInitialState();
+  state.running = true;
+  setStatus('running','Running');
+  updateStopwatchDisplay();
+  showToast('Stopwatch started — oscillation released at t = 0');
+});
+
+document.getElementById('swStop').addEventListener('click', ()=>{
+  if (state.sw.running && state.sw.t0 !== null){
+    state.sw.elapsed = (performance.now() - state.sw.t0) / 1000;
+  }
+  state.sw.running = false;
+  state.running = false;
+  swEl.classList.remove('running');
+  swEl.classList.add('stopped');
+  setStatus('paused','Paused');
+  updateStopwatchDisplay();
+  showToast('Stopwatch stopped at ' + state.sw.elapsed.toFixed(3) + ' s');
+});
+
+document.getElementById('swReset').addEventListener('click', ()=>{
+  state.sw.running = false;
+  state.sw.t0 = null;
+  state.sw.elapsed = 0;
+  swEl.classList.remove('running','stopped');
+  state.x = 0; state.v = 0; state.t = 0; state.phi = 0;
+  state.history = [];
+  resetMeasurement();
+  state.running = false;
+  setStatus('', 'Ready');
+  updateStopwatchDisplay();
+  showToast('Stopwatch and motion reset');
+});
+
 function resetMeasurement(){ state.lastCrossT = null; state.measuredT = null; }
 
 document.getElementById('btnRelease').addEventListener('click', ()=>{
-  restartMotion();
+  state.sw.running = true;
+  state.sw.t0 = performance.now();
+  state.sw.elapsed = 0;
+  swEl.classList.add('running');
+  swEl.classList.remove('stopped');
+  setInitialState();
   state.running = true; setStatus('running','Running');
   const c = currentCase();
   if (c.caseId==='pendulum') showToast('Released from θ₀ = '+(state.theta0/DEG).toFixed(1)+'°');
@@ -2128,23 +1912,45 @@ document.getElementById('btnRelease').addEventListener('click', ()=>{
   else if (c.caseId==='forced') showToast('Driver at ωd = '+state.omega_d.toFixed(2)+' rad/s');
   else if (c.caseId==='utube') showToast('Released with x₀ = '+(state.A*1000).toFixed(1)+' mm');
   else showToast('Released from x₀ = '+state.A.toFixed(3)+' m');
+  updateStopwatchDisplay();
 });
 
 document.getElementById('btnPause').addEventListener('click', ()=>{
-  if (state.running){ state.running=false; setStatus('paused','Paused'); showToast('Paused'); }
-  else { state.running=true; setStatus('running','Running'); showToast('Resumed'); }
+  if (state.running){
+    state.running=false;
+    if (state.sw.running && state.sw.t0 !== null){
+      state.sw.elapsed = (performance.now() - state.sw.t0) / 1000;
+      state.sw.running = false;
+      swEl.classList.remove('running');
+      swEl.classList.add('stopped');
+      updateStopwatchDisplay();
+    }
+    setStatus('paused','Paused');
+    showToast('Paused');
+  } else {
+    state.running=true;
+    if (!state.sw.running){
+      state.sw.t0 = performance.now() - state.sw.elapsed * 1000;
+      state.sw.running = true;
+      swEl.classList.add('running');
+      swEl.classList.remove('stopped');
+    }
+    setStatus('running','Running');
+    showToast('Resumed');
+  }
 });
 
 document.getElementById('btnReset').addEventListener('click', ()=>{
   state.x=0; state.v=0; state.phi=0; state.t=0;
   state.history=[]; state.running=false;
-  resetMeasurement(); setStatus('','Ready');
+  resetMeasurement();
+  state.sw.running = false;
+  state.sw.t0 = null;
+  state.sw.elapsed = 0;
+  swEl.classList.remove('running','stopped');
+  updateStopwatchDisplay();
+  setStatus('','Ready');
   showToast('Reset to equilibrium');
-});
-
-document.getElementById('vecToggle').addEventListener('change', e=>{
-  showVectors = e.target.checked;
-  showToast(showVectors ? 'Vectors on' : 'Vectors off');
 });
 
 function setStatus(cls, txt){
@@ -2171,8 +1977,9 @@ document.addEventListener('keydown', e=>{
 buildTabs();
 buildParams();
 switchCase(state.caseId);
+updateStopwatchDisplay();
 requestAnimationFrame(loop);
-setTimeout(()=>showToast('Drag any part · Vectors toggle · Space = pause'), 700);
+setTimeout(()=>showToast('Choose initial condition · Drag to set amplitude · Space = pause'), 700);
 </script>
 </body>
 </html>
