@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gravitational Fields — T·SIMHUB</title>
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#ffffff;color:#000;
+    font-family:"Times New Roman", Times, Georgia, serif;font-size:12pt;line-height:1.35;}
+  .topbar{position:sticky;top:0;z-index:100;background:rgba(5,8,16,0.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(180,205,240,0.12);}
+  .topbar-inner{max-width:1440px;margin:0 auto;padding:11px 32px;display:flex;align-items:center;justify-content:space-between;gap:20px;}
+  @media(max-width:640px){.topbar-inner{padding:10px 18px;}}
+  .banner{display:inline-flex;align-items:baseline;gap:11px;color:#fff;text-decoration:none;white-space:nowrap;}
+  .banner .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#ffd97a;box-shadow:0 0 12px rgba(255,217,122,0.85);position:relative;top:1px;animation:pulse 3s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{box-shadow:0 0 12px rgba(255,217,122,0.85);}50%{box-shadow:0 0 20px rgba(255,217,122,1);}}
+  .banner .main{font-size:14.5px;font-weight:bold;}
+  .banner .sub{font-size:12.5px;font-style:italic;color:rgba(255,255,255,0.72);}
+  .banner .sub::before{content:"·";margin-right:8px;color:rgba(255,255,255,0.4);}
+  @media(max-width:520px){.banner .sub{display:none;}}
+  .status{font-size:11pt;font-style:italic;color:#fff;flex:none;}
+  .status .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#666;margin-right:6px;vertical-align:middle;}
+  .status.running .dot{background:#22c55e;box-shadow:0 0 8px rgba(34,197,94,.7);}
+  .status.paused .dot{background:#f59e0b;box-shadow:0 0 8px rgba(245,158,11,.6);}
+  .app{display:flex;flex-direction:column;padding:10px 12px 16px;gap:6px;max-width:1440px;margin:0 auto;}
+  .case-tabs{display:flex;gap:14px;padding:6px 0 8px;flex-wrap:wrap;border-bottom:1.5px solid #000;}
+  .case-tab{background:none;border:none;padding:0 0 3px;font-family:inherit;font-size:10pt;font-style:italic;color:#000;cursor:pointer;border-bottom:2px solid transparent;}
+  .case-tab.active{font-weight:bold;font-style:normal;border-bottom-color:#000;}
+  .stage{display:flex;flex-direction:column;gap:8px;padding-top:8px;}
+  .sim-row{display:flex;flex-direction:column;gap:4px;border-bottom:1.5px solid #000;padding-bottom:8px;}
+  .sim-panel{position:relative;width:100%;height:58vh;min-height:400px;max-height:620px;background:#fdfcf6;overflow:hidden;}
+  .sim-panel canvas{display:block;width:100%;height:100%;touch-action:none;user-select:none;cursor:grab;}
+  .control-row{display:flex;justify-content:center;align-items:center;gap:22px;padding:4px 0 0;flex-wrap:wrap;}
+  .btn{background:none;border:none;padding:0 0 2px;font-family:inherit;font-size:12pt;color:#000;cursor:pointer;border-bottom:1.5px solid #000;font-weight:bold;}
+  .btn:active{color:#555;border-bottom-color:#555;}
+  .btn.toggle-on{border-bottom-color:#0a7d2b;color:#0a7d2b;}
+  .vec-toggle{display:inline-flex;align-items:center;gap:6px;font-family:inherit;font-size:11pt;font-style:italic;cursor:pointer;user-select:none;padding-bottom:2px;border-bottom:1.5px dotted #666;}
+  .vec-toggle input{cursor:pointer;accent-color:#1d4ed8;width:14px;height:14px;}
+  .row-graphs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;border-bottom:1.5px solid #000;padding-bottom:8px;}
+  .row-graphs.hidden{display:none;}
+  @media(max-width:960px){.row-graphs{grid-template-columns:1fr;}}
+  .row-graphs .panel{position:relative;height:31vh;min-height:230px;max-height:300px;background:#fff;border:1px solid #d0d0d0;display:flex;align-items:center;justify-content:center;min-width:0;}
+  .row-graphs .panel canvas{display:block;background:#fff;}
+  .row-bottom{display:grid;grid-template-columns:1fr;gap:12px;padding-bottom:6px;}
+  .row-bottom.hidden{display:none;}
+  .row-bottom .panel{position:relative;height:34vh;min-height:250px;max-height:330px;background:#fff;border:1px solid #d0d0d0;display:flex;align-items:center;justify-content:center;min-width:0;}
+  .row-bottom .panel canvas{display:block;background:#fff;}
+  .data-container{display:none;grid-template-columns:repeat(3,1fr);gap:14px;padding:4px 0 8px;}
+  .data-container.visible{display:grid;}
+  @media(max-width:820px){.data-container{grid-template-columns:1fr;}}
+  .data-box{border:1.5px solid #000;border-radius:14px;padding:12px 16px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.06);min-width:0;}
+  .data-box h3{margin:0 0 8px;font-size:11pt;font-weight:bold;font-style:italic;color:#000;}
+  .data-list{font-size:10.5pt;line-height:1.6;color:#000;}
+  .data-list .row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+  .data-list .k{font-style:italic;color:#000;}
+  .data-list .v{font-weight:bold;color:#000;white-space:nowrap;font-family:Consolas,"Courier New",monospace;font-size:10pt;}
+  .data-list .v .u{font-weight:normal;font-style:italic;margin-left:3px;font-size:9.5pt;font-family:"Times New Roman",Times,serif;}
+  .float-win{position:fixed;z-index:600;background:#fff;border:1.6px solid #000;border-radius:14px;box-shadow:0 4px 16px rgba(0,0,0,0.18);font-family:inherit;font-size:10pt;user-select:none;overflow:hidden;}
+  .float-win .fw-head{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:#f6f6f6;border-bottom:1px solid #d0d0d0;cursor:move;touch-action:none;}
+  .float-win .fw-head .fw-title{font-weight:bold;font-style:italic;font-size:10.5pt;color:#000;}
+  .float-win .fw-head .fw-grip{display:inline-block;width:14px;height:8px;background-image:linear-gradient(#333 1.5px, transparent 1.5px);background-size:100% 3px;opacity:.7;}
+  .float-win .fw-body{padding:8px 10px 10px;max-height:400px;overflow-y:auto;}
+  #paramWin{top:130px;right:20px;max-width:250px;}
+  .param{margin-bottom:6px;}
+  .param:last-child{margin-bottom:0;}
+  .param-row{display:flex;justify-content:space-between;align-items:baseline;font-size:10pt;margin-bottom:2px;gap:6px;}
+  .param-row .name{font-style:italic;color:#000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .param-row .value{font-weight:bold;color:#000;white-space:nowrap;font-size:9.5pt;font-family:Consolas,"Courier New",monospace;}
+  .param input[type="range"]{width:100%;-webkit-appearance:none;appearance:none;height:3.5px;background:#000;outline:none;cursor:pointer;display:block;border-radius:0;}
+  .param input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:12px;height:12px;border-radius:50%;background:#000;border:none;cursor:grab;}
+  .param input[type="range"]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#000;border:none;cursor:grab;}
+  .hint{margin-top:8px;padding-top:6px;border-top:1px dashed #ccc;font-size:9pt;font-style:italic;color:#555;line-height:1.35;}
+  .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(60px);background:#000;color:#fff;padding:7px 16px;font-size:11.5pt;font-style:italic;font-weight:bold;opacity:0;pointer-events:none;transition:opacity .22s, transform .22s;z-index:900;border-radius:3px;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="banner" href="../../../../">
+      <span class="dot"></span>
+      <span class="main">Tanzania Simulation Hub</span>
+      <span class="sub">T·SIMHUB</span>
+    </a>
+    <span class="status" id="statusTag"><span class="dot"></span><span id="statusText">Ready</span></span>
+  </div>
+</div>
+
+<div class="app">
+  <nav class="case-tabs" id="caseTabs"></nav>
+
+  <div class="stage">
+    <div class="sim-row">
+      <div class="sim-panel" id="simPanel"><canvas id="simCanvas"></canvas></div>
+      <div class="control-row">
+        <button class="btn" id="btnRelease">Launch</button>
+        <button class="btn" id="btnPause">Pause</button>
+        <button class="btn" id="btnReset">Reset</button>
+        <button class="btn" id="btnData">Show data</button>
+        <label class="vec-toggle" title="Show force, velocity and field vectors">
+          <input type="checkbox" id="vecToggle" checked>
+          <span>Vectors</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="row-graphs" id="graphRow">
+      <div class="panel"><canvas id="gCanvas1"></canvas></div>
+      <div class="panel"><canvas id="gCanvas2"></canvas></div>
+      <div class="panel"><canvas id="gCanvas3"></canvas></div>
+    </div>
+
+    <div class="row-bottom" id="mainRow">
+      <div class="panel"><canvas id="mainCanvas"></canvas></div>
+    </div>
+
+    <div class="data-container" id="dataContainer">
+      <div class="data-box">
+        <h3 id="col1Title">Quantities</h3>
+        <div class="data-list" id="col1"></div>
+      </div>
+      <div class="data-box">
+        <h3 id="col2Title">Derived</h3>
+        <div class="data-list" id="col2"></div>
+      </div>
+      <div class="data-box">
+        <h3>Constants</h3>
+        <div class="data-list">
+          <div class="row"><span class="k"><i>G</i></span><span class="v">6.674×10⁻¹¹<span class="u">N m² kg⁻²</span></span></div>
+          <div class="row"><span class="k"><i>M</i><sub>⊕</sub></span><span class="v">5.972×10²⁴<span class="u">kg</span></span></div>
+          <div class="row"><span class="k"><i>R</i><sub>⊕</sub></span><span class="v">6.371×10⁶<span class="u">m</span></span></div>
+          <div class="row"><span class="k"><i>M</i><sub>☉</sub></span><span class="v">1.989×10³⁰<span class="u">kg</span></span></div>
+          <div class="row"><span class="k">1 AU</span><span class="v">1.496×10¹¹<span class="u">m</span></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="float-win" id="paramWin">
+  <div class="fw-head" id="paramHead"><span class="fw-title">Parameters</span><span class="fw-grip"></span></div>
+  <div class="fw-body" id="paramList"></div>
+</div>
+
+<div class="toast" id="toast"><span id="toastMsg">Ready</span></div>
+
+<script>
+/* ================================================================
+   FUNDAMENTAL CONSTANTS
+   ================================================================ */
+const G         = 6.674e-11;
+const M_EARTH   = 5.972e24;
+const R_EARTH   = 6.371e6;
+const M_SUN     = 1.989e30;
+const AU        = 1.496e11;
+const DAY       = 86400;
+
+const PI = Math.PI, TWO_PI = 2*PI;
+const FONT = '"Times New Roman", Times, Georgia, serif';
+let showVectors = true;
+
+const clamp = (v,a,b) => Math.min(b, Math.max(a, v));
+
+/* ================================================================
+   LAYOUT
+   ================================================================ */
+const SIM_VW = 1400, SIM_VH = 560;
+const GR_VW = 400, GR_VH = 285;
+const MAIN_VW = 900;
+
+/* ================================================================
+   CANVAS SETUP
+   ================================================================ */
+const simCanvas  = document.getElementById('simCanvas');
+const gCanvas1   = document.getElementById('gCanvas1');
+const gCanvas2   = document.getElementById('gCanvas2');
+const gCanvas3   = document.getElementById('gCanvas3');
+const mainCanvas = document.getElementById('mainCanvas');
+
+const simPanel  = document.getElementById('simPanel');
+const gPanel1   = gCanvas1.parentElement;
+const gPanel2   = gCanvas2.parentElement;
+const gPanel3   = gCanvas3.parentElement;
+const mainPanel = mainCanvas.parentElement;
+
+const ctx  = simCanvas.getContext('2d',  {alpha:false});
+const c1   = gCanvas1.getContext('2d',   {alpha:false});
+const c2   = gCanvas2.getContext('2d',   {alpha:false});
+const c3   = gCanvas3.getContext('2d',   {alpha:false});
+const mctx = mainCanvas.getContext('2d', {alpha:false});
+
+function syncCanvas(canvas, g, panel, vW, vH){
+  const availW = Math.max(80, panel.clientWidth-2);
+  const availH = Math.max(60, panel.clientHeight-2);
+  const aspect = vW/vH;
+  let w = availW, h = w/aspect;
+  if (h > availH){ h = availH; w = h*aspect; }
+  w = Math.round(w); h = Math.round(h);
+  const dpr = window.devicePixelRatio || 1;
+  const needW = Math.round(w*dpr), needH = Math.round(h*dpr);
+  if (canvas.width !== needW || canvas.height !== needH){
+    canvas.width = needW; canvas.height = needH;
+    canvas.style.width = w+'px'; canvas.style.height = h+'px';
+  }
+  g.setTransform(needW/vW, 0, 0, needH/vH, 0, 0);
+  g.imageSmoothingEnabled = true;
+  g.imageSmoothingQuality = 'high';
+  g.lineCap = 'round'; g.lineJoin = 'round';
+  g.textBaseline = 'alphabetic';
+}
+
+/* ================================================================
+   GRID PAPER
+   ================================================================ */
+function drawGridPaper(g, w, h){
+  g.fillStyle = '#fdfcf6';
+  g.fillRect(0, 0, w, h);
+  g.strokeStyle = 'rgba(140, 195, 140, 0.42)';
+  g.lineWidth = 1;
+  g.beginPath();
+  for (let x = 0; x <= w; x += 20){ g.moveTo(x+0.5, 0); g.lineTo(x+0.5, h); }
+  for (let y = 0; y <= h; y += 20){ g.moveTo(0, y+0.5); g.lineTo(w, y+0.5); }
+  g.stroke();
+  g.strokeStyle = 'rgba(225, 130, 130, 0.55)';
+  g.lineWidth = 1.2;
+  g.beginPath();
+  for (let x = 0; x <= w; x += 100){ g.moveTo(x+0.5, 0); g.lineTo(x+0.5, h); }
+  for (let y = 0; y <= h; y += 100){ g.moveTo(0, y+0.5); g.lineTo(w, y+0.5); }
+  g.stroke();
+}
+
+/* ================================================================
+   ARROWS
+   ================================================================ */
+function drawArrow(g, x1, y1, x2, y2, color, label){
+  const dx = x2-x1, dy = y2-y1;
+  const len = Math.hypot(dx, dy);
+  if (len < 4) return;
+  const ang = Math.atan2(dy, dx);
+  const head = Math.min(12, len*0.34);
+  g.strokeStyle = color; g.fillStyle = color; g.lineWidth = 2.2;
+  g.beginPath();
+  g.moveTo(x1, y1);
+  g.lineTo(x2 - head*0.92*Math.cos(ang), y2 - head*0.92*Math.sin(ang));
+  g.stroke();
+  g.beginPath();
+  g.moveTo(x2, y2);
+  g.lineTo(x2 - head*Math.cos(ang - 0.42), y2 - head*Math.sin(ang - 0.42));
+  g.lineTo(x2 - head*Math.cos(ang + 0.42), y2 - head*Math.sin(ang + 0.42));
+  g.closePath(); g.fill();
+  if (label){
+    g.font = 'bold italic 17px ' + FONT;
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText(label, x2 + Math.cos(ang)*20, y2 + Math.sin(ang)*20);
+  }
+}
+
+/* ================================================================
+   PHYSICS
+   ================================================================ */
+function fieldStrength(M, r){ return G * M / (r*r); }
+function gravForce(M, m, r){ return G * M * m / (r*r); }
+function potential(M, r){ return -G * M / r; }
+function potEnergy(M, m, r){ return -G * M * m / r; }
+function orbitalSpeed(M, r){ return Math.sqrt(G * M / r); }
+function orbitalPeriod(M, r){ return TWO_PI * Math.sqrt(r*r*r / (G*M)); }
+function escapeSpeed(M, r){ return Math.sqrt(2 * G * M / r); }
+
+/* ================================================================
+   FORMATTING
+   ================================================================ */
+const SUP = {'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻'};
+function sup(n){ return String(n).split('').map(c => SUP[c] || c).join(''); }
+function sci(v, digits){
+  digits = (digits === undefined) ? 3 : digits;
+  if (!isFinite(v)) return '—';
+  if (v === 0) return '0';
+  const sign = v < 0 ? '−' : '';
+  v = Math.abs(v);
+  let exp = Math.floor(Math.log10(v));
+  let man = v / Math.pow(10, exp);
+  if (man >= 9.995){ exp += 1; man = v / Math.pow(10, exp); }
+  return sign + man.toFixed(digits) + '×10' + sup(exp);
+}
+function shortNum(v){
+  if (!isFinite(v)) return '—';
+  if (v === 0) return '0';
+  const a = Math.abs(v);
+  if (a >= 1e4 || a < 1e-2){
+    const e = Math.floor(Math.log10(a));
+    const mm = v / Math.pow(10, e);
+    return mm.toFixed(1) + '×10' + sup(e);
+  }
+  if (a >= 100) return v.toFixed(0);
+  if (a >= 1) return v.toFixed(1);
+  return v.toFixed(2);
+}
+
+/* ================================================================
+   DRAWING HELPERS
+   ================================================================ */
+function drawMass(g, x, y, r, color){
+  const grad = g.createRadialGradient(x - r*0.35, y - r*0.35, r*0.1, x, y, r);
+  grad.addColorStop(0, '#ffffff');
+  grad.addColorStop(0.4, color || '#3d7fd4');
+  grad.addColorStop(1, '#1a3f78');
+  g.beginPath(); g.arc(x, y, r, 0, TWO_PI);
+  g.fillStyle = grad; g.fill();
+  g.strokeStyle = '#0f2647'; g.lineWidth = 1.5; g.stroke();
+  /* subtle highlight */
+  g.beginPath(); g.arc(x - r*0.25, y - r*0.25, r*0.2, 0, TWO_PI);
+  g.fillStyle = 'rgba(255,255,255,0.35)'; g.fill();
+}
+
+function drawSun(g, x, y, r){
+  const glow = g.createRadialGradient(x, y, r*0.9, x, y, r*3);
+  glow.addColorStop(0, 'rgba(255,215,80,0.5)');
+  glow.addColorStop(0.4, 'rgba(255,180,50,0.2)');
+  glow.addColorStop(1, 'rgba(255,150,30,0)');
+  g.fillStyle = glow;
+  g.beginPath(); g.arc(x, y, r*3, 0, TWO_PI); g.fill();
+  const gr = g.createRadialGradient(x - r*0.35, y - r*0.35, r*0.1, x, y, r);
+  gr.addColorStop(0, '#fff4c0'); gr.addColorStop(0.5, '#ffd042');
+  gr.addColorStop(0.9, '#f59e0b'); gr.addColorStop(1, '#b45309');
+  g.beginPath(); g.arc(x, y, r, 0, TWO_PI); g.fillStyle = gr; g.fill();
+  g.strokeStyle = '#7c2d12'; g.lineWidth = 1.3; g.stroke();
+}
+
+function caption(g, text, x, y, color, size, align){
+  g.fillStyle = color || '#000';
+  g.font = 'italic ' + (size||12) + 'px ' + FONT;
+  g.textAlign = align || 'center';
+  g.textBaseline = 'top';
+  g.fillText(text, x, y);
+}
+
+/* ================================================================
+   CASES — Cambridge 9702 Topic 13: Gravitational fields
+   ================================================================ */
+const bodyR = M => R_EARTH*Math.cbrt(M/M_EARTH);          /* constant-density planet */
+const tauOf = (M,r) => Math.sqrt(r*r*r/(G*M));
+const T_DAY = 86400, YEAR = 3.156e7;
+const R_GEO = Math.cbrt(G*M_EARTH*T_DAY*T_DAY/(4*PI*PI));
+const fmM = v => sci(v,3) + ' m';
+const SPD = {key:'speed',label:'Time speed',sym:'',min:0.25,max:4,step:0.25,fmt:v=>'×'+v.toFixed(2)};
+const sM = (a,b,l) => ({key:'M',label:l||'Source mass',sym:'M',min:a,max:b,step:1e20,fmt:v=>sci(v,2)+' kg'});
+const sR = (l,a,b,st,w) => ({key:'r',label:l,sym:'r',min:a,max:b,step:st,when:w,fmt:fmM});
+const sK = (a,b) => ({key:'k',label:'Launch speed',sym:'v₀',min:a,max:b,step:0.01,fmt:v=>v.toFixed(2)+(a<0.5?' × v꜀':' × vₑ')});
+
+const CASES = {
+  'field-lines':{label:'Field lines',hasGraphs:true,hasMain:false,
+    defaultParams:{M:M_EARTH,mode:'radial',r:5*R_EARTH,h:100,speed:1},
+    select:{key:'mode',label:'Field type',opts:[['radial','Radial (point mass)'],['uniform','Uniform (near surface)']]},
+    sliders:[sM(1e23,1e26),sR('Probe distance',1.2*R_EARTH,10*R_EARTH,1e4,'radial'),
+      {key:'h',label:'Drop height',sym:'h',min:10,max:200,step:5,when:'uniform',fmt:v=>v.toFixed(0)+' m'},SPD],
+    note:'g = F/m is the force per unit mass. Radial field: lines point to the centre and spread out, so g falls as 1/r². Release the probe: it accelerates faster as it nears the mass. Uniform field: near a surface the lines are parallel, g is constant, and every mass falls with the same acceleration.'},
+  'newton-law':{label:"Newton's law",hasGraphs:true,hasMain:true,
+    defaultParams:{M:5.972e24,m:7.342e22,r:3.844e8,speed:1},
+    sliders:[sM(1e22,1e26,'Mass M'),Object.assign(sM(1e20,1e25,'Mass m'),{key:'m',sym:'m'}),sR('Separation',1e7,1e9,1e5),SPD],
+    note:'F = GMm/r². The forces on the two masses are equal and opposite (Newton III), but a = F/mass, so the lighter body accelerates more. Release the masses: both move about their common centre of mass and F rises as r falls.'},
+  'field-strength':{label:'Field strength',hasGraphs:true,hasMain:true,
+    defaultParams:{M:M_EARTH,r:3*R_EARTH,speed:1},
+    sliders:[sM(1e23,1e26),sR('Distance',R_EARTH,10*R_EARTH,1e4),SPD],
+    note:'g = GM/r² for a point mass (or any sphere, measured from its centre). Doubling r divides g by 4. The shaded area under the g–r graph between two radii equals the change in potential Δφ.'},
+  'potential':{label:'Potential',hasGraphs:true,hasMain:true,
+    defaultParams:{M:M_EARTH,m:100,r:2e7,speed:1},
+    sliders:[sM(1e23,1e26),{key:'m',label:'Test mass',sym:'m',min:1,max:1000,step:1,fmt:v=>v.toFixed(0)+' kg'},sR('Distance',R_EARTH,1e8,1e5),SPD],
+    note:'φ = −GM/r is the work per unit mass to bring a mass from infinity; U = mφ. As the probe falls, U decreases and KE increases by the same amount, so KE + U stays constant. g = −dφ/dr (gradient of φ–r), Δφ = area under g–r.'},
+  'orbit':{label:'Satellite orbits',hasGraphs:true,hasMain:true,
+    defaultParams:{m:500,r:R_EARTH+4e5,k:1,speed:1},
+    sliders:[{key:'m',label:'Satellite mass',sym:'m',min:10,max:5000,step:10,fmt:v=>v.toFixed(0)+' kg'},sR('Launch radius',R_EARTH+2e5,4.5e7,1e4),sK(0.4,1.5),SPD],
+    note:'Launched sideways at v₀. At v₀ = v꜀ = √(GM/r), gravity supplies exactly the centripetal force (GMm/r² = mv²/r) and the orbit is circular, T = 2π√(r³/GM). Slower gives an ellipse (or a crash), √2·v꜀ is escape speed. KE + U is constant; E = −GMm/2r for a circle.'},
+  'geostationary':{label:'Geostationary',hasGraphs:false,hasMain:true,
+    defaultParams:{r:3.6e7,dir:1,speed:1},
+    select:{key:'dir',label:'Orbit direction',opts:[[1,'West → East'],[-1,'East → West']]},
+    sliders:[sR('Orbit radius',2e7,6e7,1e4),SPD],
+    note:'A geostationary satellite stays above one point: circular, in the equatorial plane, moving west → east, with T = 24 h. T² ∝ r³ fixes the radius, about 4.22×10⁷ m. Any other radius drifts against the ground.'},
+  'escape':{label:'Escape speed',hasGraphs:true,hasMain:true,
+    defaultParams:{m:100,r:R_EARTH,k:0.8,speed:1},
+    sliders:[{key:'m',label:'Projectile mass',sym:'m',min:1,max:1000,step:1,fmt:v=>v.toFixed(0)+' kg'},sR('Launch radius',R_EARTH,2e7,1e5),sK(0.3,1.3),SPD],
+    note:'Escape needs KE + U ≥ 0: ½mv² = GMm/r, so vₑ = √(2GM/r), independent of m. Below vₑ the projectile stops at r_max and falls back; at vₑ it just reaches infinity with zero speed; above vₑ it escapes with speed to spare.'},
+  'kepler':{label:"Kepler's 3rd",hasGraphs:true,hasMain:true,
+    defaultParams:{r:4e11,speed:1},
+    sliders:[sR('Test planet radius',3e10,5e12,1e9),SPD],
+    note:'For circular orbits GMm/r² = mω²r gives T² = (4π²/GM)r³. Real planets and your test planet all give the same T²/r³. A log–log plot of T against r is a straight line with gradient 3/2.'}
+};
+
+/* ================================================================
+   STATE
+   ================================================================ */
+const state = {caseId:'field-lines',running:false,showData:false,sim:null,
+  M:M_EARTH,m:100,r:5*R_EARTH,k:1,h:100,speed:1,theta:0.6,dir:1,mode:'radial',lastFrame:performance.now()};
+const cx0 = SIM_VW/2, cy0 = SIM_VH/2;
+
+/* ================================================================
+   PHYSICS ENGINE — velocity-Verlet integration of Newton's law
+   ================================================================ */
+function orbitInfo(r0,k,M){
+  const GM=G*M, vc=Math.sqrt(GM/r0), v0=k*vc, eps=v0*v0/2-GM/r0, h=r0*v0;
+  const e=Math.sqrt(Math.max(0,1+2*eps*h*h/(GM*GM))), p=h*h/GM, bound=eps<-1e-9;
+  const a=bound?-GM/(2*eps):Infinity;
+  return {vc,v0,eps,e,p,bound,a,rp:p/(1+e),ra:bound?p/(1-e):Infinity,T:bound?TWO_PI*Math.sqrt(a*a*a/GM):Infinity};
+}
+
+function makeSim(){
+  const id=state.caseId, M=state.M, m=state.m, th=state.theta;
+  const s={t:0,done:false,msg:'',hist:[],trail:[],kind:'ana',warp:1,wf:0,x:0,y:0,vx:0,vy:0,r0:state.r};
+  const part=(Mc,x,y,vx,vy,Rs,wf,msg)=>{Object.assign(s,{kind:'part',Mc,x,y,vx,vy,Rstop:Rs,wf,pa:Math.atan2(y,x),ang:0,r0:Math.hypot(x,y),stopMsg:msg});};
+  if((id==='field-lines'&&state.mode==='radial')||id==='field-strength'||id==='potential'){
+    const Rb=bodyR(M), r0=Math.max(state.r,1.02*Rb), q=Rb/r0;
+    part(M,r0*Math.cos(th),r0*Math.sin(th),0,0,Rb,0.2,'Probe reached the surface');
+    s.tf=Math.sqrt(r0*r0*r0/(2*G*M))*(Math.acos(Math.sqrt(q))+Math.sqrt(q*(1-q)));
+  } else if(id==='field-lines'){
+    s.kind='uni'; s.g=G*M/Math.pow(bodyR(M),2); s.h0=state.h; s.tf=Math.sqrt(2*s.h0/s.g);
+  } else if(id==='newton-law'){
+    part(M+m,state.r,0,0,0,1e7,0.2,'Bodies in contact');
+  } else if(id==='orbit'){
+    const o=orbitInfo(state.r,state.k,M_EARTH);
+    part(M_EARTH,state.r,0,0,o.v0,R_EARTH,1,'Crashed into the Earth');
+  } else if(id==='escape'){
+    part(M_EARTH,0,state.r,0,state.k*escapeSpeed(M_EARTH,state.r),R_EARTH,1,'Fell back to the surface');
+    s.adapt=true; s.Rleave=2e9;
+  } else if(id==='geostationary') s.warp=T_DAY/8;
+  else if(id==='kepler') s.warp=YEAR/6;
+  if(s.wf) s.warp=s.wf*tauOf(s.Mc,s.r0);
+  return s;
+}
+
+function advance(s,simDt){
+  const M=s.Mc; let rem=simDt, n=0;
+  const acc=(x,y)=>{const r=Math.hypot(x,y),k=-G*M/(r*r*r);return [k*x,k*y];};
+  while(rem>1e-9&&n++<3000&&!s.done){
+    const h=Math.min(rem,0.004*tauOf(M,Math.hypot(s.x,s.y)));
+    let a=acc(s.x,s.y); s.vx+=a[0]*h/2; s.vy+=a[1]*h/2; s.x+=s.vx*h; s.y+=s.vy*h;
+    a=acc(s.x,s.y); s.vx+=a[0]*h/2; s.vy+=a[1]*h/2; s.t+=h; rem-=h;
+    const an=Math.atan2(s.y,s.x); let d=an-s.pa; if(d>PI)d-=TWO_PI; if(d<-PI)d+=TWO_PI; s.ang+=d; s.pa=an;
+    const r=Math.hypot(s.x,s.y);
+    if(r<=s.Rstop){const f=s.Rstop/r; s.x*=f; s.y*=f; s.done=true; s.msg=s.stopMsg;}
+    else if(s.Rleave&&r>=s.Rleave){s.done=true; s.msg='Escaped — left the diagram';}
+  }
+}
+
+function simStep(dt){
+  const s=state.sim; if(!s||!state.running||s.done) return;
+  if(s.kind==='part'){
+    const w=s.adapt?s.wf*tauOf(s.Mc,Math.max(Math.hypot(s.x,s.y),s.r0)):s.warp;
+    advance(s,dt*w*state.speed);
+    s.trail.push([s.x,s.y]); s.hist.push({t:s.t,r:Math.hypot(s.x,s.y),v:Math.hypot(s.vx,s.vy)});
+    if(!s.T&&Math.abs(s.ang)>=TWO_PI) s.T=s.t;
+    if(s.hist.length>2500){s.hist=s.hist.filter((_,i)=>i%2===0); s.trail=s.trail.filter((_,i)=>i%2===0);}
+  } else {
+    s.t+=dt*s.warp*state.speed;
+    if(s.kind==='uni'&&s.t>=s.tf){s.t=s.tf; s.done=true; s.msg='Both masses landed together';}
+  }
+  if(s.done){state.running=false; setStatus('paused',s.msg||'Finished'); showToast(s.msg||'Finished');}
+}
+
+/* ================================================================
+   DRAW HELPERS
+   ================================================================ */
+function txt(g,s,x,y,o){o=o||{};g.font=(o.f||'italic 13px')+' '+FONT;g.fillStyle=o.c||'#000';g.textAlign=o.a||'left';g.textBaseline=o.b||'top';g.fillText(s,x,y);}
+function head(t,sub,hint){txt(ctx,t,14,12,{f:'italic 15px'});txt(ctx,sub,14,34,{c:'#1d4ed8'});
+  if(hint) txt(ctx,hint,cx0,SIM_VH-10,{f:'italic 11.5px',c:'rgba(0,0,0,0.4)',a:'center',b:'bottom'});}
+function info(lines){lines.forEach((l,i)=>txt(ctx,l[0],SIM_VW-14,12+i*20,{f:'bold italic 13px',c:l[1]||'#000',a:'right'}));}
+function tri(g,x,y,ang,sz,col){g.save();g.translate(x,y);g.rotate(ang);g.beginPath();g.moveTo(sz,0);g.lineTo(-sz*.6,sz*.55);g.lineTo(-sz*.6,-sz*.55);g.closePath();g.fillStyle=col;g.fill();g.restore();}
+function trailDraw(g,pts,col,toPx){if(pts.length<2)return;g.beginPath();pts.forEach((p,i)=>{const q=toPx(p[0],p[1]);i?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]);});g.strokeStyle=col;g.lineWidth=2;g.stroke();}
+function dot(g,x,y,r,col){g.beginPath();g.arc(x,y,r,0,TWO_PI);g.fillStyle=col;g.fill();g.strokeStyle='#fff';g.lineWidth=2;g.stroke();}
+function sat(g,x,y){g.beginPath();g.arc(x,y,9,0,TWO_PI);g.fillStyle='#e2e8f0';g.fill();g.strokeStyle='#334155';g.lineWidth=1.6;g.stroke();g.fillStyle='#334155';g.beginPath();g.arc(x,y,3.5,0,TWO_PI);g.fill();}
+function dashLine(g,x1,y1,x2,y2,col){g.save();g.setLineDash([5,5]);g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.strokeStyle=col||'#666';g.lineWidth=1.3;g.stroke();g.restore();}
+function ringDash(g,r,col){g.beginPath();g.arc(cx0,cy0,r,0,TWO_PI);g.strokeStyle=col;g.lineWidth=1.1;g.setLineDash([4,5]);g.stroke();g.setLineDash([]);}
+function arrowToCentre(g,px,py,len,col,lab){const dx=cx0-px,dy=cy0-py,d=Math.hypot(dx,dy)||1;drawArrow(g,px,py,px+len*dx/d,py+len*dy/d,col,lab);}
+function bars(g,x,y,items,ref){
+  txt(g,'Energy',x+45,y-122,{f:'bold italic 12px',a:'center'});
+  g.strokeStyle='#888';g.lineWidth=1;g.beginPath();g.moveTo(x-8,y);g.lineTo(x+96,y);g.stroke();
+  items.forEach((it,i)=>{const bx=x+i*34,h=clamp(it[1]/ref*80,-100,100);
+    g.fillStyle=it[2];g.fillRect(bx,h>=0?y-h:y,22,Math.max(1,Math.abs(h)));
+    txt(g,it[0],bx+11,y+108,{f:'bold italic 12px',a:'center'});});
+}
+
+/* ================================================================
+   RENDERERS
+   ================================================================ */
+function RFieldLines(s){
+  const g=ctx,M=state.M,ph=(performance.now()/3500)%1; drawGridPaper(g,SIM_VW,SIM_VH);
+  if(state.mode==='radial'){
+    const sc=240/(10*R_EARTH),Rpx=Math.max(10,bodyR(M)*sc),maxR=252,n=24,toPx=(x,y)=>[cx0+x*sc,cy0-y*sc];
+    for(let i=0;i<n;i++){const a=i*TWO_PI/n,c=Math.cos(a),sn=Math.sin(a);
+      g.beginPath();g.moveTo(cx0+(Rpx+3)*c,cy0+(Rpx+3)*sn);g.lineTo(cx0+maxR*c,cy0+maxR*sn);g.strokeStyle='rgba(30,64,175,0.5)';g.lineWidth=1.4;g.stroke();
+      for(let j=0;j<3;j++){const rr=maxR-((ph+j/3)%1)*(maxR-Rpx-8);tri(g,cx0+rr*c,cy0+rr*sn,a+PI,7,'rgba(30,64,175,0.85)');}}
+    drawMass(g,cx0,cy0,Rpx,'#3d7fd4'); txt(g,'M = '+sci(M,3)+' kg',cx0,cy0+Rpx+8,{a:'center'});
+    trailDraw(g,s.trail,'rgba(185,28,28,0.55)',toPx);
+    const p=toPx(s.x,s.y),r=Math.hypot(s.x,s.y),gl=fieldStrength(M,r),v=Math.hypot(s.vx,s.vy);
+    dot(g,p[0],p[1],8,'#b91c1c');
+    if(showVectors){arrowToCentre(g,p[0],p[1],clamp(gl*6.5,14,120),'#1d4ed8','g');
+      if(v>1){const dx=cx0-p[0],dy=cy0-p[1],d=Math.hypot(dx,dy),nx=-dy/d*16,ny=dx/d*16;
+        drawArrow(g,p[0]+nx,p[1]+ny,p[0]+nx+clamp(v/90,6,110)*dx/d,p[1]+ny+clamp(v/90,6,110)*dy/d,'#0a7d2b','v');}}
+    head('Radial gravitational field','Field lines point towards the mass · they spread out with distance, so g falls as 1/r²','Launch to release the probe · drag it to change r');
+    info([['g = '+gl.toFixed(3)+' m/s²','#1d4ed8'],['r = '+sci(r,3)+' m'],['v = '+v.toFixed(0)+' m/s','#0a7d2b'],['t = '+s.t.toFixed(0)+' s']]);
+  } else {
+    const gy=470,ppm=1.9,gv=s.g,t=s.t,hh=Math.max(0,s.h0-0.5*gv*t*t),vv=gv*t,xs=[cx0-150,cx0+150],ms=[1,10],rs=[9,19];
+    g.fillStyle='#d4e8d4';g.fillRect(0,gy,SIM_VW,SIM_VH-gy);g.strokeStyle='#4a7c4a';g.lineWidth=2;g.beginPath();g.moveTo(0,gy);g.lineTo(SIM_VW,gy);g.stroke();
+    for(let i=0;i<16;i++){const x=100+i*(SIM_VW-200)/15;g.beginPath();g.moveTo(x,70);g.lineTo(x,gy);g.strokeStyle='rgba(30,64,175,0.45)';g.lineWidth=1.4;g.stroke();
+      for(let j=0;j<3;j++)tri(g,x,70+((ph+j/3)%1)*(gy-80),PI/2,6,'rgba(30,64,175,0.8)');}
+    for(let k=1;k*0.5<=t+1e-9;k++){const hk=Math.max(0,s.h0-0.5*gv*Math.pow(k*0.5,2));
+      xs.forEach((x,i)=>{g.beginPath();g.arc(x,gy-hk*ppm-rs[i],rs[i],0,TWO_PI);g.strokeStyle='rgba(0,0,0,0.3)';g.lineWidth=1;g.stroke();});}
+    xs.forEach((x,i)=>{const y=gy-hh*ppm-rs[i];drawMass(g,x,y,rs[i],'#3d7fd4');
+      if(showVectors){drawArrow(g,x+rs[i]+10,y,x+rs[i]+10,y+clamp(ms[i]*gv*1.5,14,150),'#dc2626','W');
+        if(vv>1)drawArrow(g,x-rs[i]-10,y,x-rs[i]-10,y+clamp(vv*0.9,6,120),'#0a7d2b','v');}
+      txt(g,ms[i]+' kg',x,gy+8,{a:'center'});});
+    head('Uniform gravitational field','Near a surface the lines are parallel and equally spaced · g is constant = '+gv.toFixed(2)+' m/s²','Launch to drop both masses · drag vertically to change the height');
+    info([['t = '+t.toFixed(2)+' s'],['v = gt = '+vv.toFixed(1)+' m/s','#0a7d2b'],['height = '+hh.toFixed(1)+' m'],['W = mg is 10× bigger, but a is the same','#b91c1c']]);
+  }
+}
+
+function RNewton(s){
+  const g=ctx,M=state.M,m=state.m,rho=s.x,F=gravForce(M,m,rho),cy=cy0; drawGridPaper(g,SIM_VW,SIM_VH);
+  const sep=90+clamp((Math.log10(rho)-7)/2,0,1)*(Math.min(SIM_VW*0.4,500)-90);
+  const xL=cx0-sep*m/(M+m),xR=cx0+sep*M/(M+m),R1=34,R2=clamp(34*Math.cbrt(m/M),10,46);
+  dashLine(g,xL,cy,xR,cy,'#777');
+  g.strokeStyle='#444';g.lineWidth=1.5;g.beginPath();g.moveTo(cx0-5,cy-5);g.lineTo(cx0+5,cy+5);g.moveTo(cx0+5,cy-5);g.lineTo(cx0-5,cy+5);g.stroke();
+  txt(g,'centre of mass',cx0,cy-60,{f:'italic 11px',c:'#555',a:'center'});
+  if(showVectors){const fl=clamp(28+Math.log10(F)*1.4,24,78);
+    drawArrow(g,xL,cy,xL+fl,cy,'#dc2626','F');drawArrow(g,xR,cy,xR-fl,cy,'#dc2626','F');
+    const la=a=>clamp(22+7*(Math.log10(a)+8),6,90),aM=F/M,am=F/m;
+    drawArrow(g,xL,cy+R1+52,xL+la(aM),cy+R1+52,'#0a7d2b','a');drawArrow(g,xR,cy+R1+52,xR-la(am),cy+R1+52,'#0a7d2b','a');}
+  drawMass(g,xL,cy,R1,'#3d7fd4');drawMass(g,xR,cy,R2,'#3d7fd4');
+  txt(g,'M',xL,cy+R1+8,{f:'italic 15px',a:'center'});txt(g,'m',xR,cy+R2+8,{f:'italic 15px',a:'center'});
+  txt(g,'a = '+sci(F/M,2)+' m/s²',xL,cy+R1+72,{c:'#0a7d2b',a:'center'});txt(g,'a = '+sci(F/m,2)+' m/s²',xR,cy+R1+72,{c:'#0a7d2b',a:'center'});
+  txt(g,'r',cx0,cy-24,{f:'italic 15px',a:'center'});
+  txt(g,'F = '+sci(F,3)+' N',cx0,cy+40,{f:'bold italic 14px',c:'#b91c1c',a:'center'});
+  head("Newton's law of universal gravitation",'F = GMm/r²  ·  equal and opposite forces, but a = F/mass is larger for the lighter body','Launch to release the masses · drag horizontally to change r');
+  info([['r = '+sci(rho,3)+' m'],['F = '+sci(F,3)+' N','#b91c1c'],['relative speed = '+Math.hypot(s.vx,s.vy).toFixed(0)+' m/s','#0a7d2b'],['t = '+(s.t/3600).toFixed(1)+' h']]);
+}
+
+function RFieldStrength(s){
+  const g=ctx,M=state.M,sc=240/(10*R_EARTH),Rb=bodyR(M),toPx=(x,y)=>[cx0+x*sc,cy0-y*sc]; drawGridPaper(g,SIM_VW,SIM_VH);
+  for(let i=0;i<24;i++){const a=i*TWO_PI/24;g.beginPath();g.moveTo(cx0+240*Math.cos(a),cy0+240*Math.sin(a));g.lineTo(cx0+Rb*sc*Math.cos(a),cy0+Rb*sc*Math.sin(a));g.strokeStyle='rgba(30,60,120,0.25)';g.lineWidth=1;g.stroke();}
+  [2,3,4,6,8,10].forEach(k=>{const rp=k*R_EARTH*sc;ringDash(g,rp,'rgba(120,150,200,0.7)');
+    for(let i=0;i<8;i++){const a=i*PI/4+0.4,x=cx0+rp*Math.cos(a),y=cy0+rp*Math.sin(a);tri(g,x,y,a+PI,5,'rgba(30,60,120,'+clamp(0.25+fieldStrength(M,k*R_EARTH)/6,0.25,0.9)+')');}
+    txt(g,'g='+fieldStrength(M,k*R_EARTH).toFixed(2),cx0+rp*0.71+3,cy0-rp*0.71-12,{f:'italic 10px',c:'#1d4ed8'});});
+  drawMass(g,cx0,cy0,Math.max(8,Rb*sc),'#3d7fd4');
+  trailDraw(g,s.trail,'rgba(185,28,28,0.55)',toPx);
+  const p=toPx(s.x,s.y),r=Math.hypot(s.x,s.y),gl=fieldStrength(M,r),a=Math.atan2(s.y,s.x),v=Math.hypot(s.vx,s.vy);
+  if(2*r<=10*R_EARTH){const q=toPx(2*s.x,2*s.y);g.beginPath();g.arc(q[0],q[1],7,0,TWO_PI);g.strokeStyle='#b91c1c';g.lineWidth=1.6;g.setLineDash([3,3]);g.stroke();g.setLineDash([]);txt(g,'2r → g/4',q[0]+10,q[1]-6,{f:'italic 11px',c:'#b91c1c'});}
+  dashLine(g,cx0,cy0,p[0],p[1]);dot(g,p[0],p[1],8,'#b91c1c');
+  if(showVectors){arrowToCentre(g,p[0],p[1],clamp(gl*6.5,12,115),'#1d4ed8','g');}
+  head('Gravitational field strength g = GM/r²','Force per unit mass · the probe feels a stronger g as it falls (arrow length ∝ g, capped)','Launch to release the probe · drag it to change r');
+  info([['g = '+sci(gl,3)+' m/s²','#1d4ed8'],['r = '+sci(r,3)+' m'],['v = '+v.toFixed(0)+' m/s','#0a7d2b'],['t = '+s.t.toFixed(0)+' s']]);
+  txt(g,'M = '+sci(M,3)+' kg',cx0,cy0+Math.max(8,Rb*sc)+8,{a:'center'});
+}
+
+const PR={lo:5e6,hi:1e8,p0:20,p1:255};
+const potPix=r=>PR.p0+clamp(Math.log10(r/PR.lo)/Math.log10(PR.hi/PR.lo),0,1.2)*(PR.p1-PR.p0);
+const potInv=d=>PR.lo*Math.pow(10,clamp((d-PR.p0)/(PR.p1-PR.p0),0,1)*Math.log10(PR.hi/PR.lo));
+function RPotential(s){
+  const g=ctx,M=state.M,m=state.m,Rb=bodyR(M); drawGridPaper(g,SIM_VW,SIM_VH);
+  for(let i=0;i<16;i++){const a=i*TWO_PI/16;g.beginPath();g.moveTo(cx0+potPix(Rb)*Math.cos(a),cy0+potPix(Rb)*Math.sin(a));g.lineTo(cx0+255*Math.cos(a),cy0+255*Math.sin(a));g.strokeStyle='rgba(30,64,175,0.18)';g.lineWidth=1;g.stroke();}
+  [8e6,1.5e7,3e7,6e7,1e8].forEach(rr=>{const d=potPix(rr);ringDash(g,d,'rgba(150,120,220,0.7)');
+    txt(g,'φ = '+sci(potential(M,rr),2),cx0+d*0.70,cy0-d*0.70-12,{f:'italic 10.5px',c:'#5b21b6'});});
+  drawMass(g,cx0,cy0,potPix(Rb),'#3d7fd4');
+  const toPx=(x,y)=>{const d=potPix(Math.hypot(x,y)),a=Math.atan2(y,x);return [cx0+d*Math.cos(a),cy0-d*Math.sin(a)];};
+  trailDraw(g,s.trail,'rgba(185,28,28,0.55)',toPx);
+  const p=toPx(s.x,s.y),r=Math.hypot(s.x,s.y),gl=fieldStrength(M,r),v=Math.hypot(s.vx,s.vy),U=potEnergy(M,m,r),KE=0.5*m*v*v;
+  dashLine(g,cx0,cy0,p[0],p[1]);dot(g,p[0],p[1],8,'#b91c1c');
+  if(showVectors)arrowToCentre(g,p[0],p[1],clamp(18*Math.sqrt(gl),14,110),'#1d4ed8','g');
+  head('Gravitational potential and potential energy','φ = −GM/r  ·  U = mφ = −GMm/r  ·  KE + U is conserved as the probe falls','Launch to release the probe · drag it to sample the potential well');
+  info([['φ = '+sci(potential(M,r),3)+' J/kg','#7c3aed'],['U = '+sci(U,3)+' J','#7c3aed'],['KE = '+sci(KE,3)+' J','#0a7d2b'],['E = KE + U = '+sci(KE+U,3)+' J','#1d4ed8'],['work to reach ∞ = '+sci(-U,3)+' J']]);
+  bars(g,1262,270,[['KE',KE,'#0a7d2b'],['U',U,'#7c3aed'],['E',KE+U,'#1d4ed8']],G*M*m/s.r0);
+}
+
+function ROrbit(s){
+  const g=ctx,GM=G*M_EARTH,m=state.m,o=orbitInfo(state.r,state.k,M_EARTH); drawGridPaper(g,SIM_VW,SIM_VH);
+  const view=Math.max(1.25*(o.bound?o.ra:3*state.r),1.3*state.r,1.2e7),sc=235/view,toPx=(x,y)=>[cx0+x*sc,cy0-y*sc];
+  const ph0=state.k>=1?0:PI,N=300;let st=false;g.beginPath();
+  for(let i=0;i<=N;i++){const nu=o.e<1?-PI+TWO_PI*i/N:(-1+2*i/N)*Math.acos(-1/Math.max(o.e,1.0000001))*0.985,r=o.p/(1+o.e*Math.cos(nu));
+    if(r<0||r>4*view){st=false;continue;}const q=toPx(r*Math.cos(ph0+nu),r*Math.sin(ph0+nu));st?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]);st=true;}
+  g.strokeStyle='rgba(60,120,200,0.55)';g.lineWidth=1.4;g.setLineDash([5,5]);g.stroke();g.setLineDash([]);
+  drawMass(g,cx0,cy0,Math.max(6,R_EARTH*sc),'#3d7fd4');
+  trailDraw(g,s.trail,'rgba(185,28,28,0.6)',toPx);
+  const p=toPx(s.x,s.y),r=Math.hypot(s.x,s.y),v=Math.hypot(s.vx,s.vy),gl=GM/(r*r),KE=0.5*m*v*v,U=-GM*m/r;
+  if(showVectors){const tx=v?s.vx/v:0,ty=v?-s.vy/v:-1,L=clamp(v/1000*9,12,110);
+    drawArrow(g,p[0],p[1],p[0]+L*tx,p[1]+L*ty,'#0a7d2b','v');arrowToCentre(g,p[0],p[1],clamp(14*Math.sqrt(gl),14,90),'#dc2626','F');dashLine(g,cx0,cy0,p[0],p[1],'#999');}
+  sat(g,p[0],p[1]);
+  const type=o.bound?(o.e<0.005?'circular':'ellipse, e = '+o.e.toFixed(2)):(Math.abs(state.k-Math.SQRT2)<0.006?'parabola — just escapes':'hyperbola — escapes');
+  head('Satellite in orbit around the Earth','GMm/r² = mv²/r for a circle  ·  v꜀ = √(GM/r)  ·  T = 2π√(r³/GM)','Launch to fire the satellite · drag in/out to change the launch radius');
+  info([['orbit: '+type,'#1d4ed8'],['r = '+sci(r,3)+' m'],['v = '+(v/1000).toFixed(3)+' km/s  (v꜀ = '+(o.vc/1000).toFixed(3)+')','#0a7d2b'],
+    ['T predicted = '+(o.bound?(o.T/3600).toFixed(2)+' h':'—')],['T measured = '+(s.T?(s.T/3600).toFixed(2)+' h':'…')],[s.done?s.msg:'', '#b91c1c']]);
+  bars(g,1262,330,[['KE',KE,'#0a7d2b'],['U',U,'#7c3aed'],['E',KE+U,'#1d4ed8']],GM*m/state.r);
+}
+
+function RGeo(s){
+  const g=ctx,sc=235/6.2e7,Rpx=R_EARTH*sc,r=state.r,d=state.dir,t=s.t; drawGridPaper(g,SIM_VW,SIM_VH);
+  const wE=TWO_PI/T_DAY,wS=Math.sqrt(G*M_EARTH/(r*r*r)),phE=wE*t,thS=d*wS*t,T=orbitalPeriod(M_EARTH,r);
+  ringDash(g,R_GEO*sc,'rgba(10,125,43,0.8)');ringDash(g,r*sc,'rgba(60,120,200,0.7)');
+  txt(g,'geostationary radius',cx0+R_GEO*sc*0.72,cy0-R_GEO*sc*0.72-14,{f:'italic 11px',c:'#0a7d2b'});
+  drawMass(g,cx0,cy0,Rpx,'#3d7fd4');
+  for(let i=0;i<12;i++){const a=phE+i*PI/6;g.beginPath();g.moveTo(cx0,cy0);g.lineTo(cx0+Rpx*Math.cos(a),cy0-Rpx*Math.sin(a));g.strokeStyle='rgba(255,255,255,0.4)';g.lineWidth=1;g.stroke();}
+  const stn=[cx0+Rpx*Math.cos(phE),cy0-Rpx*Math.sin(phE)],sp=[cx0+r*sc*Math.cos(thS),cy0-r*sc*Math.sin(thS)];
+  dashLine(g,stn[0],stn[1],sp[0],sp[1],'rgba(200,150,0,0.9)');dot(g,stn[0],stn[1],5,'#facc15');sat(g,sp[0],sp[1]);
+  txt(g,'ground station',stn[0]+8,stn[1]+4,{f:'italic 11px',c:'#92400e'});
+  if(showVectors){const tx=-d*Math.sin(thS),ty=-d*Math.cos(thS);drawArrow(g,sp[0],sp[1],sp[0]+55*tx,sp[1]+55*ty,'#0a7d2b','v');
+    drawArrow(g,cx0+Rpx*0.4,cy0,cx0+Rpx*0.4,cy0-30,'#facc15','ω');}
+  let dl=(thS-phE)%TWO_PI;if(dl>PI)dl-=TWO_PI;if(dl<-PI)dl+=TWO_PI;
+  const okT=Math.abs(T/T_DAY-1)<0.005,okD=d===1,okAll=okT&&okD;
+  head('Geostationary orbit — view from above the North Pole','T² ∝ r³ fixes one radius · Earth rotates west → east (anticlockwise from above)','Launch to start the clock · drag sideways to change the orbit radius');
+  info([['Circular','#0a7d2b'],['Equatorial plane','#0a7d2b'],['Moves west → east: '+(okD?'✓':'✗'),okD?'#0a7d2b':'#b91c1c'],['T = '+(T/3600).toFixed(2)+' h '+(okT?'✓ 24 h':'✗ not 24 h'),okT?'#0a7d2b':'#b91c1c'],
+    ['r = '+sci(r,3)+' m  (geo: '+sci(R_GEO,3)+')'],[okAll?'Stays above the station':'Drifts '+Math.abs(dl*180/PI).toFixed(0)+'° '+(dl>0?'ahead of':'behind')+' the station',okAll?'#0a7d2b':'#b91c1c']]);
+  txt(ctx,'t = '+(t/3600).toFixed(1)+' h',14,60,{c:'#555'});
+}
+
+function REscape(s){
+  const g=ctx,R0=R_EARTH,Rtop=2e9,y0=500,H=440,L=Math.log10(Rtop/R0),m=state.m,GMm=G*M_EARTH*m,r0=state.r;
+  const yp=r=>y0-H*Math.log10(Math.max(r,R0)/R0)/L; drawGridPaper(g,SIM_VW,SIM_VH);
+  g.beginPath();g.arc(cx0,y0+900,900,0,TWO_PI);g.fillStyle='#8fb8e8';g.fill();g.strokeStyle='#0f2647';g.lineWidth=2;g.stroke();
+  [1e7,3e7,1e8,3e8,1e9].forEach(rr=>{dashLine(g,300,yp(rr),1100,yp(rr),'rgba(0,0,0,0.25)');txt(g,'r = '+sci(rr,0)+' m',306,yp(rr)-14,{f:'italic 11px',c:'#555'});});
+  const kk=state.k,rmax=r0/Math.max(1e-9,1-kk*kk);
+  if(kk<1&&rmax<Rtop){dashLine(g,cx0-120,yp(rmax),cx0+120,yp(rmax),'#b91c1c');txt(g,'r_max = '+sci(rmax,3)+' m',cx0+126,yp(rmax)-7,{c:'#b91c1c'});}
+  trailDraw(g,s.trail,'rgba(185,28,28,0.6)',(x,y)=>[cx0,yp(Math.hypot(x,y))]);
+  const r=Math.hypot(s.x,s.y),v=Math.hypot(s.vx,s.vy),py=yp(r),ve=escapeSpeed(M_EARTH,r),KE=0.5*m*v*v,U=-GMm/r;
+  dot(g,cx0,py,8,'#b91c1c');
+  if(showVectors){const up=s.vy>=0?-1:1;drawArrow(g,cx0+16,py,cx0+16,py+up*clamp(v/1000*8,6,100),'#0a7d2b','v');drawArrow(g,cx0-16,py,cx0-16,py+clamp(fieldStrength(M_EARTH,r)*5,8,60),'#1d4ed8','g');}
+  head('Escape speed','vₑ = √(2GM/r)  ·  KE + U ≥ 0 is needed to reach infinity  ·  height shown on a log scale','Launch to fire the projectile · drag the red dot to change the launch radius');
+  info([['v = '+(v/1000).toFixed(3)+' km/s','#0a7d2b'],['vₑ here = '+(ve/1000).toFixed(3)+' km/s','#b45309'],['r = '+sci(r,3)+' m'],
+    [kk<1?'bound: falls back':kk===1?'exactly vₑ':'unbound: escapes',kk<1?'#b91c1c':'#0a7d2b'],[s.done?s.msg:'','#b91c1c']]);
+  bars(g,1262,330,[['KE',KE,'#0a7d2b'],['U',U,'#7c3aed'],['E',KE+U,'#1d4ed8']],GMm/r0);
+}
+
+const PLAN=[['Mercury',5.79e10,'#9ca3af',0.5],['Venus',1.082e11,'#d4a020',2.1],['Earth',AU,'#2563eb',4.0],['Mars',2.279e11,'#b91c1c',5.3],['Jupiter',7.785e11,'#b45309',1.0]];
+const kpix=r=>28+215*Math.sqrt(r/5e12);
+function RKepler(s){
+  const g=ctx; drawGridPaper(g,SIM_VW,SIM_VH); drawSun(g,cx0,cy0,22);
+  const list=PLAN.concat([['Test planet',state.r,'#7c3aed',3.0]]);
+  list.forEach((p,i)=>{const rp=kpix(p[1]),T=orbitalPeriod(M_SUN,p[1]),a=p[3]+TWO_PI*s.t/T;
+    ringDash(g,rp,'rgba(60,120,200,0.45)');const x=cx0+rp*Math.cos(a),y=cy0-rp*Math.sin(a);
+    dot(g,x,y,i===5?8:6,p[2]);txt(g,p[0],x+9,y-6,{f:'italic 11px',c:p[2]});});
+  head("Kepler's third law",'T² = (4π²/GM) r³  ·  distances drawn on a square-root scale so that every orbit fits','Launch to start the orbits (1 Earth year = 6 s) · drag to move the test planet');
+  const X=[1000,1085,1165,1262];['planet','r (AU)','T (yr)','T²/r³'].forEach((h,i)=>txt(g,h,X[i],12,{f:'bold italic 12px',a:i?'right':'left'}));
+  list.forEach((p,i)=>{const T=orbitalPeriod(M_SUN,p[1]),y=32+i*19;txt(g,p[0],X[0],y,{f:'italic 12px',c:p[2]});
+    txt(g,(p[1]/AU).toFixed(2),X[1],y,{f:'italic 12px',a:'right'});txt(g,(T/YEAR).toFixed(2),X[2],y,{f:'italic 12px',a:'right'});txt(g,(T*T/Math.pow(p[1],3)/1e-19).toFixed(3),X[3],y,{f:'italic 12px',a:'right'});});
+  txt(g,'T²/r³ in units of 10⁻¹⁹ s² m⁻³ — identical for every planet',X[0],32+6*19,{f:'italic 11px',c:'#1d4ed8'});
+  txt(g,'t = '+(s.t/YEAR).toFixed(2)+' yr',14,60,{c:'#555'});
+}
+const RENDER={'field-lines':RFieldLines,'newton-law':RNewton,'field-strength':RFieldStrength,'potential':RPotential,'orbit':ROrbit,'geostationary':RGeo,'escape':REscape,'kepler':RKepler};
+
+/* ================================================================
+   GRAPH ENGINE
+   ================================================================ */
+const GPAD = { l: 66, r: 20, t: 48, b: 46 };
+
+function renderGraph(g, vw, vh, spec, reveal){
+  g.fillStyle = '#fff'; g.fillRect(0, 0, vw, vh);
+
+  g.fillStyle = '#000';
+  g.font = 'bold italic 13px ' + FONT;
+  g.textAlign = 'center'; g.textBaseline = 'top';
+  g.fillText(spec.title, vw/2, 8);
+  g.fillStyle = '#1d4ed8';
+  g.font = 'italic 11px ' + FONT;
+  g.fillText(spec.formula, vw/2, 27);
+
+  const plotW = vw - GPAD.l - GPAD.r;
+  const plotH = vh - GPAD.t - GPAD.b;
+  const logX = !!spec.logX, logY = !!spec.logY;
+  const X0 = logX ? Math.log10(spec.xmin) : spec.xmin;
+  const X1 = logX ? Math.log10(spec.xmax) : spec.xmax;
+  const Y0 = logY ? Math.log10(spec.ymin) : spec.ymin;
+  const Y1 = logY ? Math.log10(spec.ymax) : spec.ymax;
+
+  const fx = x => {
+    const v = logX ? Math.log10(x) : x;
+    return GPAD.l + (v - X0)/(X1 - X0) * plotW;
+  };
+  const fy = y => {
+    const v = logY ? Math.log10(y) : y;
+    return GPAD.t + (1 - (v - Y0)/(Y1 - Y0)) * plotH;
+  };
+
+  /* grid */
+  g.strokeStyle = '#ececec'; g.lineWidth = 1;
+  for (let i = 1; i < 8; i++){
+    const y = Math.round(GPAD.t + i*plotH/8) + 0.5;
+    g.beginPath(); g.moveTo(GPAD.l, y); g.lineTo(GPAD.l+plotW, y); g.stroke();
+  }
+  for (let i = 1; i < 8; i++){
+    const x = Math.round(GPAD.l + i*plotW/8) + 0.5;
+    g.beginPath(); g.moveTo(x, GPAD.t); g.lineTo(x, GPAD.t+plotH); g.stroke();
+  }
+
+  /* zero line */
+  if (!logY && spec.ymin < 0 && spec.ymax > 0){
+    const yz = fy(0);
+    g.save(); g.setLineDash([4,4]);
+    g.beginPath(); g.moveTo(GPAD.l, yz); g.lineTo(GPAD.l+plotW, yz);
+    g.strokeStyle = '#9ca3af'; g.lineWidth = 1.2; g.stroke(); g.restore();
+  }
+
+  /* axes */
+  g.strokeStyle = '#000'; g.lineWidth = 1.8;
+  g.beginPath(); g.moveTo(GPAD.l+0.5, GPAD.t); g.lineTo(GPAD.l+0.5, GPAD.t+plotH); g.stroke();
+  g.beginPath(); g.moveTo(GPAD.l, GPAD.t+plotH-0.5); g.lineTo(GPAD.l+plotW, GPAD.t+plotH-0.5); g.stroke();
+
+  /* labels */
+  g.fillStyle = '#000';
+  g.font = 'bold italic 11px ' + FONT;
+  g.textAlign = 'center'; g.textBaseline = 'top';
+  g.fillText(spec.xLab, GPAD.l + plotW/2, vh - 20);
+  g.save();
+  g.translate(13, GPAD.t + plotH/2); g.rotate(-PI/2);
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillText(spec.yLab, 0, 0);
+  g.restore();
+
+  /* ticks */
+  g.font = 'italic 9px ' + FONT;
+  g.fillStyle = '#444';
+  g.textAlign = 'center'; g.textBaseline = 'top';
+  for (let i = 0; i <= 4; i++){
+    const t = i/4;
+    const xv = logX ? Math.pow(10, X0 + t*(X1-X0)) : spec.xmin + t*(spec.xmax-spec.xmin);
+    g.fillText(shortNum(xv), GPAD.l + t*plotW, GPAD.t + plotH + 4);
+  }
+  g.textAlign = 'right'; g.textBaseline = 'middle';
+  for (let i = 0; i <= 4; i++){
+    const t = i/4;
+    const yv = logY ? Math.pow(10, Y0 + t*(Y1-Y0)) : spec.ymin + t*(spec.ymax-spec.ymin);
+    g.fillText(shortNum(yv), GPAD.l - 5, GPAD.t + (1-t)*plotH);
+  }
+
+    if (spec.shade){
+    const sh = spec.shade, yb = fy(Math.max(spec.ymin, 0));
+    g.beginPath(); g.moveTo(fx(sh.x0), yb);
+    for (let i = 0; i <= 60; i++){ const x = sh.x0 + (sh.x1 - sh.x0)*i/60; g.lineTo(fx(x), fy(sh.fn(x))); }
+    g.lineTo(fx(sh.x1), yb); g.closePath(); g.fillStyle = sh.color; g.fill();
+    if (sh.label && sh.x1 > sh.x0){ g.fillStyle = '#5b21b6'; g.font = 'italic bold 9.5px ' + FONT; g.textAlign = 'center'; g.textBaseline = 'bottom'; g.fillText(sh.label, (fx(sh.x0)+fx(sh.x1))/2, yb - 3); }
+  }
+  (spec.legend || []).forEach((l, i) => { g.fillStyle = l[1]; g.font = 'bold italic 10px ' + FONT; g.textAlign = 'left'; g.textBaseline = 'top'; g.fillText('— ' + l[0], GPAD.l + 8 + i*58, GPAD.t + 4); });
+  /* curves — progressive reveal */
+  const rev = clamp(reveal, 0, 1);
+  (spec.curves || []).forEach(cv => {
+    const N = 240;
+    const n = Math.max(1, Math.round(N * rev));
+    g.beginPath();
+    let started = false;
+    for (let i = 0; i <= n; i++){
+      const t = i/N;
+      const x = logX ? Math.pow(10, X0 + t*(X1-X0)) : spec.xmin + t*(spec.xmax-spec.xmin);
+      let y;
+      try { y = cv.fn(x); } catch(e){ y = NaN; }
+      if (!isFinite(y)) { started = false; continue; }
+      if (logY && y <= 0) { started = false; continue; }
+      const px = fx(x), py = fy(y);
+      if (!isFinite(px) || !isFinite(py)) { started = false; continue; }
+      if (!started){ g.moveTo(px, py); started = true; } else g.lineTo(px, py);
+    }
+    g.strokeStyle = cv.color;
+    g.lineWidth = cv.lw || 2.3;
+    g.stroke();
+  });
+
+    (spec.traces || []).forEach(tr => {
+    g.save(); g.beginPath(); g.rect(GPAD.l, GPAD.t, plotW, plotH); g.clip();
+    g.beginPath(); tr.pts.forEach((p, i) => { const px = fx(p[0]), py = fy(p[1]); i ? g.lineTo(px, py) : g.moveTo(px, py); });
+    g.strokeStyle = tr.color; g.lineWidth = 2.4; g.stroke(); g.restore();
+  });
+  /* reference lines */
+  (spec.hlines || []).forEach(hl => {
+    const yy = fy(hl.y);
+    if (!isFinite(yy)) return;
+    g.save(); g.setLineDash([6,5]);
+    g.beginPath(); g.moveTo(GPAD.l, yy); g.lineTo(GPAD.l+plotW, yy);
+    g.strokeStyle = hl.color; g.lineWidth = 1.5; g.stroke(); g.restore();
+    if (hl.label){
+      g.fillStyle = hl.color; g.font = 'italic bold 9.5px ' + FONT;
+      g.textAlign = 'left'; g.textBaseline = 'bottom';
+      g.fillText(hl.label, GPAD.l + 5, yy - 2);
+    }
+  });
+
+  (spec.vlines || []).forEach(vl => {
+    const xx = fx(vl.x);
+    if (!isFinite(xx)) return;
+    g.save(); g.setLineDash([6,5]);
+    g.beginPath(); g.moveTo(xx, GPAD.t); g.lineTo(xx, GPAD.t+plotH);
+    g.strokeStyle = vl.color; g.lineWidth = 1.5; g.stroke(); g.restore();
+    if (vl.label){
+      g.fillStyle = vl.color; g.font = 'italic bold 9.5px ' + FONT;
+      g.textAlign = 'left'; g.textBaseline = 'top';
+      g.fillText(vl.label, xx + 4, GPAD.t + 6);
+    }
+  });
+
+  /* markers */
+  (spec.marks || []).forEach(mk => {
+    if (!isFinite(mk.x) || !isFinite(mk.y)) return;
+    if (mk.x < spec.xmin || mk.x > spec.xmax) return;
+    if (mk.y < spec.ymin || mk.y > spec.ymax) return;
+    if (logY && mk.y <= 0) return;
+    const px = fx(mk.x), py = fy(mk.y);
+    if (!isFinite(px) || !isFinite(py)) return;
+    g.beginPath(); g.arc(px, py, mk.r || 4.5, 0, TWO_PI);
+    g.fillStyle = mk.color; g.fill();
+    g.strokeStyle = '#fff'; g.lineWidth = 1.5; g.stroke();
+    if (mk.label){
+      g.fillStyle = '#000';
+      g.font = 'bold italic 9.5px ' + FONT;
+      g.textAlign = 'left'; g.textBaseline = 'bottom';
+      g.fillText(mk.label, px + 6, py - 3);
+    }
+  });
+
+  if (false){
+    g.fillStyle = 'rgba(0,0,0,0.4)';
+    g.font = 'italic 11px ' + FONT;
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText('press Launch to plot the curve', GPAD.l + plotW/2, GPAD.t + plotH/2);
+  }
+}
+
+/* ================================================================
+   CASE TABS
+   ================================================================ */
+const caseTabs = document.getElementById('caseTabs');
+
+function buildTabs(){
+  caseTabs.innerHTML = '';
+  Object.keys(CASES).forEach(id => {
+    const b = document.createElement('button');
+    b.className = 'case-tab' + (id === state.caseId ? ' active' : '');
+    b.dataset.id = id;
+    b.textContent = CASES[id].label;
+    b.addEventListener('click', () => switchCase(id));
+    caseTabs.appendChild(b);
+  });
+}
+
+/* ================================================================
+   GRAPH SPECS — live markers, traces and shaded areas
+   ================================================================ */
+function getGraphSpecs(s){
+  const id=state.caseId,M=state.M,m=state.m,hist=s.hist;
+  const mk=(x,y,l,c)=>({x,y,color:c||'#f59e0b',r:5.5,label:l||''});
+  const rN=Math.hypot(s.x,s.y),vN=Math.hypot(s.vx,s.vy),E0=(a,b)=>({y:a,color:'#1d4ed8',label:b});
+
+  if(id==='field-lines'){
+    if(state.mode==='radial'){
+      const Rb=bodyR(M),r0=s.r0,vmax=Math.sqrt(2*G*M*(1/Rb-1/r0)),gO=r=>fieldStrength(M,r),rr=Math.max(rN,Rb);
+      return {
+        g1:{title:'Field strength g against r',formula:'g = GM/r² — grows as the probe falls',xLab:'r (m)',yLab:'g (m/s²)',xmin:Rb,xmax:10*R_EARTH,ymin:0,ymax:1.12*gO(Rb),curves:[{fn:gO,color:'#1d4ed8'}],marks:[mk(rr,gO(rr),'r')]},
+        g2:{title:'Speed against time',formula:'gradient = acceleration, which increases',xLab:'t (s)',yLab:'v (m/s)',xmin:0,xmax:s.tf*1.05,ymin:0,ymax:1.1*vmax,traces:[{pts:hist.map(h=>[h.t,h.v]),color:'#0a7d2b'}],marks:[mk(s.t,vN)]},
+        g3:{title:'Distance against time',formula:'r decreases faster and faster',xLab:'t (s)',yLab:'r (m)',xmin:0,xmax:s.tf*1.05,ymin:0,ymax:1.1*r0,traces:[{pts:hist.map(h=>[h.t,h.r]),color:'#b45309'}],marks:[mk(s.t,rr)]}};
+    }
+    const gv=s.g,tf=s.tf,t=Math.min(s.t,tf);
+    return {
+      g1:{title:'Speed against time',formula:'v = gt — straight line, gradient g',xLab:'t (s)',yLab:'v (m/s)',xmin:0,xmax:tf*1.05,ymin:0,ymax:1.1*gv*tf,curves:[{fn:x=>gv*x,color:'#0a7d2b'}],marks:[mk(t,gv*t)]},
+      g2:{title:'Height against time',formula:'h = h₀ − ½gt²',xLab:'t (s)',yLab:'h (m)',xmin:0,xmax:tf*1.05,ymin:0,ymax:1.1*s.h0,curves:[{fn:x=>Math.max(0,s.h0-0.5*gv*x*x),color:'#b45309'}],marks:[mk(t,Math.max(0,s.h0-0.5*gv*t*t))]},
+      g3:{title:'Acceleration against mass',formula:'a = g for every mass — flat line',xLab:'m (kg)',yLab:'a (m/s²)',xmin:0,xmax:12,ymin:0,ymax:1.5*gv,curves:[{fn:()=>gv,color:'#1d4ed8'}],marks:[mk(1,gv,'1 kg'),mk(10,gv,'10 kg')]}};
+  }
+
+  if(id==='newton-law'){
+    const rmin=1e7,rmax=1e9,Fof=r=>gravForce(M,m,r),F0=Fof(rmin),rr=clamp(s.x,rmin,rmax);
+    const aM=r=>G*m/(r*r),am=r=>G*M/(r*r);
+    return {
+      g1:{title:'F against r',formula:'F = Gm₁m₂/r² — inverse-square',xLab:'r (m)',yLab:'F (N)',xmin:rmin,xmax:rmax,ymin:0,ymax:1.15*F0,curves:[{fn:Fof,color:'#b91c1c'}],marks:[mk(rr,Fof(rr),'r')]},
+      g2:{title:'F against 1/r²',formula:'straight line through O, gradient GMm',xLab:'1/r² (m⁻²)',yLab:'F (N)',xmin:0,xmax:1/(rmin*rmin),ymin:0,ymax:1.1*F0,curves:[{fn:x=>G*M*m*x,color:'#0a7d2b'}],marks:[mk(1/(rr*rr),Fof(rr))]},
+      g3:{title:'F against m (fixed r)',formula:'F ∝ m — linear',xLab:'m (kg)',yLab:'F (N)',xmin:0,xmax:1e25,ymin:0,ymax:1.1*gravForce(M,1e25,rr),curves:[{fn:q=>gravForce(M,q,rr),color:'#0a7d2b'}],marks:m<=1e25?[mk(m,Fof(rr))]:[]},
+      main:{title:'Acceleration of each body against r',formula:'a₁ = Gm/r² (mass M) · a₂ = GM/r² (mass m) — same F, different a',xLab:'r (m)',yLab:'a (m/s²)',logY:true,xmin:rmin,xmax:rmax,
+        ymin:Math.min(aM(rmax),am(rmax))*0.5,ymax:Math.max(aM(rmin),am(rmin))*2,legend:[['a₁ (M)','#1d4ed8'],['a₂ (m)','#b91c1c']],
+        curves:[{fn:aM,color:'#1d4ed8'},{fn:am,color:'#b91c1c'}],marks:[mk(rr,aM(rr),'',"#1d4ed8"),mk(rr,am(rr),'',"#b91c1c")]}};
+  }
+
+  if(id==='field-strength'){
+    const Rb=bodyR(M),rmax=10*R_EARTH,gO=r=>fieldStrength(M,r),g0=gO(Rb),rr=Math.max(rN,Rb),phi=r=>potential(M,r);
+    const shade={fn:gO,x0:Rb,x1:rr,color:'rgba(124,58,237,0.28)',label:'area = Δφ'};
+    return {
+      g1:{title:'Field strength g against r',formula:'g = GM/r² · shaded area = Δφ',xLab:'r (m)',yLab:'g (m/s²)',xmin:Rb,xmax:rmax,ymin:0,ymax:1.12*g0,shade,curves:[{fn:gO,color:'#1d4ed8'}],marks:[mk(rr,gO(rr),'r')]},
+      g2:{title:'g against 1/r²',formula:'straight line, gradient GM',xLab:'1/r² (m⁻²)',yLab:'g (m/s²)',xmin:0,xmax:1/(Rb*Rb),ymin:0,ymax:1.12*g0,curves:[{fn:x=>G*M*x,color:'#0a7d2b'}],marks:[mk(1/(rr*rr),gO(rr))]},
+      g3:{title:'Gravitational potential',formula:'φ = −GM/r (φ → 0 as r → ∞)',xLab:'r (m)',yLab:'φ (J/kg)',xmin:Rb,xmax:rmax,ymin:1.12*phi(Rb),ymax:0,curves:[{fn:phi,color:'#7c3aed'}],marks:[mk(rr,phi(rr),'r')]},
+      main:{title:'Inverse-square law of the radial field',formula:'g = GM/r² · doubling r gives g/4',xLab:'r (m)',yLab:'g (m/s²)',xmin:Rb,xmax:rmax,ymin:0,ymax:1.12*g0,shade,curves:[{fn:gO,color:'#1d4ed8',lw:2.9}],marks:[mk(rr,gO(rr),'r'),mk(2*rr,gO(2*rr),'2r','#b91c1c')]}};
+  }
+
+  if(id==='potential'){
+    const Rb=bodyR(M),rmax=1e8,phi=r=>potential(M,r),U=r=>potEnergy(M,m,r),gO=r=>fieldStrength(M,r),rr=Math.max(rN,Rb);
+    const Ei=-G*M*m/s.r0,KEo=r=>{const k=Ei-U(r);return k>=0?k:NaN;},KEn=Math.max(0,Ei-U(rr));
+    return {
+      g1:{title:'Potential φ against r',formula:'φ = −GM/r · φ = 0 at infinity',xLab:'r (m)',yLab:'φ (J/kg)',xmin:Rb,xmax:rmax,ymin:1.12*phi(Rb),ymax:0,curves:[{fn:phi,color:'#7c3aed'}],hlines:[{y:0,color:'#9ca3af',label:'φ = 0'}],marks:[mk(rr,phi(rr),'r')]},
+      g2:{title:'Energy against r',formula:'KE + U = E constant: KE gained = U lost',xLab:'r (m)',yLab:'energy (J)',xmin:Rb,xmax:rmax,ymin:1.1*U(Rb),ymax:-1.05*U(Rb),legend:[['U','#b45309'],['KE','#0a7d2b'],['E','#1d4ed8']],
+        curves:[{fn:U,color:'#b45309'},{fn:KEo,color:'#0a7d2b'}],hlines:[E0(Ei,'E')],marks:[mk(rr,U(rr)),mk(rr,KEn,'','#0a7d2b')]},
+      g3:{title:'g as the gradient of φ',formula:'g = −dφ/dr · area under g–r = Δφ',xLab:'r (m)',yLab:'g (m/s²)',xmin:Rb,xmax:rmax,ymin:0,ymax:1.12*gO(Rb),shade:{fn:gO,x0:Rb,x1:rr,color:'rgba(124,58,237,0.28)',label:'Δφ'},curves:[{fn:gO,color:'#1d4ed8'}],marks:[mk(rr,gO(rr),'r')]},
+      main:{title:'The gravitational potential well',formula:'U = −GMm/r · work to move to ∞ = +GMm/r',xLab:'r (m)',yLab:'U (J)',xmin:Rb,xmax:rmax,ymin:1.15*U(Rb),ymax:0,curves:[{fn:U,color:'#7c3aed',lw:3}],hlines:[{y:0,color:'#9ca3af',label:'U = 0'},E0(Ei,'E')],marks:[mk(rr,U(rr),'r')]}};
+  }
+
+  if(id==='orbit'){
+    const GM=G*M_EARTH,o=orbitInfo(state.r,state.k,M_EARTH),rmin=R_EARTH+2e5,rmax=4.5e7,kk=4*PI*PI/GM,vc=r=>orbitalSpeed(M_EARTH,r);
+    const rpv=Math.max(o.rp,1e6),Tp=o.bound?o.T:12*tauOf(M_EARTH,state.r),KEmax=m*(o.eps+GM/rpv),r=rN||state.r;
+    const KEn=0.5*m*vN*vN,Un=-GM*m/r,Ec=x=>GM*m/x;
+    return {
+      g1:{title:'Orbital speed against radius',formula:'v꜀ = √(GM/r) — marker shows the actual speed',xLab:'r (m)',yLab:'v (m/s)',xmin:rmin,xmax:rmax,ymin:0,ymax:1.12*vc(rmin),curves:[{fn:vc,color:'#0a7d2b'}],marks:[mk(clamp(r,rmin,rmax),vN,'now')]},
+      g2:{title:'T² against a³',formula:'T² = (4π²/GM)a³ — straight line through O',xLab:'a³ (m³)',yLab:'T² (s²)',xmin:0,xmax:Math.pow(rmax,3),ymin:0,ymax:1.1*kk*Math.pow(rmax,3),curves:[{fn:x=>kk*x,color:'#1d4ed8'}],marks:o.bound?[mk(Math.pow(o.a,3),o.T*o.T)]:[]},
+      g3:{title:'Energy against time',formula:'KE and U swap; E stays constant',xLab:'t (s)',yLab:'energy (J)',xmin:0,xmax:Math.max(2.4*Tp,s.t*1.05),ymin:-1.15*GM*m/rpv,ymax:1.1*KEmax,legend:[['KE','#0a7d2b'],['U','#7c3aed'],['E','#1d4ed8']],
+        traces:[{pts:hist.map(h=>[h.t,0.5*m*h.v*h.v]),color:'#0a7d2b'},{pts:hist.map(h=>[h.t,-GM*m/h.r]),color:'#7c3aed'},{pts:hist.map(h=>[h.t,0.5*m*h.v*h.v-GM*m/h.r]),color:'#1d4ed8'}],hlines:[{y:0,color:'#9ca3af'}]},
+      main:{title:'Energies of a satellite in a circular orbit',formula:'KE = GMm/2r · U = −GMm/r · E = −GMm/2r (always negative)',xLab:'r (m)',yLab:'energy (J)',xmin:rmin,xmax:rmax,ymin:-1.15*Ec(rmin),ymax:0.6*Ec(rmin),legend:[['KE','#0a7d2b'],['U','#7c3aed'],['E','#1d4ed8']],
+        curves:[{fn:x=>Ec(x)/2,color:'#0a7d2b'},{fn:x=>-Ec(x),color:'#7c3aed'},{fn:x=>-Ec(x)/2,color:'#1d4ed8'}],hlines:[{y:0,color:'#9ca3af',label:'E = 0 (escape)'}],
+        marks:[mk(clamp(r,rmin,rmax),KEn,'','#0a7d2b'),mk(clamp(r,rmin,rmax),Un,'','#7c3aed'),mk(clamp(r,rmin,rmax),KEn+Un,'','#1d4ed8')]}};
+  }
+
+  if(id==='geostationary'){
+    const T=r=>orbitalPeriod(M_EARTH,r)/3600;
+    return {main:{title:'Orbital period against orbit radius',formula:'T = 2π√(r³/GM) — T = 24 h only at one radius',xLab:'r (m)',yLab:'T (h)',xmin:2e7,xmax:6e7,ymin:0,ymax:1.1*T(6e7),
+      curves:[{fn:T,color:'#b45309',lw:3}],hlines:[{y:24,color:'#0a7d2b',label:'24 h'}],vlines:[{x:R_GEO,color:'#0a7d2b',label:'geostationary r'}],marks:[mk(state.r,T(state.r),'r')]}};
+  }
+
+  if(id==='escape'){
+    const rmin=R_EARTH,rmax=1e8,veO=r=>escapeSpeed(M_EARTH,r),voO=r=>orbitalSpeed(M_EARTH,r),r=clamp(rN||state.r,rmin,rmax),ve0=veO(rmin);
+    const GMm=G*M_EARTH*m,U=x=>-GMm/x,v0=state.k*veO(state.r),Ei=0.5*m*v0*v0-GMm/state.r,KEo=x=>{const q=Ei-U(x);return q>=0?q:NaN;};
+    return {
+      g1:{title:'Escape speed against radius',formula:'vₑ = √(2GM/r) — marker is the projectile’s actual speed',xLab:'r (m)',yLab:'v (m/s)',xmin:rmin,xmax:rmax,ymin:0,ymax:1.4*ve0,curves:[{fn:veO,color:'#b91c1c'}],marks:[mk(r,vN,'v')]},
+      g2:{title:'vₑ² against 1/r',formula:'vₑ² = 2GM(1/r) — straight line',xLab:'1/r (m⁻¹)',yLab:'v² (m²/s²)',xmin:0,xmax:1/rmin,ymin:0,ymax:1.9*ve0*ve0,curves:[{fn:x=>2*G*M_EARTH*x,color:'#0a7d2b'}],marks:[mk(1/r,vN*vN)]},
+      g3:{title:'Escape speed vs orbital speed',formula:'vₑ = √2 · v_orbit',xLab:'r (m)',yLab:'speed (m/s)',xmin:rmin,xmax:rmax,ymin:0,ymax:1.12*ve0,curves:[{fn:veO,color:'#b91c1c'},{fn:voO,color:'#0a7d2b',lw:2.2}],marks:[mk(r,veO(r),'vₑ'),mk(r,voO(r),'v')]},
+      main:{title:'Energy of the projectile against r',formula:'E = KE + U · E ≥ 0 reaches infinity · E < 0 turns back where KE = 0',xLab:'r (m)',yLab:'energy (J)',xmin:rmin,xmax:rmax,ymin:1.1*U(rmin),ymax:1.8*Math.abs(U(rmin)),legend:[['U','#7c3aed'],['KE','#0a7d2b'],['E','#1d4ed8']],
+        curves:[{fn:U,color:'#7c3aed'},{fn:KEo,color:'#0a7d2b'}],hlines:[E0(Ei,'E'),{y:0,color:'#9ca3af'}],marks:[mk(r,U(r),'','#7c3aed'),mk(r,0.5*m*vN*vN,'','#0a7d2b')]}};
+  }
+
+  if(id==='kepler'){
+    const T=r=>orbitalPeriod(M_SUN,r),k=4*PI*PI/(G*M_SUN),r=state.r,xr=Math.max(1e12,1.2*r),all=PLAN.map(p=>p[1]).concat([r]);
+    const pm=(f)=>all.map((x,i)=>{const q=mk(x,f(x),'',i===5?'#7c3aed':'#f59e0b');return q;});
+    return {
+      g1:{title:'Orbital period against radius',formula:'T = 2π√(r³/GM) · dots: the planets',xLab:'r (m)',yLab:'T (s)',xmin:0,xmax:xr,ymin:0,ymax:1.1*T(xr),curves:[{fn:T,color:'#b45309'}],marks:pm(T)},
+      g2:{title:'log T against log r',formula:'gradient 3/2 — straight line on log–log axes',xLab:'r (m)',yLab:'T (s)',logX:true,logY:true,xmin:3e10,xmax:1e13,ymin:T(3e10)*0.5,ymax:T(1e13)*2,curves:[{fn:T,color:'#1d4ed8'}],marks:pm(T)},
+      g3:{title:'T²/r³ is constant',formula:'T²/r³ = 4π²/GM for every orbit',xLab:'r (m)',yLab:'T²/r³ (s² m⁻³)',xmin:0,xmax:xr,ymin:0,ymax:2*k,curves:[{fn:()=>k,color:'#0a7d2b'}],marks:pm(()=>k)},
+      main:{title:"Kepler's third law for circular orbits",formula:'T² ∝ r³ — all points on one straight line',xLab:'r³ (m³)',yLab:'T² (s²)',xmin:0,xmax:Math.pow(xr,3),ymin:0,ymax:1.1*Math.pow(T(xr),2),curves:[{fn:x=>k*x,color:'#1d4ed8',lw:2.9}],marks:pm(x=>Math.pow(T(x),2)).map((q,i)=>(q.x=Math.pow(all[i],3),q))}};
+  }
+  return null;
+}
+
+/* ================================================================
+   READOUTS
+   ================================================================ */
+const col1=document.getElementById('col1'),col2=document.getElementById('col2'),col1Title=document.getElementById('col1Title'),col2Title=document.getElementById('col2Title');
+const rowHTML=(k,v)=>'<div class="row"><span class="k">'+k+'</span><span class="v">'+v+'</span></div>';
+const U_=(v,u)=>v+'<span class="u">'+u+'</span>';
+let readCounter=0;
+function updateReadouts(s){
+  if(++readCounter%4!==0||!state.showData) return;
+  const id=state.caseId,M=state.M,m=state.m,r=Math.hypot(s.x,s.y),v=Math.hypot(s.vx,s.vy);
+  let t1='Quantities',t2='Derived',a=[],b=[];
+  if(id==='field-lines'){t1='Probe';t2='Field';
+    if(state.mode==='radial'){a=[['Distance r',U_(sci(r,3),'m')],['Field g',U_(sci(fieldStrength(M,r),3),'m/s²')],['Speed v',U_(v.toFixed(0),'m/s')],['Time t',U_(s.t.toFixed(0),'s')]];
+      b=[['g at surface',U_(sci(fieldStrength(M,bodyR(M)),3),'m/s²')],['g at 2r',U_(sci(fieldStrength(M,2*r),3),'m/s²')],['Direction','towards the mass']];}
+    else{a=[['g',U_(s.g.toFixed(2),'m/s²')],['Time t',U_(s.t.toFixed(2),'s')],['Speed v = gt',U_((s.g*s.t).toFixed(2),'m/s')],['Fall time',U_(s.tf.toFixed(2),'s')]];b=[['Mass 1 kg: a',U_(s.g.toFixed(2),'m/s²')],['Mass 10 kg: a',U_(s.g.toFixed(2),'m/s²')],['Weight 10 kg',U_((10*s.g).toFixed(1),'N')]];}}
+  else if(id==='newton-law'){t1='The two bodies';const F=gravForce(M,m,s.x);
+    a=[['Mass M',U_(sci(M,3),'kg')],['Mass m',U_(sci(m,3),'kg')],['Separation r',U_(sci(s.x,3),'m')],['Force F',U_(sci(F,3),'N')]];
+    b=[['a of M = F/M',U_(sci(F/M,3),'m/s²')],['a of m = F/m',U_(sci(F/m,3),'m/s²')],['Double r → F','F/4'],['Double m → F','2F']];}
+  else if(id==='field-strength'){t1='Field point';const g=fieldStrength(M,r);
+    a=[['Mass M',U_(sci(M,3),'kg')],['Distance r',U_(sci(r,3),'m')],['Field g',U_(sci(g,3),'m/s²')],['Potential φ',U_(sci(potential(M,r),3),'J/kg')]];
+    b=[['g at 2r',U_(sci(g/4,3),'m/s²')],['g at r/2',U_(sci(g*4,3),'m/s²')],['Speed v',U_(v.toFixed(0),'m/s')],['Force on 1 kg',U_(sci(g,3),'N')]];}
+  else if(id==='potential'){t1='At radius r';t2='Energy';const U=potEnergy(M,m,r),KE=0.5*m*v*v;
+    a=[['Distance r',U_(sci(r,3),'m')],['Potential φ',U_(sci(potential(M,r),3),'J/kg')],['Field g = −dφ/dr',U_(sci(fieldStrength(M,r),3),'m/s²')],['Speed v',U_(v.toFixed(0),'m/s')]];
+    b=[['U = mφ',U_(sci(U,3),'J')],['KE',U_(sci(KE,3),'J')],['KE + U',U_(sci(KE+U,3),'J')],['Work to ∞',U_(sci(-U,3),'J')]];}
+  else if(id==='orbit'){t1='Satellite';t2='Orbit';const o=orbitInfo(state.r,state.k,M_EARTH),KE=0.5*m*v*v,U=-G*M_EARTH*m/r;
+    a=[['Radius r',U_(sci(r,3),'m')],['Altitude',U_(sci(r-R_EARTH,3),'m')],['Speed v',U_((v/1000).toFixed(3),'km/s')],['Centripetal a = g',U_(fieldStrength(M_EARTH,r).toFixed(3),'m/s²')]];
+    b=[['Circular speed',U_((o.vc/1000).toFixed(3),'km/s')],['Period (pred.)',o.bound?U_((o.T/3600).toFixed(2),'h'):'—'],['KE + U',U_(sci(KE+U,3),'J')],['Eccentricity e',o.e.toFixed(3)]];}
+  else if(id==='geostationary'){t1='Satellite';t2='Geostationary conditions';const rr=state.r;
+    a=[['Radius r',U_(sci(rr,3),'m')],['Period T',U_((orbitalPeriod(M_EARTH,rr)/3600).toFixed(2),'h')],['Speed v',U_((orbitalSpeed(M_EARTH,rr)/1000).toFixed(3),'km/s')],['Field g',U_(fieldStrength(M_EARTH,rr).toFixed(4),'m/s²')]];
+    b=[['Geostationary r',U_(sci(R_GEO,3),'m')],['Required T','24 h'],['Orbit plane','equatorial'],['Direction','west → east']];}
+  else if(id==='escape'){t1='Projectile';const ve=escapeSpeed(M_EARTH,r),KE=0.5*m*v*v,U=-G*M_EARTH*m/r;
+    a=[['Radius r',U_(sci(r,3),'m')],['Speed v',U_((v/1000).toFixed(3),'km/s')],['Escape speed vₑ',U_((ve/1000).toFixed(3),'km/s')],['v / vₑ',(v/ve).toFixed(3)]];
+    b=[['KE',U_(sci(KE,3),'J')],['U',U_(sci(U,3),'J')],['E = KE + U',U_(sci(KE+U,3),'J')],['Outcome',KE+U<0?'bound':'unbound']];}
+  else if(id==='kepler'){t1='Test planet';t2="Kepler's third law";const rr=state.r,T=orbitalPeriod(M_SUN,rr);
+    a=[['Central mass',U_(sci(M_SUN,3),'kg')],['Orbit radius r',U_(sci(rr,3),'m')],['Period T',U_((T/YEAR).toFixed(3),'yr')],['Speed v',U_((orbitalSpeed(M_SUN,rr)/1000).toFixed(2),'km/s')]];
+    b=[['T²',U_(sci(T*T,3),'s²')],['r³',U_(sci(rr*rr*rr,3),'m³')],['T²/r³',U_(sci(T*T/Math.pow(rr,3),3),'s² m⁻³')],['4π²/GM',U_(sci(4*PI*PI/(G*M_SUN),3),'s² m⁻³')]];}
+  col1Title.textContent=t1;col2Title.textContent=t2;
+  col1.innerHTML=a.map(x=>rowHTML(x[0],x[1])).join('');col2.innerHTML=b.map(x=>rowHTML(x[0],x[1])).join('');
+}
+
+/* ================================================================
+   PARAMETERS PANEL
+   ================================================================ */
+const paramList=document.getElementById('paramList'),SF={};
+function invalidate(){if(state.sim){state.sim=null;state.running=false;setStatus('','Ready');}}
+function setS(key,val){const p=SF[key];if(!p)return;state[key]=clamp(val,p.min,p.max);
+  const el=document.getElementById('sld_'+key);if(el){el.value=state[key];document.getElementById('val_'+key).textContent=p.fmt(state[key]);}}
+function buildParams(){
+  paramList.innerHTML='';const c=CASES[state.caseId];
+  if(c.select){const sel=c.select,d=document.createElement('div');d.className='param';
+    d.innerHTML='<div class="param-row"><span class="name">'+sel.label+'</span></div><select style="width:100%;padding:4px;font-family:inherit;font-size:10pt;border:1px solid #000;border-radius:4px;background:#fff;"></select>';
+    const el=d.querySelector('select');
+    sel.opts.forEach(o=>{const op=document.createElement('option');op.value=o[0];op.textContent=o[1];if(String(state[sel.key])===String(o[0]))op.selected=true;el.appendChild(op);});
+    el.addEventListener('change',e=>{const v=e.target.value;state[sel.key]=isNaN(+v)?v:+v;invalidate();buildParams();});
+    paramList.appendChild(d);}
+  c.sliders.forEach(p=>{
+    if(p.when&&p.when!==state.mode) return;
+    SF[p.key]=p;const v=state[p.key],w=document.createElement('div');w.className='param';
+    w.innerHTML='<div class="param-row"><span class="name">'+p.label+' <i>'+p.sym+'</i></span><span class="value" id="val_'+p.key+'">'+p.fmt(v)+'</span></div>'+
+      '<input type="range" id="sld_'+p.key+'" min="'+p.min+'" max="'+p.max+'" step="'+p.step+'" value="'+v+'">';
+    paramList.appendChild(w);
+    w.querySelector('input').addEventListener('input',e=>{const nv=parseFloat(e.target.value);state[p.key]=nv;document.getElementById('val_'+p.key).textContent=p.fmt(nv);if(p.key!=='speed')invalidate();});
+  });
+  const note=document.createElement('div');note.className='hint';note.textContent=c.note||'';paramList.appendChild(note);
+}
+
+/* ================================================================
+   CASE SWITCHING & DRAG INTERACTION
+   ================================================================ */
+function applyDefaults(){Object.assign(state,{theta:0.6,speed:1,dir:1,mode:'radial'},CASES[state.caseId].defaultParams);}
+function switchCase(id){
+  state.caseId=id;
+  document.querySelectorAll('.case-tab').forEach(b=>b.classList.toggle('active',b.dataset.id===id));
+  state.running=false;state.sim=null;applyDefaults();
+  const c=CASES[id];
+  document.getElementById('graphRow').classList.toggle('hidden',!c.hasGraphs);
+  document.getElementById('mainRow').classList.toggle('hidden',!c.hasMain);
+  buildParams();setStatus('','Ready');
+}
+
+let simDrag={active:false};
+function canvasPoint(evt){const rc=simCanvas.getBoundingClientRect();return {x:(evt.clientX-rc.left)/rc.width*SIM_VW,y:(evt.clientY-rc.top)/rc.height*SIM_VH};}
+function updateFromPoint(v){
+  const dx=v.x-cx0,dy=v.y-cy0,dist=Math.hypot(dx,dy),ang=Math.atan2(-dy,dx);
+  switch(state.caseId){
+    case 'field-lines':
+      if(state.mode==='radial'){setS('r',dist/(240/(10*R_EARTH)));state.theta=ang;}
+      else setS('h',(470-v.y)/1.9);
+      break;
+    case 'newton-law':{const sep=Math.abs(v.x-cx0)*2,t=clamp((sep-90)/(Math.min(SIM_VW*0.4,500)-90),0,1);setS('r',Math.pow(10,7+2*t));break;}
+    case 'field-strength':setS('r',dist/(240/(10*R_EARTH)));state.theta=ang;break;
+    case 'potential':setS('r',potInv(dist));state.theta=ang;break;
+    case 'orbit':{const t=clamp((dist-40)/195,0,1),a=R_EARTH+2e5,b=4.5e7;setS('r',Math.pow(10,Math.log10(a)+t*(Math.log10(b)-Math.log10(a))));break;}
+    case 'geostationary':setS('r',dist/(235/6.2e7));break;
+    case 'escape':setS('r',R_EARTH*Math.pow(10,clamp((500-v.y)/440,0,1)*Math.log10(2e9/R_EARTH)));break;
+    case 'kepler':setS('r',5e12*Math.pow(clamp((dist-28)/215,0,1),2));break;
+  }
+}
+simCanvas.addEventListener('pointerdown',e=>{invalidate();simDrag.active=true;simCanvas.setPointerCapture(e.pointerId);simCanvas.style.cursor='grabbing';updateFromPoint(canvasPoint(e));e.preventDefault();});
+simCanvas.addEventListener('pointermove',e=>{if(simDrag.active)updateFromPoint(canvasPoint(e));});
+function endDrag(){if(!simDrag.active)return;simDrag.active=false;simCanvas.style.cursor='grab';}
+simCanvas.addEventListener('pointerup',endDrag);simCanvas.addEventListener('pointercancel',endDrag);
+simCanvas.addEventListener('pointerleave',endDrag);
+
+/* ================================================================
+   MAIN LOOP
+   ================================================================ */
+function loop(now){
+  const dt=Math.min((now-state.lastFrame)/1000,0.05);state.lastFrame=now;
+  simStep(dt);
+  syncCanvas(simCanvas,ctx,simPanel,SIM_VW,SIM_VH);
+  syncCanvas(gCanvas1,c1,gPanel1,GR_VW,GR_VH);syncCanvas(gCanvas2,c2,gPanel2,GR_VW,GR_VH);syncCanvas(gCanvas3,c3,gPanel3,GR_VW,GR_VH);
+  syncCanvas(mainCanvas,mctx,mainPanel,MAIN_VW,GR_VH);
+  const s=state.sim||makeSim(),c=CASES[state.caseId];
+  RENDER[state.caseId](s);
+  const sp=getGraphSpecs(s);
+  if(sp){
+    if(c.hasGraphs){renderGraph(c1,GR_VW,GR_VH,sp.g1,1);renderGraph(c2,GR_VW,GR_VH,sp.g2,1);renderGraph(c3,GR_VW,GR_VH,sp.g3,1);}
+    if(c.hasMain&&sp.main)renderGraph(mctx,MAIN_VW,GR_VH,sp.main,1);
+  }
+  updateReadouts(s);
+  requestAnimationFrame(loop);
+}
+
+/* ================================================================
+   BUTTONS & UI
+   ================================================================ */
+const MSG={'field-lines':'Probe released — watch g grow as it falls','newton-law':'Masses released — equal forces, unequal accelerations','field-strength':'Probe released — g rises as r falls',
+  'potential':'Probe released — U becomes KE','orbit':'Satellite launched','geostationary':'Clock started — compare satellite and ground station',
+  'escape':'Projectile launched','kepler':'Orbits running — inner planets are faster'};
+function launch(){state.sim=makeSim();state.running=true;setStatus('running','Running');showToast(MSG[state.caseId]);}
+document.getElementById('btnRelease').addEventListener('click',launch);
+document.getElementById('btnPause').addEventListener('click',()=>{
+  if(!state.sim||state.sim.done){launch();return;}
+  state.running=!state.running;setStatus(state.running?'running':'paused',state.running?'Running':'Paused');showToast(state.running?'Resumed':'Paused');});
+document.getElementById('btnReset').addEventListener('click',()=>{state.running=false;state.sim=null;applyDefaults();buildParams();setStatus('','Ready');showToast('Reset');});
+
+function setStatus(cls, txt){
+  document.getElementById('statusTag').className = 'status' + (cls ? ' '+cls : '');
+  document.getElementById('statusText').textContent = txt;
+}
+
+let toastTimer = null;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 1700);
+}
+
+document.getElementById('vecToggle').addEventListener('change', e => {
+  showVectors = e.target.checked;
+  showToast(showVectors ? 'Vectors on' : 'Vectors off');
+});
+
+document.getElementById('btnData').addEventListener('click', () => {
+  state.showData = !state.showData;
+  const c = document.getElementById('dataContainer');
+  c.classList.toggle('visible', state.showData);
+  const btn = document.getElementById('btnData');
+  btn.textContent = state.showData ? 'Hide data' : 'Show data';
+  btn.classList.toggle('toggle-on', state.showData);
+});
+
+/* ================================================================
+   FLOATING WINDOW DRAG
+   ================================================================ */
+function makeDraggable(winId, headId){
+  const win = document.getElementById(winId);
+  const head = document.getElementById(headId);
+  let dragging = false, offX = 0, offY = 0;
+  head.addEventListener('pointerdown', e => {
+    dragging = true;
+    const r = win.getBoundingClientRect();
+    offX = e.clientX - r.left; offY = e.clientY - r.top;
+    head.setPointerCapture(e.pointerId); e.preventDefault();
+  });
+  head.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    let left = e.clientX - offX, top = e.clientY - offY;
+    left = Math.max(0, Math.min(window.innerWidth - win.offsetWidth, left));
+    top  = Math.max(0, Math.min(window.innerHeight - win.offsetHeight, top));
+    win.style.left = left+'px'; win.style.top = top+'px'; win.style.right = 'auto';
+  });
+  head.addEventListener('pointerup', e => {
+    dragging = false;
+    try { head.releasePointerCapture(e.pointerId); } catch(_){}
+  });
+  head.addEventListener('pointercancel', () => { dragging = false; });
+}
+
+makeDraggable('paramWin', 'paramHead');
+
+
+/* ================================================================
+   BOOT
+   ================================================================ */
+buildTabs();
+buildParams();
+switchCase(state.caseId);
+requestAnimationFrame(loop);
+setTimeout(() => showToast('Select a case · drag to explore · press Launch'), 600);
+</script>
+</body>
+</html>
